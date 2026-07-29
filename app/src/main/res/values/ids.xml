@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Adivery Native Ad Required IDs -->
+    <item name="adivery_wrapper" type="id" />
+    <item name="adivery_headline" type="id" />
+    <item name="adivery_call_to_action" type="id" />
+
+    <!-- Adivery Native Ad Optional IDs -->
+    <item name="adivery_description" type="id" />
+    <item name="adivery_advertiser" type="id" />
+    <item name="adivery_image" type="id" />
+    <item name="adivery_icon" type="id" />
+</resources>

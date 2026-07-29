@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "434223502147",
+    "firebase_url": "https://prolocker-dfd73.firebaseio.com",
+    "project_id": "prolocker-dfd73",
+    "storage_bucket": "prolocker-dfd73.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:434223502147:android:1da34722abf47b2a",
+        "android_client_info": {
+          "package_name": "com.carbon.prolocker"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "434223502147-ob19fn9rsmld1njv3s5vtsr7dppqua9a.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBDTF1VGAs7zhSwAbGwuNVADYi_XtM6a0U"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "434223502147-ob19fn9rsmld1njv3s5vtsr7dppqua9a.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

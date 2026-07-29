@@ -1,0 +1,221 @@
+package com.carbon.prolocker.core.navigation
+
+import android.app.Activity
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
+import com.carbon.prolocker.feature.home.LockedAppsScreen
+import com.carbon.prolocker.feature.home.MemoryOptimizerScreen
+import com.carbon.prolocker.feature.lock.LockTypeSelectionScreen
+import com.carbon.prolocker.feature.lock.PatternSetupScreen
+import com.carbon.prolocker.feature.lock.PinSetupScreen
+import com.carbon.prolocker.feature.onboarding.PermissionsScreen
+import com.carbon.prolocker.feature.onboarding.SuccessScreen
+import com.carbon.prolocker.feature.onboarding.WelcomeScreen
+
+@Composable
+fun AppNavigation(
+    deepLinkType: String? = null,
+    isOnboardingCompleted: Boolean,
+    trustedLaunchDestination: String? = null,
+    isStandaloneExit: Boolean = false
+) {
+    val navController = rememberNavController()
+    val context = LocalContext.current
+    val startDest = if (isOnboardingCompleted) HomeRoute() else WelcomeRoute
+
+    val effectiveDeepLink = trustedLaunchDestination ?: deepLinkType
+
+    androidx.compose.runtime.LaunchedEffect(effectiveDeepLink) {
+        if (effectiveDeepLink != null) {
+            when (effectiveDeepLink) {
+                "home" -> navController.navigate(HomeRoute()) { popUpTo(startDest) { inclusive = true } }
+                "backgrounds" -> {
+                    if (trustedLaunchDestination != null) {
+                        navController.navigate(BackgroundGalleryRoute)
+                    } else {
+                        navController.navigate(HomeRoute()) { popUpTo(startDest) { inclusive = true } }
+                        navController.navigate(BackgroundGalleryRoute)
+                    }
+                }
+                "security" -> {
+                    navController.navigate(HomeRoute("security")) { popUpTo(startDest) { inclusive = true } }
+                }
+                "update" -> {
+                    navController.navigate(HomeRoute("update")) { popUpTo(startDest) { inclusive = true } }
+                }
+                "memory" -> {
+                    if (trustedLaunchDestination != null) {
+                        navController.navigate(MemoryOptimizerRoute)
+                    } else {
+                        navController.navigate(HomeRoute()) { popUpTo(startDest) { inclusive = true } }
+                        navController.navigate(MemoryOptimizerRoute)
+                    }
+                }
+                else -> navController.navigate(HomeRoute()) { popUpTo(startDest) { inclusive = true } }
+            }
+        }
+    }
+
+    NavHost(
+        navController = navController,
+        startDestination = startDest
+    ) {
+        composable<WelcomeRoute> {
+            WelcomeScreen(
+                onContinue = {
+                    navController.navigate(LockTypeSelectionRoute)
+                }
+            )
+        }
+        composable<LockTypeSelectionRoute> {
+            LockTypeSelectionScreen(
+                onSelectPattern = { navController.navigate(PatternSetupRoute) },
+                onSelectPin = { navController.navigate(PinSetupRoute) }
+            )
+        }
+        composable<PatternSetupRoute> {
+            PatternSetupScreen(
+                onSetupComplete = {
+                    navController.navigate(SuccessRoute)
+                }
+            )
+        }
+        composable<PinSetupRoute> {
+            PinSetupScreen(
+                onSetupComplete = {
+                    navController.navigate(SuccessRoute)
+                }
+            )
+        }
+        composable<PermissionsRoute> { backStackEntry ->
+            val route = backStackEntry.toRoute<PermissionsRoute>()
+            PermissionsScreen(
+                pendingPackage = route.pendingPackage,
+                onPermissionsGranted = {
+                    navController.popBackStack()
+                }
+            )
+        }
+        composable<SuccessRoute> {
+            SuccessScreen(
+                onGoHome = {
+                    navController.navigate(HomeRoute()) {
+                        popUpTo(WelcomeRoute) { inclusive = true }
+                    }
+                }
+            )
+        }
+        composable<HomeRoute> { backStackEntry ->
+            val route = backStackEntry.toRoute<HomeRoute>()
+            com.carbon.prolocker.feature.main.MainScreen(
+                initialTab = route.tab,
+                onNavigateToLockedApps = {
+                    navController.navigate(LockedAppsRoute)
+                },
+                onNavigateToLockSetup = {
+                    navController.navigate(LockTypeSelectionRoute)
+                },
+                onNavigateToAudit = {
+                    navController.navigate(SecurityAuditRoute)
+                },
+                onNavigateToAppSettings = {
+                    navController.navigate(AppSettingsRoute)
+                },
+                onNavigateToMemoryOptimizer = {
+                    navController.navigate(MemoryOptimizerRoute)
+                },
+                onNavigateToGallery = {
+                    navController.navigate(BackgroundGalleryRoute)
+                },
+                onNavigateToPermissions = { pkg ->
+                    navController.navigate(PermissionsRoute(pendingPackage = pkg))
+                },
+                onNavigateToPhotoDetail = { eventId ->
+                    navController.navigate(IntruderPhotoDetailRoute(eventId = eventId))
+                },
+                onNavigateToAboutUs = {
+                    navController.navigate(AboutUsRoute)
+                }
+            )
+        }
+        composable<IntruderPhotoDetailRoute> { backStackEntry ->
+            val route = backStackEntry.toRoute<IntruderPhotoDetailRoute>()
+            com.carbon.prolocker.feature.security.IntruderPhotoDetailScreen(
+                eventId = route.eventId,
+                onBack = { navController.popBackStack() }
+            )
+        }
+        composable<LockedAppsRoute> {
+            LockedAppsScreen(
+                onBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+        composable<MemoryOptimizerRoute> {
+            val shouldFinishAffinity = isStandaloneExit && trustedLaunchDestination == "memory"
+            MemoryOptimizerScreen(
+                onBack = {
+                    if (shouldFinishAffinity) {
+                        (context as? Activity)?.finishAffinity()
+                    } else {
+                        navController.popBackStack()
+                    }
+                }
+            )
+        }
+        composable<BackgroundGalleryRoute> {
+            val isStandalone = trustedLaunchDestination == "backgrounds"
+            com.carbon.prolocker.feature.gallery.BackgroundGalleryScreen(
+                onBack = {
+                    if (isStandalone) {
+                        (context as? Activity)?.finishAffinity()
+                    } else {
+                        navController.popBackStack()
+                    }
+                },
+                onBackgroundClick = { url, id ->
+                    val encodedUrl = java.net.URLEncoder.encode(url, "UTF-8")
+                    navController.navigate(BackgroundPreviewRoute(encodedUrl, id))
+                }
+            )
+        }
+        composable<BackgroundPreviewRoute> { backStackEntry ->
+            val route = backStackEntry.toRoute<BackgroundPreviewRoute>()
+            val decodedUrl = java.net.URLDecoder.decode(route.url, "UTF-8")
+            com.carbon.prolocker.feature.gallery.BackgroundPreviewScreen(
+                url = decodedUrl,
+                id = route.id,
+                onBack = { navController.popBackStack() }
+            )
+        }
+        composable<SecurityAuditRoute> {
+            com.carbon.prolocker.feature.account.SecurityAuditScreen(
+                onBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+        composable<AppSettingsRoute> {
+            com.carbon.prolocker.feature.account.AppSettingsScreen(
+                onBack = {
+                    navController.popBackStack()
+                },
+                onNavigateToAudit = {
+                    navController.navigate(SecurityAuditRoute)
+                }
+            )
+        }
+        composable<AboutUsRoute> {
+            com.carbon.prolocker.feature.account.AboutUsScreen(
+                onBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+    }
+}

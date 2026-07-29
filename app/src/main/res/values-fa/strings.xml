@@ -1,0 +1,288 @@
+<resources>
+    <string name="app_name">قفل حرفه ای</string>
+    <string name="home_title">قفل حرفه ای</string>
+    <string name="accessibility_service_desc">این برنامه برای نظارت بر برنامه های در حال اجرا و اعمال صفحه قفل به سرویس دسترسی نیاز دارد.</string>
+    <string name="account_title">حساب و تنظیمات</string>
+    <string name="change_lock_type">تغییر نوع قفل</string>
+    <string name="recovery_settings">تنظیمات بازیابی</string>
+    <string name="app_settings">تنظیمات برنامه</string>
+    <string name="recovery_setup_title">تنظیم بازیابی</string>
+    <string name="recovery_intro_title">تنظیم بازیابی</string>
+    <string name="recovery_intro_message">اگر رمز عبور یا الگوی خود را فراموش کنید، می‌توانید با استفاده از سوال امنیتی و پاسخ، دسترسی به برنامه را بازیابی کنید. توصیه می‌کنیم همین حالا آن را تنظیم کنید.</string>
+    <string name="configure_now">تنظیم کن</string>
+    <string name="not_now">بعداً</string>
+    <string name="question">سوال</string>
+    <string name="answer">پاسخ</string>
+    <string name="save">ذخیره</string>
+    <string name="cancel">لغو</string>
+    <string name="enable">فعال‌سازی</string>
+    <string name="general_settings">تنظیمات عمومی</string>
+    <string name="theme">پوسته</string>
+    <string name="dark">تاریک</string>
+    <string name="light">روشن</string>
+    <string name="language">زبان</string>
+    <string name="persian">فارسی</string>
+    <string name="english">انگلیسی</string>
+    <string name="vibration_options">تنظیمات لرزش</string>
+    <string name="vibration_desc">هنگام لمس کلیدها یا کشیدن الگو بازخورد لرزشی ایجاد کن</string>
+    <string name="hide_pattern_path">مخفی کردن مسیر الگو</string>
+    <string name="hide_pattern_desc">هنگام باز کردن قفل مسیر کشیده شده را نمایش نده</string>
+    <string name="failed_attempts_threshold">آستانه تلاش‌های ناموفق</string>
+    <string name="failed_attempts_desc">تعداد تلاش قبل از فعال شدن اقدامات مزاحم</string>
+    <string name="short_exit_grace_period">مهلت خروج کوتاه</string>
+    <string name="short_exit_desc">زمان مجاز خارج از یک برنامه قفل شده قبل از قفل مجدد</string>
+    <string name="lock_again_after_screen_off">قفل مجدد پس از خاموش شدن صفحه</string>
+    <string name="lock_again_desc">بازگرداندن قفل برای همه برنامه‌ها هنگام خاموش شدن صفحه</string>
+    <string name="auto_start_after_reboot">شروع خودکار پس از راه اندازی مجدد</string>
+    <string name="auto_start_desc">محافظت را بلافاصله پس از روشن شدن دستگاه شروع کن</string>
+    <string name="system_settings">تنظیمات سیستم</string>
+    <string name="lock_screen_rotation">چرخش صفحه قفل</string>
+    <string name="current_colon">فعلی:</string>
+    <string name="battery_optimization">بهینه سازی باتری</string>
+    <string name="battery_ignored">بهینه‌سازی نادیده گرفته شد (توصیه می‌شود)</string>
+    <string name="battery_optimized">بهینه شده (ممکن است محافظت را متوقف کند)</string>
+    <string name="protection_settings">تنظیمات محافظت</string>
+    <string name="prevent_easy_uninstall">جلوگیری از حذف آسان</string>
+    <string name="prevent_uninstall_desc">برای جلوگیری از حذف برنامه، مدیریت دستگاه را فعال کنید</string>
+    <string name="accessibility_mode">حالت دسترسی‌پذیری</string>
+    <string name="accessibility_mode_desc">اختیاری: با استفاده از سرویس دسترسی، سرعت قفل کردن را افزایش دهید</string>
+    <string name="stealth_mode">حالت مخفی</string>
+    <string name="stealth_mode_desc">آیکون اصلی برنامه را از لیست پنهان می‌کند و یک آیکون بازیابی را در دسترس نگه می‌دارد.</string>
+    <string name="recovery_launcher_name">ماشین حساب</string>
+    <string name="stealth_warning_title">حالت مخفی فعال شود؟</string>
+    <string name="stealth_warning_message">آیکون اصلی برنامه پنهان می‌شود و یک آیکون ماشین حساب ایجاد میشود تا بتوانید برنامه را با PIN یا الگو دوباره باز کنید.</string>
+    <string name="stealth_requires_lock_title">ابتدا قفل را تنظیم کنید</string>
+    <string name="stealth_requires_lock_message">حالت مخفی به یک PIN یا الگوی موجود نیاز دارد تا برنامه به‌صورت ایمن دوباره باز شود.</string>
+    <string name="back">بازگشت</string>
+    <string name="setup_lock_title">تنظیم قفل</string>
+    <string name="continue_action">ادامه</string>
+    <string name="success_title">قفل با موفقیت تنظیم شد</string>
+    <string name="start_using_app">شروع استفاده از برنامه</string>
+    <string name="welcome_title">به قفل حرفه ای خوش آمدید</string>
+    <string name="exit_title">برای خروج کلیک کن</string>
+
+    <string-array name="recovery_questions">
+        <item>نام حیوان خانگی شما چیست؟</item>
+        <item>رنگ مورد علاقه شما چیست؟</item>
+        <item>در کدام شهر متولد شده اید؟</item>
+    </string-array>
+
+    <string name="home">امنیت</string>
+    <string name="security">فضولگیر</string>
+    <string name="account">تنظیمات</string>
+    <string name="security_center">مرکز امنیت</string>
+    <string name="capture_intruder_selfie">عکس از فضول</string>
+    <string name="capture_intruder_selfie_desc">با دوربین جلو عکس بگیر زمانی که تلاش های ناموفق به حداکثر رسید</string>
+    <string name="trigger_alarm">پخش دزدگیر</string>
+    <string name="trigger_alarm_desc">پخش آژیر بلند با رسیدن به حداکثر تلاش ناموفق</string>
+    <string name="intruders">فضول ها</string>
+    <string name="lock_history">تاریخچه قفل</string>
+    <string name="no_intruders_detected">فضولی یافت نشد</string>
+    <string name="clear_all">پاک کردن همه</string>
+    <string name="no_security_events">هیچ رویداد امنیتی ثبت نشده است.</string>
+    <string name="app_prefix">برنامه: %1$s</string>
+    <string name="details_prefix">جزئیات: %1$s</string>
+    <string name="split_screen_not_allowed">حالت چند پنجره ای مجاز نیست</string>
+    <string name="split_screen_desc">لطفا برای باز کردن برنامه بخاطر مسائل امنیتی از حالت چند پنجره ای خارج شوید.</string>
+    <string name="forgot_password">رمز را فراموش کردید؟</string>
+    <string name="recover_lock">بازیابی قفل</string>
+    <string name="no_recovery_question">سوال بازیابی تنظیم نشده است.</string>
+    <string name="question_prefix">سوال: %1$s</string>
+    <string name="incorrect_answer">پاسخ اشتباه است</string>
+    <string name="submit">ارسال</string>
+    <string name="ok">تایید</string>
+    <string name="apps_protected">برنامه محافظت شده: %1$s</string>
+    <string name="search_apps">جستجوی برنامه ها...</string>
+    <string name="no_apps_found">برنامه‌ای یافت نشد</string>
+    <string name="locked_apps">برنامه های قفل شده</string>
+    <string name="no_apps_locked">هیچ برنامه ای قفل نیست.</string>
+    <string name="security_audit">بررسی امنیتی</string>
+    <string name="security_score">امتیاز امنیتی</string>
+    <string name="score_format">%1$s/100</string>
+    <string name="no_events_recorded">هیچ رویدادی هنوز ثبت نشده است.</string>
+
+    <string name="pattern_lock">قفل الگو</string>
+    <string name="draw_secure_pattern">یک الگوی امن بکشید</string>
+    <string name="pin_lock">قفل پین</string>
+    <string name="enter_numeric_pin">پین ۴ رقمی وارد کنید</string>
+    <string name="choose_lock_type">انتخاب نوع قفل</string>
+    <string name="select_method_secure">انتخاب روشی برای محافظت از برنامه‌ها.</string>
+    <string name="locked_app">برنامه قفل شده</string>
+    <string name="pattern_text">الگو</string>
+    <string name="pin_text">پین</string>
+    <string name="credential_text">رمز</string>
+    <string name="incorrect_credential_prefix">%1$s اشتباه است</string>
+    <string name="enter_credential_prefix">برای باز کردن قفل، %1$s وارد کنید</string>
+    <string name="notification_channel_name">محافظت قفل حرفه ای</string>
+    <string name="notification_channel_desc">قفل حرفه ای را در پس‌زمینه فعال نگه می‌دارد</string>
+    <string name="ram_cleaner_channel_name">بهینه‌ساز حافظه</string>
+    <string name="ram_cleaner_channel_desc">یادآوری برای بهینه‌سازی حافظه گوشی</string>
+    <string name="prolocker_is_active">قفل حرفه ای فعال است</string>
+    <string name="protecting_your_apps">در حال محافظت از برنامه‌های شما</string>
+    <string name="usage_access_revoked">مجوز دسترسی به استفاده لغو شد</string>
+    <string name="usage_access_revoked_desc">قفل حرفه ای ممکن است به درستی کار نکند.</string>
+    <string name="overlay_revoked">مجوز نمایش روی سایر برنامه‌ها لغو شد</string>
+    <string name="overlay_revoked_desc">صفحات قفل نمایش داده نخواهند شد.</string>
+    <string name="camera_revoked">مجوز دوربین لغو شد</string>
+    <string name="camera_revoked_desc">ثبت عکس از فضول غیرفعال شد.</string>
+    <string name="general_notifications_channel">اعلان‌های عمومی</string>
+    <string name="security_alerts_channel">هشدارهای امنیتی</string>
+    <string name="prolocker_security_alert">هشدار امنیتی قفل حرفه ای</string>
+    <string name="revoked_message_format">%1$s: %2$s</string>
+    <string name="target_app">برنامه هدف: %1$s</string>
+    <string name="unknown_app">نامعلوم</string>
+    <string name="excellent_protection">محافظت عالی</string>
+    <string name="good_protection">محافظت خوب</string>
+    <string name="needs_attention">نیاز به توجه</string>
+    <string name="protection_status">وضعیت محافظت</string>
+    <string name="audit_usage_access">دسترسی استفاده</string>
+    <string name="audit_usage_access_desc">برای مانیتور اجرای برنامه‌ها نیاز است</string>
+    <string name="audit_draw_over_apps">نمایش روی سایر برنامه‌ها</string>
+    <string name="audit_draw_over_apps_desc">برای نمایش صفحه قفل نیاز است</string>
+    <string name="audit_battery_opt">بهینه‌سازی باتری</string>
+    <string name="audit_battery_opt_desc">نادیده گرفته شد برای اجرای پایدار</string>
+    <string name="audit_device_admin">مدیریت دستگاه</string>
+    <string name="audit_device_admin_desc">جلوگیری از حذف غیرمجاز برنامه</string>
+    <string name="audit_accessibility_mode">حالت دسترسی</string>
+    <string name="audit_accessibility_mode_desc">جایگزین مانیتور سریع</string>
+    <string name="audit_background_service">سرویس پس‌زمینه</string>
+    <string name="audit_background_service_desc">کاپوننت فعال مانیتور</string>
+    <string name="event_log">لاگ رویدادها</string>
+    <string name="healthy">سالم</string>
+    <string name="missing_or_warning">هشدار یا گمشده</string>
+    <string name="service_active">سرویس فعال</string>
+    <string name="service_idle">سرویس بیکار</string>
+    <string name="service_stopped">سرویس متوقف شد</string>
+    <string name="rotation_system">سیستم</string>
+    <string name="rotation_auto">چرخش خودکار</string>
+    <string name="rotation_portrait">عمودی</string>
+    <string name="rotation_landscape">افقی</string>
+    <string name="duration_seconds">%1$s ثانیه</string>
+
+    <string name="memory_optimizer">بهینه‌ساز حافظه</string>
+    <string name="total_ram">کل حافظه رم</string>
+    <string name="used_ram">رم استفاده شده</string>
+    <string name="free_ram">رم آزاد</string>
+    <string name="ram_usage">مصرف رم</string>
+    <string name="optimize_memory">بهینه‌سازی حافظه</string>
+    <string name="scanning_memory">در حال اسکن حافظه...</string>
+    <string name="cleaning_memory">در حال پاکسازی حافظه...</string>
+    <string name="optimization_complete">بهینه‌سازی انجام شد</string>
+    <string name="memory_optimized_successfully">حافظه با موفقیت بهینه‌سازی شد</string>
+    <string name="before_optimization">قبل از بهینه‌سازی</string>
+    <string name="after_optimization">بعد از بهینه‌سازی</string>
+    <string name="freed_memory">حافظه آزاد شده</string>
+    <string name="done_button">انجام شد</string>
+
+    <string name="system_status">وضعیت سیستم</string>
+    <string name="unlock">باز کردن قفل</string>
+    <string name="lock">قفل کردن</string>
+    <string name="intruder_settings">تنظیمات فضولگیر</string>
+    <string name="connect_dots">حداقل ۴ نقطه را وصل کنید</string>
+    <string name="secure_apps_msg">برنامه‌های خود را با مکانیزم‌های قفل حرفه‌ای ایمن کنید.</string>
+    <string name="permission_granted">مجوز داده شد</string>
+    <string name="next">بعدی</string>
+    <string name="finish">پایان</string>
+    <string name="grant_permission">اعطای مجوز</string>
+
+    <string name="pattern_setup">تنظیم الگو</string>
+    <string name="patterns_do_not_match">الگوها مطابقت ندارند. دوباره امتحان کنید.</string>
+    <string name="draw_unlock_pattern">یک الگوی باز کردن قفل بکشید</string>
+    <string name="confirm_pattern">الگوی خود را تأیید کنید</string>
+    <string name="pin_setup">تنظیم پین</string>
+    <string name="pins_do_not_match">پین‌ها مطابقت ندارند. دوباره امتحان کنید.</string>
+    <string name="enter_pin">یک پین ۴ رقمی وارد کنید</string>
+    <string name="confirm_pin">پین خود را تأیید کنید</string>
+    <string name="usage_access_title">دسترسی به استفاده</string>
+    <string name="usage_access_desc">ما برای تشخیص زمان اجرا شدن برنامه‌های محافظت‌شده به این مجوز نیاز داریم.</string>
+    <string name="usage_access_reason">بدون این، ProLocker نمی‌تواند بداند چه زمانی صفحه قفل را نشان دهد.</string>
+
+    <string name="display_over_apps_title">نمایش روی سایر برنامه‌ها</string>
+    <string name="display_over_apps_desc">ما به این مجوز نیاز داریم تا صفحه قفل را روی برنامه‌های محافظت‌شده شما بکشیم.</string>
+    <string name="display_over_apps_reason">بدون این، صفحه قفل نمی‌تواند روی برنامه راه‌اندازی شده ظاهر شود.</string>
+
+    <string name="battery_opt_title">بهینه‌سازی باتری</string>
+    <string name="battery_opt_desc">به ProLocker اجازه می‌دهد بدون اینکه توسط سیستم کشته شود، در پس‌زمینه با اطمینان اجرا شود.</string>
+    <string name="battery_opt_reason">اگر توسط سیستم کشته شود، برنامه‌های شما محافظت نشده باقی می‌مانند.</string>
+    <string name="setup_permissions">تنظیم مجوزها</string>
+    <string name="notification_permission_title">مجوز اعلان</string>
+    <string name="notification_permission_desc">قفل‌کننده برنامه برای اطمینان از اجرای قابل اعتماد سرویس قفل در پس‌زمینه بدون از کار افتادن توسط سیستم، به اعلان‌های مداوم نیاز دارد.</string>
+    <string name="warning">هشدار</string>
+    <string name="notification_warning_desc">بدون مجوز اعلان، سرویس قفل‌کننده برنامه ممکن است به طور غیرمنتظره توسط سیستم اندروید خاتمه یابد و برنامه‌های شما قفل نشوند.</string>
+    <!-- سایر قسمت ها -->
+    <string name="other">سایر</string>
+    <string name="rate_app">امتیاز به برنامه</string>
+    <string name="share_app">اشتراک گذاری برنامه</string>
+    <string name="contact_us">تماس با ما</string>
+    <string name="about_us">درباره ما</string>
+    <string name="update_available">نسخه جدید در دسترس است</string>
+    <string name="update">بروزرسانی</string>
+    <string name="close">بستن</string>
+    <string name="new_version_available">نسخه جدید رسید!</string>
+    <string name="background_gallery">گالری پس زمینه</string>
+    <string name="preview">پیش نمایش</string>
+    <string name="set_as_lock_background">تنظیم به عنوان پس زمینه قفل</string>
+    <string name="remove_background">حذف پس‌زمینه</string>
+    <string name="use_default_background">استفاده از پس‌زمینه پیش‌فرض</string>
+    <string name="downloads">بارگیری‌ها</string>
+    <string name="category">دسته‌بندی</string>
+    <string name="gallery_error_title">خطا در دریافت تصاویر</string>
+    <string name="gallery_error_no_network">امکان دریافت تصاویر وجود ندارد. اتصال اینترنت خود را بررسی کرده و دوباره تلاش کنید.</string>
+    <string name="gallery_error_timeout">درخواست زمان‌بر شد. اتصال اینترنت خود را بررسی کرده و دوباره تلاش کنید.</string>
+    <string name="gallery_error_server">خطایی از سمت سرور رخ داد. لطفاً بعداً دوباره تلاش کنید.</string>
+    <string name="gallery_error_client">امکان دریافت تصاویر وجود ندارد. لطفاً دوباره تلاش کنید.</string>
+    <string name="gallery_error_unexpected">مشکلی پیش آمد. لطفاً دوباره تلاش کنید.</string>
+    <string name="retry">تلاش مجدد</string>
+
+    <!-- Event types -->
+    <string name="event_locked">برنامه قفل شد</string>
+    <string name="event_unlock_success">ورود موفق</string>
+    <string name="event_unlock_failed">ورود ناموفق</string>
+    <string name="event_intruder_detected">فضول شناسایی شد</string>
+    <string name="event_alarm_triggered">آلارم امنیتی فعال شد</string>
+    <string name="event_recovery_used">بازیابی رمز انجام شد</string>
+    <string name="event_permission_revoked">دسترسی امنیتی لغو شد</string>
+    <string name="event_unknown">رویداد ناشناخته</string>
+
+    <!-- Intruder Photo Detail -->
+    <string name="intruder_details">جزئیات فضول</string>
+    <string name="capture_time">زمان ثبت</string>
+    <string name="related_app">برنامه مرتبط</string>
+    <string name="event_type">نوع رویداد</string>
+    <string name="package_name">نوع قفل</string>
+    <string name="save_to_gallery">ذخیره در گالری</string>
+    <string name="image_saved_to_gallery">تصویر در گالری ذخیره شد</string>
+    <string name="share">اشتراک‌گذاری</string>
+    <string name="delete">حذف</string>
+    <string name="delete_confirmation">آیا از حذف این تصویر مطمئن هستید؟</string>
+
+    <!-- Delete Confirmation Dialogs -->
+    <string name="delete_all_intruder_photos_title">حذف همه تصاویر فضول؟</string>
+    <string name="delete_all_intruder_photos_message">تمام تصاویر فضول و اطلاعات مرتبط حذف خواهند شد. این عملیات قابل بازگشت نیست.</string>
+    <string name="delete_photo_title">حذف تصویر؟</string>
+    <string name="delete_photo_message">این تصویر فضول حذف خواهد شد. آیا مطمئن هستید؟</string>
+    <string name="delete_lock_history_title">حذف تاریخچه قفل؟</string>
+    <string name="delete_lock_history_message">تمام رویدادهای تاریخچه قفل حذف خواهند شد. این عملیات قابل بازگشت نیست.</string>
+    <string name="delete_all_history">حذف تاریخچه</string>
+
+    <!-- Rate App Dialog -->
+    <string name="rate_title">امتیاز به برنامه</string>
+    <string name="rate_description">اگر از برنامه خوشت اومد با امتیاز از ما حمایت کن</string>
+    <string name="rate_action">امتیاز میدم</string>
+    <string name="rate_dont_show_again">بعدا</string>
+
+    <!-- About Us Screen -->
+    <string name="about_subtitle">قفل حرفه‌ای اپلیکیشن، محافظت از حریم خصوصی شما</string>
+    <string name="about_description">با قفل حرفه ای، دیگر نگران امنیت گوشی خود نباشید. قفل حرفه ای یک پکیج امنیتی است که اطلاعات دستگاه شما را در مقابل تهدیدها، دزدی و مزاحمت‌های احتمالی از جانب سایر افراد حفظ می‌کند تا دیگر نگران نقض حریم خصوصی خود نباشید.
+\n\n
+همچنین در کنار پکیج امنیتی می‌توانید از سایر قابلیت‌های کاربردی قفل حرفه ای لذت ببرید.
+\n\n
+برای اطلاع از اخبار، جشنواره‌ها، کدهای تخفیف و آخرین بروزرسانی‌ها می‌توانید ما را در شبکه‌های اجتماعی دنبال نمایید.</string>
+    <string name="about_version">نسخه %1$s</string>
+
+    <!-- Protection Switch -->
+    <string name="app_lock_protection">محافظت قفل اپلیکیشن</string>
+    <string name="protection_active">محافظت فعال است</string>
+    <string name="protection_disabled">محافظت غیرفعال است</string>
+    <string name="protection_reenabled">محافظت قفل اپلیکیشن مجدداً فعال شد</string>
+</resources>

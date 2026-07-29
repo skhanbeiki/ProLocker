@@ -1,0 +1,284 @@
+<resources>
+    <string name="app_name">قفل حرفه ای</string>
+    <string name="home_title">ProLocker</string>
+    <string name="accessibility_service_desc">This app requires accessibility service to monitor running applications and enforce lock screens.</string>
+    <string name="account_title">Account &amp; Settings</string>
+    <string name="change_lock_type">Change Lock Type</string>
+    <string name="recovery_settings">Recovery Settings</string>
+    <string name="app_settings">App Settings</string>
+    <string name="recovery_setup_title">Recovery Setup</string>
+    <string name="recovery_intro_title">Recovery Setup</string>
+    <string name="recovery_intro_message">If you forget your password or pattern, you can recover access to the application using a security question and answer. We recommend configuring it now.</string>
+    <string name="configure_now">Configure Now</string>
+    <string name="not_now">Not Now</string>
+    <string name="question">Question</string>
+    <string name="answer">Answer</string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+    <string name="enable">Enable</string>
+    <string name="general_settings">General Settings</string>
+    <string name="theme">Theme</string>
+    <string name="dark">Dark</string>
+    <string name="light">Light</string>
+    <string name="language">Language</string>
+    <string name="persian">Persian</string>
+    <string name="english">English</string>
+    <string name="vibration_options">Vibration Options</string>
+    <string name="vibration_desc">Vibrate when touching keys or drawing patterns</string>
+    <string name="hide_pattern_path">Hide Pattern Path</string>
+    <string name="hide_pattern_desc">Do not show the drawn path when unlocking</string>
+    <string name="failed_attempts_threshold">Failed Attempts Threshold</string>
+    <string name="failed_attempts_desc">attempts before intruder actions trigger</string>
+    <string name="short_exit_grace_period">Short Exit Grace Period</string>
+    <string name="short_exit_desc">Time allowed outside a locked app before unlocking again</string>
+    <string name="lock_again_after_screen_off">Lock Again After Screen Off</string>
+    <string name="lock_again_desc">Relock all apps instantly when device screen turns off</string>
+    <string name="auto_start_after_reboot">Auto Start After Reboot</string>
+    <string name="auto_start_desc">Automatically start protection on device boot</string>
+    <string name="system_settings">System Settings</string>
+    <string name="lock_screen_rotation">Lock Screen Rotation</string>
+    <string name="current_colon">Current:</string>
+    <string name="battery_optimization">Battery Optimization</string>
+    <string name="battery_ignored">Optimizations Ignored (Recommended)</string>
+    <string name="battery_optimized">Optimized (May stop protection)</string>
+    <string name="protection_settings">Protection Settings</string>
+    <string name="prevent_easy_uninstall">Prevent Easy Uninstall</string>
+    <string name="prevent_uninstall_desc">Activate Device Admin to prevent uninstallation</string>
+    <string name="accessibility_mode">Accessibility Mode</string>
+    <string name="accessibility_mode_desc">Optional: Improve locking speed by using accessibility service</string>
+    <string name="stealth_mode">Stealth Mode</string>
+    <string name="stealth_mode_desc">Hide the main app icon from the launcher while keeping a recovery icon available.</string>
+    <string name="recovery_launcher_name">Calculator</string>
+    <string name="stealth_warning_title">Enable Stealth Mode?</string>
+    <string name="stealth_warning_message">The main app icon will be hidden. A recovery icon will stay visible so you can reopen the app with your PIN or pattern.</string>
+    <string name="stealth_requires_lock_title">Set Up a Lock First</string>
+    <string name="stealth_requires_lock_message">Stealth Mode needs an existing PIN or pattern so the app can be reopened safely.</string>
+    <string name="back">Back</string>
+    <string name="setup_lock_title">Setup Lock</string>
+    <string name="continue_action">Continue</string>
+    <string name="success_title">Lock set successfully</string>
+    <string name="start_using_app">Start Using App</string>
+    <string name="welcome_title">Welcome to ProLocker</string>
+    <string name="exit_title">Click to exit</string>
+    <string-array name="recovery_questions">
+        <item>What is your pet name?</item>
+        <item>What is your favorite color?</item>
+        <item>What city were you born in?</item>
+    </string-array>
+    
+    <string name="home">Home</string>
+    <string name="security">Security</string>
+    <string name="account">Account</string>
+    <string name="security_center">Security Center</string>
+    <string name="capture_intruder_selfie">Capture Intruder Selfie</string>
+    <string name="capture_intruder_selfie_desc">Take a photo using the front camera when max failed attempts are reached</string>
+    <string name="trigger_alarm">Trigger Alarm</string>
+    <string name="trigger_alarm_desc">Play a loud alarm sound when max failed attempts are reached</string>
+    <string name="intruders">Intruders</string>
+    <string name="lock_history">Lock History</string>
+    <string name="no_intruders_detected">No intruders detected</string>
+    <string name="clear_all">Clear All</string>
+    <string name="no_security_events">No security events recorded.</string>
+    <string name="app_prefix">App: %1$s</string>
+    <string name="details_prefix">Details: %1$s</string>
+    <string name="split_screen_not_allowed">Split Screen Not Allowed</string>
+    <string name="split_screen_desc">Please exit multi-window mode to unlock the application for security reasons.</string>
+    <string name="forgot_password">Forgot Password?</string>
+    <string name="recover_lock">Recover Lock</string>
+    <string name="no_recovery_question">No recovery question setup.</string>
+    <string name="question_prefix">Question: %1$s</string>
+    <string name="incorrect_answer">Incorrect answer</string>
+    <string name="submit">Submit</string>
+    <string name="ok">OK</string>
+    <string name="apps_protected">%1$s Apps Protected</string>
+    <string name="search_apps">Search apps...</string>
+    <string name="no_apps_found">No apps found</string>
+    <string name="locked_apps">Locked Apps</string>
+    <string name="no_apps_locked">No apps are locked.</string>
+    <string name="security_audit">Security Audit</string>
+    <string name="security_score">Security Score</string>
+    <string name="score_format">%1$s/100</string>
+    <string name="no_events_recorded">No events recorded yet.</string>
+
+    <string name="pattern_lock">Pattern Lock</string>
+    <string name="draw_secure_pattern">Draw a secure pattern</string>
+    <string name="pin_lock">PIN Lock</string>
+    <string name="enter_numeric_pin">Enter a 4-digit numeric pin</string>
+    <string name="choose_lock_type">Choose Lock Type</string>
+    <string name="select_method_secure">Select a method to secure your apps.</string>
+    <string name="locked_app">Locked App</string>
+    <string name="pattern_text">pattern</string>
+    <string name="pin_text">pin</string>
+    <string name="credential_text">credential</string>
+    <string name="incorrect_credential_prefix">Incorrect %1$s</string>
+    <string name="enter_credential_prefix">Enter %1$s to unlock</string>
+    <string name="notification_channel_name">ProLocker Protection</string>
+    <string name="notification_channel_desc">Keeps ProLocker active in the background</string>
+    <string name="ram_cleaner_channel_name">Memory Optimizer</string>
+    <string name="ram_cleaner_channel_desc">Reminders to optimize your phone memory</string>
+    <string name="prolocker_is_active">ProLocker is Active</string>
+    <string name="protecting_your_apps">Protecting your locked apps</string>
+    <string name="usage_access_revoked">Usage Access Permission Revoked</string>
+    <string name="usage_access_revoked_desc">App Lock may not function correctly.</string>
+    <string name="overlay_revoked">Overlay Permission Revoked</string>
+    <string name="overlay_revoked_desc">Lock screens will not appear.</string>
+    <string name="camera_revoked">Camera Permission Revoked</string>
+    <string name="camera_revoked_desc">Intruder selfies are disabled.</string>
+    <string name="general_notifications_channel">General Notifications</string>
+    <string name="security_alerts_channel">Security Alerts</string>
+    <string name="prolocker_security_alert">App Locker Security Alert</string>
+    <string name="revoked_message_format">%1$s: %2$s</string>
+    <string name="target_app">Target App: %1$s</string>
+    <string name="unknown_app">Unknown</string>
+    <string name="excellent_protection">Excellent Protection</string>
+    <string name="good_protection">Good Protection</string>
+    <string name="needs_attention">Needs Attention</string>
+    <string name="protection_status">Protection Status</string>
+    <string name="audit_usage_access">Usage Access</string>
+    <string name="audit_usage_access_desc">Required for monitoring app launches</string>
+    <string name="audit_draw_over_apps">Draw Over Apps</string>
+    <string name="audit_draw_over_apps_desc">Required to show lock screen</string>
+    <string name="audit_battery_opt">Battery Optimization</string>
+    <string name="audit_battery_opt_desc">Ignored for stable background running</string>
+    <string name="audit_device_admin">Device Admin</string>
+    <string name="audit_device_admin_desc">Prevents unauthorized uninstalls</string>
+    <string name="audit_accessibility_mode">Accessibility Mode</string>
+    <string name="audit_accessibility_mode_desc">Alternative quick monitoring</string>
+    <string name="audit_background_service">Background Service</string>
+    <string name="audit_background_service_desc">Active monitoring component</string>
+    <string name="event_log">Event Log</string>
+    <string name="healthy">Healthy</string>
+    <string name="missing_or_warning">Missing or Warning</string>
+    <string name="service_active">Service Active</string>
+    <string name="service_idle">Service Idle</string>
+    <string name="service_stopped">Service Stopped</string>
+    <string name="rotation_system">System</string>
+    <string name="rotation_auto">Auto-Rotate</string>
+    <string name="rotation_portrait">Portrait</string>
+    <string name="rotation_landscape">Landscape</string>
+    <string name="duration_seconds">%1$ss</string>
+    
+    <string name="memory_optimizer">Memory Optimizer</string>
+    <string name="total_ram">Total RAM</string>
+    <string name="used_ram">Used RAM</string>
+    <string name="free_ram">Free RAM</string>
+    <string name="ram_usage">RAM Usage</string>
+    <string name="optimize_memory">Optimize Memory</string>
+    <string name="scanning_memory">Scanning memory...</string>
+    <string name="cleaning_memory">Cleaning memory...</string>
+    <string name="optimization_complete">Optimization complete</string>
+    <string name="memory_optimized_successfully">Memory Optimized Successfully</string>
+    <string name="before_optimization">Before Optimization</string>
+    <string name="after_optimization">After Optimization</string>
+    <string name="freed_memory">Freed Memory</string>
+    <string name="done_button">Done</string>
+
+    <string name="system_status">SYSTEM STATUS</string>
+    <string name="unlock">Unlock</string>
+    <string name="lock">Lock</string>
+    <string name="intruder_settings">Intruder Settings</string>
+    <string name="connect_dots">Connect at least 4 dots</string>
+    <string name="secure_apps_msg">Secure your apps with professional locking mechanisms.</string>
+    <string name="permission_granted">Permission Granted</string>
+    <string name="next">Next</string>
+    <string name="finish">Finish</string>
+    <string name="grant_permission">Grant Permission</string>
+    
+    <string name="pattern_setup">Pattern Setup</string>
+    <string name="patterns_do_not_match">Patterns do not match. Try again.</string>
+    <string name="draw_unlock_pattern">Draw an unlock pattern</string>
+    <string name="confirm_pattern">Confirm your pattern</string>
+    <string name="pin_setup">PIN Setup</string>
+    <string name="pins_do_not_match">PINs do not match. Try again.</string>
+    <string name="enter_pin">Enter a 4-digit PIN</string>
+    <string name="confirm_pin">Confirm your PIN</string>
+    <string name="usage_access_title">Usage Access</string>
+    <string name="usage_access_desc">We need this permission to detect when protected apps are launched.</string>
+    <string name="usage_access_reason">Without this, ProLocker cannot know when to show the lock screen.</string>
+    
+    <string name="display_over_apps_title">Display Over Other Apps</string>
+    <string name="display_over_apps_desc">We need this permission to draw the lock screen over your protected apps.</string>
+    <string name="display_over_apps_reason">Without this, the lock screen cannot appear above the launched app.</string>
+    
+    <string name="battery_opt_title">Battery Optimization</string>
+    <string name="battery_opt_desc">Allows ProLocker to run reliably in the background without being killed by the system.</string>
+    <string name="battery_opt_reason">If killed by the system, your apps will be left unprotected.</string>
+    <string name="setup_permissions">Setup Permissions</string>
+    <string name="notification_permission_title">Notification Permission</string>
+    <string name="notification_permission_desc">The App Locker requires persistent notifications to ensure the locking service runs reliably in the background without being killed by the system.</string>
+    <string name="warning">Warning</string>
+    <string name="notification_warning_desc">Without notification permission, the App Locker service might be terminated by the Android system unexpectedly, and your apps might not be locked.</string>
+
+    <!-- Other Section -->
+    <string name="other">Other</string>
+    <string name="rate_app">Rate App</string>
+    <string name="share_app">Share App</string>
+    <string name="contact_us">Contact Us</string>
+    <string name="about_us">About Us</string>
+    <string name="update_available">New version available!</string>
+    <string name="update">Update</string>
+    <string name="close">Close</string>
+    <string name="new_version_available">New version available!</string>
+    <string name="background_gallery">Background Gallery</string>
+    <string name="preview">Preview</string>
+    <string name="set_as_lock_background">Set As Lock Background</string>
+    <string name="remove_background">Remove Background</string>
+    <string name="use_default_background">Use Default Background</string>
+    <string name="downloads">Downloads</string>
+    <string name="category">Category</string>
+    <string name="gallery_error_title">Failed to Load Images</string>
+    <string name="gallery_error_no_network">Unable to load images. Please check your internet connection and try again.</string>
+    <string name="gallery_error_timeout">The request timed out. Please check your connection and try again.</string>
+    <string name="gallery_error_server">A server error occurred. Please try again later.</string>
+    <string name="gallery_error_client">Unable to load images. Please try again.</string>
+    <string name="gallery_error_unexpected">Something went wrong. Please try again.</string>
+    <string name="retry">Try Again</string>
+
+    <!-- Event types -->
+    <string name="event_locked">App Locked</string>
+    <string name="event_unlock_success">Unlock Successful</string>
+    <string name="event_unlock_failed">Unlock Failed</string>
+    <string name="event_intruder_detected">Intruder Detected</string>
+    <string name="event_alarm_triggered">Security Alarm Triggered</string>
+    <string name="event_recovery_used">Recovery Used</string>
+    <string name="event_permission_revoked">Security Permission Revoked</string>
+    <string name="event_unknown">Unknown Event</string>
+
+    <!-- Intruder Photo Detail -->
+    <string name="intruder_details">Intruder Details</string>
+    <string name="capture_time">Capture Time</string>
+    <string name="related_app">Related Application</string>
+    <string name="event_type">Event Type</string>
+    <string name="package_name">Package Name</string>
+    <string name="save_to_gallery">Save To Gallery</string>
+    <string name="image_saved_to_gallery">Image saved to gallery</string>
+    <string name="share">Share</string>
+    <string name="delete">Delete</string>
+    <string name="delete_confirmation">Are you sure you want to delete this image?</string>
+
+    <!-- Delete Confirmation Dialogs -->
+    <string name="delete_all_intruder_photos_title">Delete All Intruder Photos?</string>
+    <string name="delete_all_intruder_photos_message">All intruder photos and related records will be permanently deleted. This action cannot be undone.</string>
+    <string name="delete_photo_title">Delete Photo?</string>
+    <string name="delete_photo_message">This intruder photo will be permanently deleted. Are you sure?</string>
+    <string name="delete_lock_history_title">Delete Lock History?</string>
+    <string name="delete_lock_history_message">All lock history events will be permanently deleted. This action cannot be undone.</string>
+    <string name="delete_all_history">Delete All History</string>
+
+    <!-- Rate App Dialog -->
+    <string name="rate_title">Enjoying the App?</string>
+    <string name="rate_description">If you love using this app, please take a moment to rate us. Your support helps us improve!</string>
+    <string name="rate_action">Rate App</string>
+    <string name="rate_dont_show_again">Don\'t Show Again</string>
+
+    <!-- About Us Screen -->
+    <string name="about_subtitle">Professional App Lock, Protecting Your Privacy</string>
+    <string name="about_description">With Professional App Lock, you no longer need to worry about the security of your phone. Professional App Lock is a security solution that protects your device and applications against unauthorized access and privacy violations.\n\nIn addition to application protection, the app provides useful tools and features to help improve security and user experience.\n\nThank you for choosing Professional App Lock.</string>
+    <string name="about_version">Version %1$s</string>
+
+    <!-- Protection Switch -->
+    <string name="app_lock_protection">App Lock Protection</string>
+    <string name="protection_active">Protection is active</string>
+    <string name="protection_disabled">Protection is disabled</string>
+    <string name="protection_reenabled">App Lock protection has been re-enabled</string>
+</resources>
