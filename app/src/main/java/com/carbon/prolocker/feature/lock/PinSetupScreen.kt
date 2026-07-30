@@ -15,6 +15,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -34,9 +36,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.core.view.WindowCompat
 import com.carbon.prolocker.R
 import com.carbon.prolocker.core.ui.components.AppToolbar
@@ -44,6 +46,7 @@ import com.carbon.prolocker.core.ui.components.PinKeypadButton
 import com.carbon.prolocker.core.ui.components.PinKeypadDeleteButton
 import org.koin.androidx.compose.koinViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PinSetupScreen(
     onSetupComplete: () -> Unit
@@ -56,6 +59,7 @@ fun PinSetupScreen(
     val enteredPin by viewModel?.enteredPin?.collectAsState() ?: remember { mutableStateOf("") }
 
     val context = LocalContext.current
+    val bgColor = MaterialTheme.colorScheme.background
 
     if (!isInspection) {
         DisposableEffect(Unit) {
@@ -66,7 +70,6 @@ fun PinSetupScreen(
             } else {
                 val window = activity.window
 
-                // ذخیره وضعیت قبلی
                 val oldStatusBarColor = window.statusBarColor
                 val oldNavigationBarColor = window.navigationBarColor
 
@@ -76,10 +79,8 @@ fun PinSetupScreen(
                 val oldLightStatusBars = insetsController.isAppearanceLightStatusBars
                 val oldLightNavigationBars = insetsController.isAppearanceLightNavigationBars
 
-                // اعمال تنظیمات صفحه Pattern/PIN
                 window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
 
-                val bgColor = Color(0xFF3E7FB5)
                 window.statusBarColor = bgColor.toArgb()
                 window.navigationBarColor = bgColor.toArgb()
 
@@ -87,7 +88,6 @@ fun PinSetupScreen(
                 insetsController.isAppearanceLightNavigationBars = false
 
                 onDispose {
-                    // بازگردانی تنظیمات قبلی
                     window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
 
                     window.statusBarColor = oldStatusBarColor
@@ -108,12 +108,9 @@ fun PinSetupScreen(
 
     Scaffold(
         topBar = {
-            AppToolbar(
-                title = stringResource(R.string.pin_setup),
-                containerColor = Color(0xFF3E7FB5)
-            )
+            AppToolbar(title = stringResource(R.string.pin_setup))
         },
-        containerColor = Color(0xFF3E7FB5)
+        containerColor = MaterialTheme.colorScheme.background
     ) { padding ->
         Column(
             modifier = Modifier
@@ -131,13 +128,14 @@ fun PinSetupScreen(
                         step == PinSetupViewModel.SetupStep.ENTER -> stringResource(R.string.enter_pin)
                         else -> stringResource(R.string.confirm_pin)
                     },
-                    fontSize = 18.sp,
-                    color = if (isError) Color.Red else Color.White
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = if (isError) MaterialTheme.colorScheme.error
+                    else MaterialTheme.colorScheme.onBackground
                 )
 
                 Spacer(modifier = Modifier.height(32.dp))
 
-                // PIN Dots
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(16.dp),
                     verticalAlignment = Alignment.CenterVertically
@@ -148,8 +146,16 @@ fun PinSetupScreen(
                             modifier = Modifier
                                 .size(24.dp)
                                 .clip(CircleShape)
-                                .background(if (isFilled) Color.White else Color.Transparent)
-                                .border(2.dp, Color.White, CircleShape)
+                                .background(
+                                    if (isFilled) MaterialTheme.colorScheme.onBackground
+                                    else Color.Transparent
+                                )
+                                .border(
+                                    2.dp,
+                                    if (isFilled) MaterialTheme.colorScheme.onBackground
+                                    else MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f),
+                                    CircleShape
+                                )
                         )
                     }
                 }
@@ -157,7 +163,6 @@ fun PinSetupScreen(
             CompositionLocalProvider(
                 LocalLayoutDirection provides LayoutDirection.Ltr
             ) {
-                // Keypad
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -181,7 +186,7 @@ fun PinSetupScreen(
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        Box(modifier = Modifier.size(64.dp)) // Empty space
+                        Box(modifier = Modifier.size(64.dp))
                         PinKeypadButton(
                             text = "0",
                             onClick = { viewModel?.onNumberClicked(0) }
@@ -195,4 +200,3 @@ fun PinSetupScreen(
         }
     }
 }
-

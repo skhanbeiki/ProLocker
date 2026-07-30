@@ -37,8 +37,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -66,7 +64,10 @@ import com.carbon.prolocker.ad.AdPlacement
 import com.carbon.prolocker.ad.NativeAdContainer
 import com.carbon.prolocker.ad.NativeAdType
 import com.carbon.prolocker.core.datastore.PreferencesRepository
-import com.carbon.prolocker.core.theme.AppTypography
+import com.carbon.prolocker.core.theme.ProLockerPrimary
+import com.carbon.prolocker.core.theme.ProLockerSecondary
+import com.carbon.prolocker.core.theme.ProLockerTertiary
+import com.carbon.prolocker.core.ui.components.AppToolbar
 import com.carbon.prolocker.network.repository.RemoteConfigRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -119,14 +120,8 @@ fun MemoryOptimizerScreen(onBack: () -> Unit) {
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        stringResource(R.string.memory_optimizer),
-                        style = AppTypography.titleLarge,
-                        fontSize = 20.sp
-                    )
-                },
+            AppToolbar(
+                title = stringResource(R.string.memory_optimizer),
                 navigationIcon = {
                     IconButton(onClick = {
                         handleThemeInterstitial(
@@ -140,8 +135,7 @@ fun MemoryOptimizerScreen(onBack: () -> Unit) {
                     }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background)
+                }
             )
         }
     ) { padding ->
@@ -149,7 +143,7 @@ fun MemoryOptimizerScreen(onBack: () -> Unit) {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .padding(16.dp),
+                .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             when (optimizationState) {
@@ -191,14 +185,14 @@ fun MemoryOptimizerScreen(onBack: () -> Unit) {
                 OptimizationState.SCANNING -> {
                     AnimationStateContent(
                         title = stringResource(R.string.scanning_memory),
-                        waveColor = Color(0xFF005FB0)
+                        waveColor = ProLockerPrimary
                     )
                 }
 
                 OptimizationState.CLEANING -> {
                     AnimationStateContent(
                         title = stringResource(R.string.cleaning_memory),
-                        waveColor = Color(0xFF00AA00)
+                        waveColor = ProLockerTertiary
                     )
                 }
 
@@ -289,16 +283,18 @@ fun IdleStateContent(
             modifier = Modifier.size(200.dp)
         ) {
             val progress = usagePercentage / 100f
+            val trackColor = MaterialTheme.colorScheme.surfaceVariant
+            val arcColor = if (usagePercentage > 80) MaterialTheme.colorScheme.error else ProLockerPrimary
             Canvas(modifier = Modifier.fillMaxSize()) {
                 drawArc(
-                    color = Color.LightGray.copy(alpha = 0.3f),
+                    color = trackColor,
                     startAngle = 135f,
                     sweepAngle = 270f,
                     useCenter = false,
                     style = Stroke(width = 16.dp.toPx(), cap = StrokeCap.Round)
                 )
                 drawArc(
-                    color = if (usagePercentage > 80) Color.Red else Color(0xFF005FB0),
+                    color = arcColor,
                     startAngle = 135f,
                     sweepAngle = 270f * progress,
                     useCenter = false,
@@ -308,12 +304,12 @@ fun IdleStateContent(
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
                     stringResource(R.string.ram_usage),
-                    style = AppTypography.labelLarge,
-                    color = Color.Gray
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Text(
                     "$usagePercentage%",
-                    style = AppTypography.titleLarge,
+                    style = MaterialTheme.typography.titleLarge,
                     fontSize = 48.sp,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onBackground
@@ -351,12 +347,12 @@ fun IdleStateContent(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(56.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF005FB0)),
+            colors = ButtonDefaults.buttonColors(containerColor = ProLockerPrimary),
             shape = RoundedCornerShape(28.dp)
         ) {
             Text(
                 stringResource(R.string.optimize_memory),
-                fontSize = 18.sp,
+                style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
         }
@@ -367,25 +363,29 @@ fun IdleStateContent(
 fun StatCard(title: String, value: String) {
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(20.dp),
         modifier = Modifier.wrapContentSize()
     ) {
         Column(
-            modifier = Modifier.width(100.dp).height(110.dp).padding(16.dp),
+            modifier = Modifier
+                .width(110.dp)
+                .height(110.dp)
+                .padding(20.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
             Text(
                 title,
-                style = AppTypography.labelMedium,
-                color = Color.Gray,
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
                 maxLines = 2
             )
-            Spacer(modifier = Modifier.weight(1f))
+            Spacer(modifier = Modifier.height(8.dp))
             Text(
                 value,
-                style = AppTypography.titleMedium,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
                 color = MaterialTheme.colorScheme.onBackground
             )
         }
@@ -446,7 +446,7 @@ fun AnimationStateContent(title: String, waveColor: Color) {
         Spacer(modifier = Modifier.height(32.dp))
         Text(
             title,
-            style = AppTypography.titleLarge,
+            style = MaterialTheme.typography.titleLarge,
             color = MaterialTheme.colorScheme.onBackground
         )
     }
@@ -471,17 +471,17 @@ fun CompletedStateContent(
             modifier = Modifier
                 .size(120.dp)
                 .clip(CircleShape)
-                .background(Color(0xFF00AA00).copy(alpha = 0.1f)),
+                .background(ProLockerTertiary.copy(alpha = 0.1f)),
             contentAlignment = Alignment.Center
         ) {
-            Text("\u2713", fontSize = 64.sp, color = Color(0xFF00AA00))
+            Text("\u2713", fontSize = 64.sp, color = ProLockerTertiary)
         }
 
         Spacer(modifier = Modifier.height(24.dp))
 
         Text(
             stringResource(R.string.memory_optimized_successfully),
-            style = AppTypography.titleLarge,
+            style = MaterialTheme.typography.titleLarge,
             color = MaterialTheme.colorScheme.onBackground,
             textAlign = TextAlign.Center
         )
@@ -490,13 +490,14 @@ fun CompletedStateContent(
 
         Card(
             modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(20.dp),
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
         ) {
-            Column(modifier = Modifier.padding(24.dp)) {
+            Column(modifier = Modifier.padding(20.dp)) {
                 ResultRow(
                     title = stringResource(R.string.before_optimization),
                     value = usedBefore,
-                    color = Color.Gray
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 ResultRow(
@@ -505,12 +506,12 @@ fun CompletedStateContent(
                     color = MaterialTheme.colorScheme.onBackground
                 )
                 Spacer(modifier = Modifier.height(16.dp))
-                HorizontalDivider(color = Color.LightGray.copy(alpha = 0.2f))
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                 Spacer(modifier = Modifier.height(16.dp))
                 ResultRow(
                     title = stringResource(R.string.freed_memory),
                     value = freed,
-                    color = Color(0xFF00AA00),
+                    color = ProLockerTertiary,
                     isBold = true
                 )
             }
@@ -534,12 +535,12 @@ fun CompletedStateContent(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(56.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF005FB0)),
+            colors = ButtonDefaults.buttonColors(containerColor = ProLockerPrimary),
             shape = RoundedCornerShape(28.dp)
         ) {
             Text(
                 stringResource(R.string.done_button),
-                fontSize = 18.sp,
+                style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
         }
@@ -552,12 +553,16 @@ fun ResultRow(title: String, value: String, color: Color, isBold: Boolean = fals
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(title, style = AppTypography.bodyLarge, color = Color.Gray)
+        Text(
+            title,
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
         Text(
             value,
-            style = AppTypography.titleMedium,
+            style = MaterialTheme.typography.titleMedium,
             color = color,
-            fontWeight = if (isBold) FontWeight.Bold else FontWeight.Normal
+            fontWeight = if (isBold) FontWeight.Bold else FontWeight.SemiBold
         )
     }
 }

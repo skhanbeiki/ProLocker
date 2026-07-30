@@ -1,6 +1,5 @@
 package com.carbon.prolocker.feature.main
 
-
 import android.content.Intent
 import android.content.res.Configuration
 import android.net.Uri
@@ -16,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -23,8 +23,9 @@ import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Security
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.BottomSheetDefaults
+import androidx.compose.material3.AlertDialogDefaults
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -51,6 +52,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -67,6 +69,9 @@ import com.carbon.prolocker.ad.findActivity
 import com.carbon.prolocker.core.config.MarketConfig
 import com.carbon.prolocker.core.rate.RateAppDialog
 import com.carbon.prolocker.core.rate.RateAppManager
+import com.carbon.prolocker.core.theme.ProLockerPrimary
+import com.carbon.prolocker.core.theme.ProLockerSecondary
+import com.carbon.prolocker.core.theme.ProLockerSurfaceVariant
 import com.carbon.prolocker.feature.account.AccountScreen
 import com.carbon.prolocker.feature.home.HomeScreen
 import com.carbon.prolocker.feature.security.SecurityScreen
@@ -137,7 +142,6 @@ fun MainScreen(
         }
     }
 
-    // Request new ad on every tab change
     var adKey by remember { mutableIntStateOf(0) }
     LaunchedEffect(selectedTab) {
         adKey++
@@ -159,8 +163,19 @@ fun MainScreen(
                     viewModel.dismissUpdate()
                 }
             },
-            title = { Text(updateState?.title ?: "") },
+            shape = RoundedCornerShape(20.dp),
+            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+            titleContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            textContentColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
+            title = {
+                Text(
+                    updateState?.title ?: "",
+                    fontWeight = FontWeight.Bold
+                )
+            },
             text = {
+                val textColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f).hashCode()
+                val bgColor = MaterialTheme.colorScheme.surfaceVariant.hashCode()
                 androidx.compose.ui.viewinterop.AndroidView(
                     factory = { ctx ->
                         android.widget.TextView(ctx).apply {
@@ -168,12 +183,17 @@ fun MainScreen(
                                 updateState?.description ?: "",
                                 HtmlCompat.FROM_HTML_MODE_COMPACT
                             )
+                            setTextColor(textColor)
+                            setBackgroundColor(bgColor)
                         }
                     }
                 )
             },
             confirmButton = {
-                Button(onClick = { openMarket(context) }) {
+                Button(
+                    onClick = { openMarket(context) },
+                    shape = RoundedCornerShape(16.dp)
+                ) {
                     Text(stringResource(R.string.update))
                 }
             },
@@ -212,26 +232,32 @@ fun MainScreen(
                 Column {
                     if (updateState?.displayType == "notification") {
                         Surface(
-                            color = MaterialTheme.colorScheme.primaryContainer,
+                            color = ProLockerPrimary.copy(alpha = 0.15f),
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             Row(
-                                modifier = Modifier.padding(8.dp),
+                                modifier = Modifier.padding(12.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Text(
                                     stringResource(R.string.new_version_available),
                                     modifier = Modifier.weight(1f),
-                                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                                    color = ProLockerPrimary,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    fontWeight = FontWeight.SemiBold
                                 )
-                                Button(onClick = { openMarket(context) }) {
+                                Button(
+                                    onClick = { openMarket(context) },
+                                    shape = RoundedCornerShape(16.dp)
+                                ) {
                                     Text(stringResource(R.string.update))
                                 }
                                 if (updateState?.priority == "normal") {
                                     IconButton(onClick = { viewModel.dismissUpdate() }) {
                                         Icon(
                                             Icons.Default.Close,
-                                            contentDescription = stringResource(R.string.close)
+                                            contentDescription = stringResource(R.string.close),
+                                            tint = MaterialTheme.colorScheme.onSurfaceVariant
                                         )
                                     }
                                 }
@@ -239,7 +265,6 @@ fun MainScreen(
                         }
                     }
 
-                    // Native Ad above bottom navigation - placement depends on selected tab
                     key(adKey) {
                         val placement = when (selectedTab) {
                             MainTab.HOME -> AdPlacement.HOME_TAB_APPS
@@ -252,67 +277,106 @@ fun MainScreen(
                             adType = NativeAdType.TYPE_1,
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(horizontal = 8.dp, vertical = 4.dp)
+                                .padding(horizontal = 12.dp, vertical = 4.dp)
                                 .clip(RoundedCornerShape(16.dp))
                         )
                     }
 
                     NavigationBar(
-                        containerColor = MaterialTheme.colorScheme.surface,
-                        tonalElevation = 8.dp
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                        tonalElevation = 0.dp
                     ) {
                         NavigationBarItem(
                             selected = selectedTab == MainTab.HOME,
                             onClick = { viewModel.setSelectedTab(MainTab.HOME) },
-                            icon = { Icon(Icons.Default.Lock, contentDescription = null) },
+                            icon = {
+                                Icon(
+                                    Icons.Default.Lock,
+                                    contentDescription = null,
+                                    tint = if (selectedTab == MainTab.HOME)
+                                        MaterialTheme.colorScheme.primary
+                                    else
+                                        MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            },
                             label = {
                                 Text(
                                     stringResource(R.string.home),
-                                    style = com.carbon.prolocker.core.theme.AppTypography.labelSmall
+                                    style = MaterialTheme.typography.labelSmall,
+                                    fontWeight = if (selectedTab == MainTab.HOME)
+                                        FontWeight.SemiBold
+                                    else
+                                        FontWeight.Medium
                                 )
                             },
                             colors = NavigationBarItemDefaults.colors(
                                 selectedIconColor = MaterialTheme.colorScheme.primary,
                                 selectedTextColor = MaterialTheme.colorScheme.primary,
-                                indicatorColor = MaterialTheme.colorScheme.primaryContainer,
-                                unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                                unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant
+                                indicatorColor = ProLockerSecondary.copy(alpha = 0.25f),
+                                unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                                unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                             )
                         )
                         NavigationBarItem(
                             selected = selectedTab == MainTab.SECURITY,
                             onClick = { viewModel.setSelectedTab(MainTab.SECURITY) },
-                            icon = { Icon(Icons.Default.Security, contentDescription = null) },
+                            icon = {
+                                Icon(
+                                    Icons.Default.Security,
+                                    contentDescription = null,
+                                    tint = if (selectedTab == MainTab.SECURITY)
+                                        MaterialTheme.colorScheme.primary
+                                    else
+                                        MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            },
                             label = {
                                 Text(
                                     stringResource(R.string.security),
-                                    style = com.carbon.prolocker.core.theme.AppTypography.labelSmall
+                                    style = MaterialTheme.typography.labelSmall,
+                                    fontWeight = if (selectedTab == MainTab.SECURITY)
+                                        FontWeight.SemiBold
+                                    else
+                                        FontWeight.Medium
                                 )
                             },
                             colors = NavigationBarItemDefaults.colors(
                                 selectedIconColor = MaterialTheme.colorScheme.primary,
                                 selectedTextColor = MaterialTheme.colorScheme.primary,
-                                indicatorColor = MaterialTheme.colorScheme.primaryContainer,
-                                unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                                unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant
+                                indicatorColor = ProLockerSecondary.copy(alpha = 0.25f),
+                                unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                                unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                             )
                         )
                         NavigationBarItem(
                             selected = selectedTab == MainTab.ACCOUNT,
                             onClick = { viewModel.setSelectedTab(MainTab.ACCOUNT) },
-                            icon = { Icon(Icons.Default.Settings, contentDescription = null) },
+                            icon = {
+                                Icon(
+                                    Icons.Default.Settings,
+                                    contentDescription = null,
+                                    tint = if (selectedTab == MainTab.ACCOUNT)
+                                        MaterialTheme.colorScheme.primary
+                                    else
+                                        MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            },
                             label = {
                                 Text(
                                     stringResource(R.string.account),
-                                    style = com.carbon.prolocker.core.theme.AppTypography.labelSmall
+                                    style = MaterialTheme.typography.labelSmall,
+                                    fontWeight = if (selectedTab == MainTab.ACCOUNT)
+                                        FontWeight.SemiBold
+                                    else
+                                        FontWeight.Medium
                                 )
                             },
                             colors = NavigationBarItemDefaults.colors(
                                 selectedIconColor = MaterialTheme.colorScheme.primary,
                                 selectedTextColor = MaterialTheme.colorScheme.primary,
-                                indicatorColor = MaterialTheme.colorScheme.primaryContainer,
-                                unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                                unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant
+                                indicatorColor = ProLockerSecondary.copy(alpha = 0.25f),
+                                unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                                unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                             )
                         )
                     }
@@ -372,11 +436,25 @@ fun ExitBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
         containerColor = MaterialTheme.colorScheme.background,
-        dragHandle = { BottomSheetDefaults.DragHandle() }
+        shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
+        dragHandle = {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Box(
+                    modifier = Modifier
+                        .padding(top = 12.dp, bottom = 8.dp)
+                        .width(36.dp)
+                        .height(4.dp)
+                        .clip(RoundedCornerShape(2.dp))
+                        .background(MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f))
+                )
+            }
+        }
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             if (preloadedAd != null) {
@@ -384,7 +462,7 @@ fun ExitBottomSheet(
                     preloadedAd = preloadedAd,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
+                        .padding(horizontal = 20.dp, vertical = 8.dp)
                         .clip(RoundedCornerShape(16.dp))
                 )
             } else {
@@ -394,16 +472,18 @@ fun ExitBottomSheet(
                     adType = NativeAdType.TYPE_6,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
+                        .padding(horizontal = 20.dp, vertical = 8.dp)
                         .clip(RoundedCornerShape(16.dp))
                 )
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .padding(horizontal = 20.dp)
+                    .padding(bottom = 32.dp)
                     .clickable(
                         onClick = {
                             (context as? android.app.Activity)?.finishAffinity()
@@ -411,15 +491,17 @@ fun ExitBottomSheet(
                     )
                     .height(56.dp)
                     .background(
-                        MaterialTheme.colorScheme.surfaceVariant,
-                        RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp)
+                        Brush.linearGradient(
+                            colors = listOf(ProLockerPrimary, ProLockerSecondary)
+                        ),
+                        RoundedCornerShape(20.dp)
                     ),
                 contentAlignment = Alignment.Center,
             ) {
-
                 Text(
                     text = stringResource(R.string.exit_title),
-                    fontSize = 18.sp,
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
                 )
             }
@@ -447,7 +529,6 @@ fun openMarket(context: android.content.Context) {
         try {
             context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(fallbackUri)))
         } catch (_e: Exception) {
-            // Do nothing if both fail
         }
     }
 }

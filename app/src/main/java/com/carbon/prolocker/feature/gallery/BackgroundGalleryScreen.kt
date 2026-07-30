@@ -1,6 +1,7 @@
 package com.carbon.prolocker.feature.gallery
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -50,10 +51,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.carbon.prolocker.R
 import com.carbon.prolocker.ad.AdManager
@@ -61,6 +62,7 @@ import com.carbon.prolocker.ad.AdPlacement
 import com.carbon.prolocker.ad.NativeAdContainer
 import com.carbon.prolocker.ad.NativeAdType
 import com.carbon.prolocker.core.datastore.PreferencesRepository
+import com.carbon.prolocker.core.theme.ProLockerPrimary
 import com.carbon.prolocker.core.ui.components.EmptyState
 import com.carbon.prolocker.network.model.BackgroundItem
 import com.carbon.prolocker.network.repository.RemoteConfigRepository
@@ -124,8 +126,8 @@ fun BackgroundGalleryScreen(
                 title = {
                     Text(
                         stringResource(R.string.background_gallery),
-                        style = com.carbon.prolocker.core.theme.AppTypography.titleLarge,
-                        fontSize = 20.sp
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold
                     )
                 },
                 navigationIcon = {
@@ -277,10 +279,14 @@ fun BackgroundCard(bg: BackgroundItem, isSelected: Boolean, onClick: () -> Unit)
         modifier = Modifier
             .fillMaxWidth()
             .aspectRatio(0.8f)
+            .then(
+                if (isSelected) Modifier.border(3.dp, ProLockerPrimary, RoundedCornerShape(20.dp))
+                else Modifier
+            )
             .clickable(onClick = onClick),
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = if (isSelected) 8.dp else 2.dp)
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
             AsyncImage(
@@ -291,14 +297,18 @@ fun BackgroundCard(bg: BackgroundItem, isSelected: Boolean, onClick: () -> Unit)
             )
 
             if (isSelected) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(ProLockerPrimary.copy(alpha = 0.25f))
+                )
                 Icon(
                     imageVector = Icons.Default.CheckCircle,
                     contentDescription = "Selected",
-                    tint = Color.White,
+                    tint = ProLockerPrimary,
                     modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .padding(8.dp)
-                        .size(32.dp)
+                        .align(Alignment.Center)
+                        .size(48.dp)
                 )
             }
 
@@ -318,6 +328,7 @@ fun BackgroundCard(bg: BackgroundItem, isSelected: Boolean, onClick: () -> Unit)
                         text = bg.name,
                         color = Color.White,
                         style = MaterialTheme.typography.bodySmall,
+                        fontWeight = FontWeight.Medium,
                         modifier = Modifier.weight(1f),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis

@@ -2,8 +2,6 @@ package com.carbon.prolocker.feature.account
 
 import android.content.Intent
 import android.content.res.Configuration
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -35,8 +33,6 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -61,6 +57,8 @@ import androidx.lifecycle.LifecycleEventObserver
 import com.carbon.prolocker.R
 import com.carbon.prolocker.core.permissions.PermissionManager
 import com.carbon.prolocker.core.theme.AppTypography
+import com.carbon.prolocker.core.theme.ProLockerPrimary
+import com.carbon.prolocker.core.ui.components.AppToolbar
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -134,103 +132,100 @@ fun AppSettingsScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.app_settings), style = AppTypography.titleLarge) },
+            AppToolbar(
+                title = stringResource(R.string.app_settings),
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background)
+                }
             )
         }
     ) { innerPadding ->
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
                 .padding(innerPadding)
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                .padding(horizontal = 20.dp),
+            verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
             item {
                 Text(
                     text = stringResource(R.string.general_settings),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    style = AppTypography.titleMedium,
-                    modifier = Modifier.padding(start = 8.dp)
+                    style = MaterialTheme.typography.titleMedium,
+                    color = ProLockerPrimary,
+                    modifier = Modifier.padding(start = 4.dp)
                 )
             }
 
             item {
                 Card(
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                    shape = RoundedCornerShape(16.dp),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
-                    ,
-                    border = BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.surfaceVariant),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+                    shape = RoundedCornerShape(20.dp),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
                 ) {
                     Column(modifier = Modifier.fillMaxWidth()) {
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clickable { showThemeDialog = true }
-                                .padding(16.dp),
+                                .padding(horizontal = 16.dp, vertical = 14.dp),
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Column(modifier = Modifier.weight(1f)) {
-                                Text(stringResource(R.string.theme), style = AppTypography.bodyLarge)
-                                // We map system, light, dark directly in text.
+                                Text(stringResource(R.string.theme), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
+                                Spacer(modifier = Modifier.height(2.dp))
                                 Text(if (prefs.isDarkMode) stringResource(R.string.dark) else stringResource(R.string.light), style = AppTypography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                             }
                         }
 
-                        HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant, modifier = Modifier.padding(horizontal = 16.dp))
+                        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant, modifier = Modifier.padding(horizontal = 16.dp))
 
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clickable { showLanguageDialog = true }
-                                .padding(16.dp),
+                                .padding(horizontal = 16.dp, vertical = 14.dp),
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Column(modifier = Modifier.weight(1f)) {
-                                Text(stringResource(R.string.language), style = AppTypography.bodyLarge)
+                                Text(stringResource(R.string.language), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
+                                Spacer(modifier = Modifier.height(2.dp))
                                 Text(if (prefs.language == "fa") stringResource(R.string.persian) else stringResource(R.string.english), style = AppTypography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                             }
                         }
                     }
                 }
             }
-            
+
             item {
                 Text(
                     text = stringResource(R.string.app_settings),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    style = AppTypography.titleMedium,
-                    modifier = Modifier.padding(start = 8.dp)
+                    style = MaterialTheme.typography.titleMedium,
+                    color = ProLockerPrimary,
+                    modifier = Modifier.padding(start = 4.dp)
                 )
             }
 
             item {
                 Card(
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+                    shape = RoundedCornerShape(20.dp),
                     elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-                    border = BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.surfaceVariant),
                 ) {
                     Column(modifier = Modifier.fillMaxWidth()) {
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(16.dp),
+                                .padding(horizontal = 16.dp, vertical = 14.dp),
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Column(modifier = Modifier.weight(1f)) {
-                                Text(stringResource(R.string.vibration_options), style = AppTypography.bodyLarge)
+                                Text(stringResource(R.string.vibration_options), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
+                                Spacer(modifier = Modifier.height(2.dp))
                                 Text(stringResource(R.string.vibration_desc), style = AppTypography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                             }
                             Switch(
@@ -239,17 +234,18 @@ fun AppSettingsScreen(
                             )
                         }
 
-                        HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant, modifier = Modifier.padding(horizontal = 16.dp))
+                        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant, modifier = Modifier.padding(horizontal = 16.dp))
 
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(16.dp),
+                                .padding(horizontal = 16.dp, vertical = 14.dp),
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Column(modifier = Modifier.weight(1f)) {
-                                Text(stringResource(R.string.hide_pattern_path), style = AppTypography.bodyLarge)
+                                Text(stringResource(R.string.hide_pattern_path), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
+                                Spacer(modifier = Modifier.height(2.dp))
                                 Text(stringResource(R.string.hide_pattern_desc), style = AppTypography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                             }
                             Switch(
@@ -258,25 +254,26 @@ fun AppSettingsScreen(
                             )
                         }
 
-                        HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant, modifier = Modifier.padding(horizontal = 16.dp))
+                        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant, modifier = Modifier.padding(horizontal = 16.dp))
 
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(16.dp),
+                                .padding(horizontal = 16.dp, vertical = 14.dp),
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Column(modifier = Modifier.fillMaxWidth()) {
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceBetween
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    Text(stringResource(R.string.failed_attempts_threshold), style = AppTypography.bodyLarge)
+                                    Text(stringResource(R.string.failed_attempts_threshold), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
                                     val count = prefs.failedAttemptsThreshold
-                                    Text(count.toString(), style = AppTypography.labelLarge, color = MaterialTheme.colorScheme.primary)
+                                    Text(count.toString(), style = MaterialTheme.typography.titleLarge, color = ProLockerPrimary)
                                 }
-                                Spacer(modifier = Modifier.height(8.dp))
+                                Spacer(modifier = Modifier.height(12.dp))
                                 Slider(
                                     value = prefs.failedAttemptsThreshold.toFloat(),
                                     onValueChange = { viewModel?.updateFailedAttemptsThreshold(it.toInt()) },
@@ -284,29 +281,31 @@ fun AppSettingsScreen(
                                     steps = 5,
                                     modifier = Modifier.fillMaxWidth()
                                 )
+                                Spacer(modifier = Modifier.height(4.dp))
                                 Text(stringResource(R.string.failed_attempts_desc), style = AppTypography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                             }
                         }
 
-                        HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant, modifier = Modifier.padding(horizontal = 16.dp))
+                        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant, modifier = Modifier.padding(horizontal = 16.dp))
 
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(16.dp),
+                                .padding(horizontal = 16.dp, vertical = 14.dp),
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Column(modifier = Modifier.fillMaxWidth()) {
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceBetween
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    Text(stringResource(R.string.short_exit_grace_period), style = AppTypography.bodyLarge)
+                                    Text(stringResource(R.string.short_exit_grace_period), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
                                     val duration = prefs.shortExitDurationSeconds
-                                    Text(stringResource(R.string.duration_seconds, duration.toString()), style = AppTypography.labelLarge, color = MaterialTheme.colorScheme.primary)
+                                    Text(stringResource(R.string.duration_seconds, duration.toString()), style = MaterialTheme.typography.titleLarge, color = ProLockerPrimary)
                                 }
-                                Spacer(modifier = Modifier.height(8.dp))
+                                Spacer(modifier = Modifier.height(12.dp))
                                 Slider(
                                     value = prefs.shortExitDurationSeconds.toFloat(),
                                     onValueChange = { viewModel?.updateShortExitDuration(it.toInt()) },
@@ -314,21 +313,23 @@ fun AppSettingsScreen(
                                     steps = 29,
                                     modifier = Modifier.fillMaxWidth()
                                 )
+                                Spacer(modifier = Modifier.height(4.dp))
                                 Text(stringResource(R.string.short_exit_desc), style = AppTypography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                             }
                         }
 
-                        HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant, modifier = Modifier.padding(horizontal = 16.dp))
+                        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant, modifier = Modifier.padding(horizontal = 16.dp))
 
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(16.dp),
+                                .padding(horizontal = 16.dp, vertical = 14.dp),
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Column(modifier = Modifier.weight(1f)) {
-                                Text(stringResource(R.string.lock_again_after_screen_off), style = AppTypography.bodyLarge)
+                                Text(stringResource(R.string.lock_again_after_screen_off), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
+                                Spacer(modifier = Modifier.height(2.dp))
                                 Text(stringResource(R.string.lock_again_desc), style = AppTypography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                             }
                             Switch(
@@ -337,17 +338,18 @@ fun AppSettingsScreen(
                             )
                         }
 
-                        HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant, modifier = Modifier.padding(horizontal = 16.dp))
+                        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant, modifier = Modifier.padding(horizontal = 16.dp))
 
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(16.dp),
+                                .padding(horizontal = 16.dp, vertical = 14.dp),
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Column(modifier = Modifier.weight(1f)) {
-                                Text(stringResource(R.string.auto_start_after_reboot), style = AppTypography.bodyLarge)
+                                Text(stringResource(R.string.auto_start_after_reboot), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
+                                Spacer(modifier = Modifier.height(2.dp))
                                 Text(stringResource(R.string.auto_start_desc), style = AppTypography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                             }
                             Switch(
@@ -362,18 +364,17 @@ fun AppSettingsScreen(
             item {
                 Text(
                     text = stringResource(R.string.system_settings),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    style = AppTypography.titleMedium,
-                    modifier = Modifier.padding(start = 8.dp)
+                    style = MaterialTheme.typography.titleMedium,
+                    color = ProLockerPrimary,
+                    modifier = Modifier.padding(start = 4.dp)
                 )
             }
 
             item {
                 Card(
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+                    shape = RoundedCornerShape(20.dp),
                     elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-                    border = BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.surfaceVariant),
                 ) {
                     Column(modifier = Modifier.fillMaxWidth()) {
                         Row(
@@ -384,12 +385,13 @@ fun AppSettingsScreen(
                                     val nextRotation = options[(options.indexOf(prefs.lockScreenRotation) + 1) % options.size]
                                     viewModel?.updateLockScreenRotation(nextRotation)
                                 }
-                                .padding(16.dp),
+                                .padding(horizontal = 16.dp, vertical = 14.dp),
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Column(modifier = Modifier.weight(1f)) {
-                                Text(stringResource(R.string.lock_screen_rotation), style = AppTypography.bodyLarge)
+                                Text(stringResource(R.string.lock_screen_rotation), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
+                                Spacer(modifier = Modifier.height(2.dp))
                                 val rotationStr = when(prefs.lockScreenRotation) {
                                     "SYSTEM" -> stringResource(R.string.rotation_system)
                                     "AUTO" -> stringResource(R.string.rotation_auto)
@@ -397,13 +399,13 @@ fun AppSettingsScreen(
                                     "LANDSCAPE" -> stringResource(R.string.rotation_landscape)
                                     else -> prefs.lockScreenRotation
                                 }
-                                Text("${stringResource(R.string.current_colon)} $rotationStr", style = AppTypography.bodySmall, color = MaterialTheme.colorScheme.primary)
+                                Text("${stringResource(R.string.current_colon)} $rotationStr", style = AppTypography.bodySmall, color = ProLockerPrimary)
                             }
                             Icon(Icons.Default.Settings, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
 
-                        HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant, modifier = Modifier.padding(horizontal = 16.dp))
-                        
+                        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant, modifier = Modifier.padding(horizontal = 16.dp))
+
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -413,7 +415,7 @@ fun AppSettingsScreen(
                                         context.startActivity(intent)
                                     }
                                 }
-                                .padding(16.dp),
+                                .padding(horizontal = 16.dp, vertical = 14.dp),
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
@@ -422,7 +424,8 @@ fun AppSettingsScreen(
                                     val pm = context.getSystemService(android.content.Context.POWER_SERVICE) as android.os.PowerManager
                                     pm.isIgnoringBatteryOptimizations(context.packageName)
                                 } else { false }
-                                Text(stringResource(R.string.battery_optimization), style = AppTypography.bodyLarge)
+                                Text(stringResource(R.string.battery_optimization), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
+                                Spacer(modifier = Modifier.height(2.dp))
                                 Text(if (ignored) stringResource(R.string.battery_ignored) else stringResource(R.string.battery_optimized), style = AppTypography.bodySmall, color = if (ignored) Color(0xFF00AA00) else MaterialTheme.colorScheme.error)
                             }
                             Icon(
@@ -434,22 +437,21 @@ fun AppSettingsScreen(
                     }
                 }
             }
-            
+
             item {
                 Text(
                     text = stringResource(R.string.protection_settings),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    style = AppTypography.titleMedium,
-                    modifier = Modifier.padding(top = 16.dp, start = 8.dp)
+                    style = MaterialTheme.typography.titleMedium,
+                    color = ProLockerPrimary,
+                    modifier = Modifier.padding(start = 4.dp)
                 )
             }
-            
+
             item {
                 Card(
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+                    shape = RoundedCornerShape(20.dp),
                     elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-                    border = BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.surfaceVariant),
                 ) {
                     Column(modifier = Modifier.fillMaxWidth()) {
                         Row(
@@ -466,12 +468,13 @@ fun AppSettingsScreen(
                                         }
                                     }
                                 }
-                                .padding(16.dp),
+                                .padding(horizontal = 16.dp, vertical = 14.dp),
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Column(modifier = Modifier.weight(1f)) {
-                                Text(stringResource(R.string.prevent_easy_uninstall), style = AppTypography.bodyLarge)
+                                Text(stringResource(R.string.prevent_easy_uninstall), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
+                                Spacer(modifier = Modifier.height(2.dp))
                                 Text(stringResource(R.string.prevent_uninstall_desc), style = AppTypography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                             }
                             Switch(
@@ -489,18 +492,19 @@ fun AppSettingsScreen(
                                 }
                             )
                         }
-                        
-                        HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant, modifier = Modifier.padding(horizontal = 16.dp))
-                        
+
+                        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant, modifier = Modifier.padding(horizontal = 16.dp))
+
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(16.dp),
+                                .padding(horizontal = 16.dp, vertical = 14.dp),
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Column(modifier = Modifier.weight(1f)) {
-                                Text(stringResource(R.string.accessibility_mode), style = AppTypography.bodyLarge)
+                                Text(stringResource(R.string.accessibility_mode), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
+                                Spacer(modifier = Modifier.height(2.dp))
                                 Text(stringResource(R.string.accessibility_mode_desc), style = AppTypography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                             }
                             Switch(
@@ -514,22 +518,23 @@ fun AppSettingsScreen(
                             )
                         }
 
-                        HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant, modifier = Modifier.padding(horizontal = 16.dp))
+                        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant, modifier = Modifier.padding(horizontal = 16.dp))
 
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(16.dp),
+                                .padding(horizontal = 16.dp, vertical = 14.dp),
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Column(modifier = Modifier.weight(1f)) {
-                                Text(stringResource(R.string.stealth_mode), style = AppTypography.bodyLarge)
+                                Text(stringResource(R.string.stealth_mode), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
+                                Spacer(modifier = Modifier.height(2.dp))
                                 Text(stringResource(R.string.stealth_mode_desc), style = AppTypography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                             }
                             Switch(
                                 checked = isStealthActive,
-                                onCheckedChange = { 
+                                onCheckedChange = {
                                     if (it) {
                                         if (canEnableStealth) {
                                             showStealthWarningDialog = true
@@ -549,16 +554,15 @@ fun AppSettingsScreen(
 
             item {
                 Card(
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+                    shape = RoundedCornerShape(20.dp),
                     elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-                    border = BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.surfaceVariant),
                 ) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable { onNavigateToAudit() }
-                            .padding(16.dp),
+                            .padding(horizontal = 16.dp, vertical = 14.dp),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -569,10 +573,10 @@ fun AppSettingsScreen(
                             Icon(
                                 imageVector = Icons.Default.Security,
                                 contentDescription = null,
-                                tint = MaterialTheme.colorScheme.primary
+                                tint = ProLockerPrimary
                             )
                             Spacer(modifier = Modifier.width(16.dp))
-                            Text(stringResource(R.string.security_audit), style = AppTypography.bodyLarge)
+                            Text(stringResource(R.string.security_audit), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
                         }
                         Icon(
                             imageVector = if (isRtl) Icons.Default.ChevronLeft else Icons.Default.ChevronRight,
@@ -583,18 +587,19 @@ fun AppSettingsScreen(
                 }
             }
         }
-        
+
         if (showThemeDialog) {
             AlertDialog(
                 onDismissRequest = { showThemeDialog = false },
-                title = { Text(stringResource(R.string.theme), style = AppTypography.titleLarge) },
+                shape = RoundedCornerShape(20.dp),
+                title = { Text(stringResource(R.string.theme), style = MaterialTheme.typography.titleLarge) },
                 text = {
                     Column {
                         Row(modifier = Modifier.fillMaxWidth().clickable { viewModel?.changeTheme(false); showThemeDialog = false }.padding(16.dp)) {
-                            Text(stringResource(R.string.light), style = AppTypography.bodyLarge)
+                            Text(stringResource(R.string.light), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
                         }
                         Row(modifier = Modifier.fillMaxWidth().clickable { viewModel?.changeTheme(true); showThemeDialog = false }.padding(16.dp)) {
-                            Text(stringResource(R.string.dark), style = AppTypography.bodyLarge)
+                            Text(stringResource(R.string.dark), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
                         }
                     }
                 },
@@ -605,14 +610,15 @@ fun AppSettingsScreen(
         if (showLanguageDialog) {
             AlertDialog(
                 onDismissRequest = { showLanguageDialog = false },
-                title = { Text(stringResource(R.string.language), style = AppTypography.titleLarge) },
+                shape = RoundedCornerShape(20.dp),
+                title = { Text(stringResource(R.string.language), style = MaterialTheme.typography.titleLarge) },
                 text = {
                     Column {
                         Row(modifier = Modifier.fillMaxWidth().clickable { viewModel?.changeLanguage("en"); showLanguageDialog = false }.padding(16.dp)) {
-                            Text(stringResource(R.string.english), style = AppTypography.bodyLarge)
+                            Text(stringResource(R.string.english), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
                         }
                         Row(modifier = Modifier.fillMaxWidth().clickable { viewModel?.changeLanguage("fa"); showLanguageDialog = false }.padding(16.dp)) {
-                            Text(stringResource(R.string.persian), style = AppTypography.bodyLarge)
+                            Text(stringResource(R.string.persian), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
                         }
                     }
                 },
@@ -623,8 +629,9 @@ fun AppSettingsScreen(
         if (showStealthWarningDialog) {
             AlertDialog(
                 onDismissRequest = { showStealthWarningDialog = false },
-                title = { Text(stringResource(R.string.stealth_warning_title), style = AppTypography.titleLarge) },
-                text = { Text(stringResource(R.string.stealth_warning_message), style = AppTypography.bodyMedium) },
+                shape = RoundedCornerShape(20.dp),
+                title = { Text(stringResource(R.string.stealth_warning_title), style = MaterialTheme.typography.titleLarge) },
+                text = { Text(stringResource(R.string.stealth_warning_message), style = MaterialTheme.typography.bodyMedium) },
                 confirmButton = {
                     TextButton(
                         onClick = {
@@ -647,8 +654,9 @@ fun AppSettingsScreen(
         if (showStealthRequiresLockDialog) {
             AlertDialog(
                 onDismissRequest = { showStealthRequiresLockDialog = false },
-                title = { Text(stringResource(R.string.stealth_requires_lock_title), style = AppTypography.titleLarge) },
-                text = { Text(stringResource(R.string.stealth_requires_lock_message), style = AppTypography.bodyMedium) },
+                shape = RoundedCornerShape(20.dp),
+                title = { Text(stringResource(R.string.stealth_requires_lock_title), style = MaterialTheme.typography.titleLarge) },
+                text = { Text(stringResource(R.string.stealth_requires_lock_message), style = MaterialTheme.typography.bodyMedium) },
                 confirmButton = {
                     TextButton(onClick = { showStealthRequiresLockDialog = false }) {
                         Text(stringResource(R.string.ok))
@@ -674,4 +682,3 @@ fun AppSettingsScreenDarkPreview() {
         AppSettingsScreen(onBack = {})
     }
 }
-

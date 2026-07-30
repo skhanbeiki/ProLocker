@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -23,20 +25,20 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.core.view.WindowCompat
 import com.carbon.prolocker.R
 import com.carbon.prolocker.core.ui.components.AppToolbar
 import com.carbon.prolocker.core.ui.components.PatternLockView
 import org.koin.androidx.compose.koinViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PatternSetupScreen(
     onSetupComplete: () -> Unit
@@ -46,7 +48,8 @@ fun PatternSetupScreen(
     val step by viewModel?.step?.collectAsState() ?: remember { mutableStateOf(PatternSetupViewModel.SetupStep.ENTER) }
     val isError by viewModel?.isError?.collectAsState() ?: remember { mutableStateOf(false) }
     val context = LocalContext.current
-    
+    val bgColor = MaterialTheme.colorScheme.background
+
     if (!isInspection) {
         DisposableEffect(Unit) {
             val activity = context as? Activity
@@ -56,7 +59,6 @@ fun PatternSetupScreen(
             } else {
                 val window = activity.window
 
-                // ذخیره وضعیت قبلی
                 val oldStatusBarColor = window.statusBarColor
                 val oldNavigationBarColor = window.navigationBarColor
 
@@ -66,10 +68,8 @@ fun PatternSetupScreen(
                 val oldLightStatusBars = insetsController.isAppearanceLightStatusBars
                 val oldLightNavigationBars = insetsController.isAppearanceLightNavigationBars
 
-                // اعمال تنظیمات صفحه Pattern/PIN
                 window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
 
-                val bgColor = Color(0xFF3E7FB5)
                 window.statusBarColor = bgColor.toArgb()
                 window.navigationBarColor = bgColor.toArgb()
 
@@ -77,7 +77,6 @@ fun PatternSetupScreen(
                 insetsController.isAppearanceLightNavigationBars = false
 
                 onDispose {
-                    // بازگردانی تنظیمات قبلی
                     window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
 
                     window.statusBarColor = oldStatusBarColor
@@ -97,12 +96,12 @@ fun PatternSetupScreen(
     }
 
     Scaffold(
-        topBar = { AppToolbar(title = stringResource(R.string.pattern_setup), containerColor = Color(0xFF3E7FB5)) },
-        containerColor = Color(0xFF3E7FB5)
+        topBar = { AppToolbar(title = stringResource(R.string.pattern_setup)) },
+        containerColor = MaterialTheme.colorScheme.background
     ) { padding ->
         val configuration = LocalContext.current.resources.configuration
         val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
-        
+
         if (isLandscape) {
             Row(
                 modifier = Modifier
@@ -122,17 +121,19 @@ fun PatternSetupScreen(
                             step == PatternSetupViewModel.SetupStep.ENTER -> stringResource(R.string.draw_unlock_pattern)
                             else -> stringResource(R.string.confirm_pattern)
                         },
-                        fontSize = 18.sp,
-                        color = if (isError) Color.Red else Color.White
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = if (isError) MaterialTheme.colorScheme.error
+                        else MaterialTheme.colorScheme.onBackground
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
                         text = stringResource(R.string.connect_dots),
-                        fontSize = 14.sp,
-                        color = Color.White.copy(alpha = 0.6f)
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
                     )
                 }
-                
+
                 Box(modifier = Modifier.weight(0.6f).fillMaxHeight(), contentAlignment = Alignment.Center) {
                     PatternLockView(
                         isError = isError,
@@ -160,8 +161,10 @@ fun PatternSetupScreen(
                         step == PatternSetupViewModel.SetupStep.ENTER -> stringResource(R.string.draw_unlock_pattern)
                         else -> stringResource(R.string.confirm_pattern)
                     },
-                    fontSize = 18.sp,
-                    color = if (isError) Color.Red else Color.White
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = if (isError) MaterialTheme.colorScheme.error
+                    else MaterialTheme.colorScheme.onBackground
                 )
 
                 PatternLockView(
@@ -173,11 +176,11 @@ fun PatternSetupScreen(
                     },
                     onInteractionStarted = { viewModel?.resetError() }
                 )
-                
+
                 Text(
                     text = stringResource(R.string.connect_dots),
-                    fontSize = 14.sp,
-                    color = Color.White.copy(alpha = 0.6f)
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
                 )
             }
         }

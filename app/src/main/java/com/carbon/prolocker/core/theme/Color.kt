@@ -2,22 +2,65 @@ package com.carbon.prolocker.core.theme
 
 import androidx.compose.ui.graphics.Color
 
-val md_theme_light_primary = Color(0xFF3E7FB5)
-val md_theme_light_onPrimary = Color(0xFFFFFFFF)
-val md_theme_light_primaryContainer = Color(0xFFD1E4FF)
-val md_theme_light_onPrimaryContainer = Color(0xFF001D36)
-val md_theme_light_secondary = Color(0xFF535F70)
-val md_theme_light_onSecondary = Color(0xFFFFFFFF)
-val md_theme_light_secondaryContainer = Color(0xFFD7E3F7)
-val md_theme_light_onSecondaryContainer = Color(0xFF101C2B)
-val md_theme_light_tertiary = Color(0xFF6B5778)
-val md_theme_light_onTertiary = Color(0xFFFFFFFF)
-val md_theme_light_tertiaryContainer = Color(0xFFF2DAFF)
-val md_theme_light_onTertiaryContainer = Color(0xFF251431)
-val md_theme_light_error = Color(0xFFBA1A1A)
-val md_theme_light_errorContainer = Color(0xFFFFDAD6)
-val md_theme_light_onError = Color(0xFFFFFFFF)
-val md_theme_light_onErrorContainer = Color(0xFF410002)
+val ProLockerPrimary = Color(0xFF6C7CFF)
+val ProLockerOnPrimary = Color(0xFFFFFFFF)
+val ProLockerPrimaryContainer = Color(0xFF3D4FE0)
+val ProLockerOnPrimaryContainer = Color(0xFFDDE1FF)
+
+val ProLockerSecondary = Color(0xFF7B61FF)
+val ProLockerOnSecondary = Color(0xFFFFFFFF)
+val ProLockerSecondaryContainer = Color(0xFF5B3FD8)
+val ProLockerOnSecondaryContainer = Color(0xFFE8DEFF)
+
+val ProLockerTertiary = Color(0xFF00D1B2)
+val ProLockerOnTertiary = Color(0xFF00382E)
+val ProLockerTertiaryContainer = Color(0xFF005045)
+val ProLockerOnTertiaryContainer = Color(0xFF6FFFE0)
+
+val ProLockerError = Color(0xFFFF6B6B)
+val ProLockerOnError = Color(0xFFFFFFFF)
+val ProLockerErrorContainer = Color(0xFF93001A)
+val ProLockerOnErrorContainer = Color(0xFFFFDAD6)
+
+val ProLockerBackground = Color(0xFF111216)
+val ProLockerOnBackground = Color(0xFFE6E1E6)
+
+val ProLockerSurface = Color(0xFF1A1C22)
+val ProLockerOnSurface = Color(0xFFE6E1E6)
+
+val ProLockerSurfaceVariant = Color(0xFF23262E)
+val ProLockerOnSurfaceVariant = Color(0xFFC4C6D0)
+
+val ProLockerOutline = Color(0xFF8E9099)
+val ProLockerOutlineVariant = Color(0xFF44474E)
+
+val ProLockerInverseSurface = Color(0xFFE6E1E6)
+val ProLockerInverseOnSurface = Color(0xFF1A1C22)
+val ProLockerInversePrimary = Color(0xFF6C7CFF)
+
+val ProLockerCard = Color(0xFF23262E)
+val ProLockerCardBorder = Color(0xFF2E3139)
+
+val ProLockerSuccess = Color(0xFF00D1B2)
+val ProLockerWarning = Color(0xFFFFA726)
+val ProLockerInfo = Color(0xFF5B6CFF)
+
+val md_theme_light_primary = ProLockerPrimary
+val md_theme_light_onPrimary = ProLockerOnPrimary
+val md_theme_light_primaryContainer = ProLockerPrimaryContainer
+val md_theme_light_onPrimaryContainer = ProLockerOnPrimaryContainer
+val md_theme_light_secondary = ProLockerSecondary
+val md_theme_light_onSecondary = ProLockerOnSecondary
+val md_theme_light_secondaryContainer = ProLockerSecondaryContainer
+val md_theme_light_onSecondaryContainer = ProLockerOnSecondaryContainer
+val md_theme_light_tertiary = ProLockerTertiary
+val md_theme_light_onTertiary = ProLockerOnTertiary
+val md_theme_light_tertiaryContainer = ProLockerTertiaryContainer
+val md_theme_light_onTertiaryContainer = ProLockerOnTertiaryContainer
+val md_theme_light_error = ProLockerError
+val md_theme_light_errorContainer = ProLockerErrorContainer
+val md_theme_light_onError = ProLockerOnError
+val md_theme_light_onErrorContainer = ProLockerOnErrorContainer
 val md_theme_light_background = Color(0xFFF8F9FF)
 val md_theme_light_onBackground = Color(0xFF191C20)
 val md_theme_light_surface = Color(0xFFFFFFFF)
@@ -27,31 +70,31 @@ val md_theme_light_onSurfaceVariant = Color(0xFF43474E)
 val md_theme_light_outline = Color(0xFF73777F)
 val md_theme_light_inverseOnSurface = Color(0xFFF1F0F4)
 val md_theme_light_inverseSurface = Color(0xFF2F3033)
-val md_theme_light_inversePrimary = Color(0xFF9ECAFF)
+val md_theme_light_inversePrimary = ProLockerPrimary
 
-val md_theme_dark_primary = Color(0xFF9ECAFF)
-val md_theme_dark_onPrimary = Color(0xFF003258)
-val md_theme_dark_primaryContainer = Color(0xFF00497D)
-val md_theme_dark_onPrimaryContainer = Color(0xFFD1E4FF)
-val md_theme_dark_secondary = Color(0xFFBBC7DB)
-val md_theme_dark_onSecondary = Color(0xFF253140)
-val md_theme_dark_secondaryContainer = Color(0xFF3B4858)
-val md_theme_dark_onSecondaryContainer = Color(0xFFD7E3F7)
-val md_theme_dark_tertiary = Color(0xFFD6BEE4)
-val md_theme_dark_onTertiary = Color(0xFF3B2948)
-val md_theme_dark_tertiaryContainer = Color(0xFF523F5F)
-val md_theme_dark_onTertiaryContainer = Color(0xFFF2DAFF)
-val md_theme_dark_error = Color(0xFFFFB4AB)
-val md_theme_dark_errorContainer = Color(0xFF93000A)
-val md_theme_dark_onError = Color(0xFF690005)
-val md_theme_dark_onErrorContainer = Color(0xFFFFDAD6)
-val md_theme_dark_background = Color(0xFF1A1C1E)
-val md_theme_dark_onBackground = Color(0xFFE2E2E6)
-val md_theme_dark_surface = Color(0xFF1A1C1E)
-val md_theme_dark_onSurface = Color(0xFFE2E2E6)
-val md_theme_dark_surfaceVariant = Color(0xFF43474E)
-val md_theme_dark_onSurfaceVariant = Color(0xFFC3C7CF)
-val md_theme_dark_outline = Color(0xFF8D9199)
-val md_theme_dark_inverseOnSurface = Color(0xFF1A1C1E)
-val md_theme_dark_inverseSurface = Color(0xFFE2E2E6)
-val md_theme_dark_inversePrimary = Color(0xFF3E7FB5)
+val md_theme_dark_primary = ProLockerPrimary
+val md_theme_dark_onPrimary = ProLockerOnPrimary
+val md_theme_dark_primaryContainer = ProLockerPrimaryContainer
+val md_theme_dark_onPrimaryContainer = ProLockerOnPrimaryContainer
+val md_theme_dark_secondary = ProLockerSecondary
+val md_theme_dark_onSecondary = ProLockerOnSecondary
+val md_theme_dark_secondaryContainer = ProLockerSecondaryContainer
+val md_theme_dark_onSecondaryContainer = ProLockerOnSecondaryContainer
+val md_theme_dark_tertiary = ProLockerTertiary
+val md_theme_dark_onTertiary = ProLockerOnTertiary
+val md_theme_dark_tertiaryContainer = ProLockerTertiaryContainer
+val md_theme_dark_onTertiaryContainer = ProLockerOnTertiaryContainer
+val md_theme_dark_error = ProLockerError
+val md_theme_dark_errorContainer = ProLockerErrorContainer
+val md_theme_dark_onError = ProLockerOnError
+val md_theme_dark_onErrorContainer = ProLockerOnErrorContainer
+val md_theme_dark_background = ProLockerBackground
+val md_theme_dark_onBackground = ProLockerOnBackground
+val md_theme_dark_surface = ProLockerSurface
+val md_theme_dark_onSurface = ProLockerOnSurface
+val md_theme_dark_surfaceVariant = ProLockerSurfaceVariant
+val md_theme_dark_onSurfaceVariant = ProLockerOnSurfaceVariant
+val md_theme_dark_outline = ProLockerOutline
+val md_theme_dark_inverseOnSurface = ProLockerInverseOnSurface
+val md_theme_dark_inverseSurface = ProLockerInverseSurface
+val md_theme_dark_inversePrimary = ProLockerInversePrimary

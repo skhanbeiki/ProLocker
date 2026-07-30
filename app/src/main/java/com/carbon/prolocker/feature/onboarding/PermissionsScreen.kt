@@ -3,6 +3,9 @@ package com.carbon.prolocker.feature.onboarding
 import android.content.res.Configuration
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -26,6 +29,7 @@ import androidx.compose.material.icons.filled.BatteryAlert
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Layers
 import androidx.compose.material.icons.filled.QueryStats
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -47,9 +51,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import coil.compose.AsyncImage
@@ -57,6 +63,7 @@ import coil.request.ImageRequest
 import com.carbon.prolocker.R
 import com.carbon.prolocker.core.permissions.PermissionManager
 import com.carbon.prolocker.core.security.TrustedReturnManager
+import com.carbon.prolocker.core.theme.ProLockerTertiary
 import com.carbon.prolocker.core.ui.components.AppToolbar
 import com.carbon.prolocker.core.ui.components.PrimaryButton
 import kotlinx.coroutines.launch
@@ -68,7 +75,7 @@ private enum class BatteryPermissionLaunchPhase {
     FALLBACK_SETTINGS
 }
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun PermissionsScreen(
     pendingPackage: String = "",
@@ -197,20 +204,26 @@ fun PermissionsScreen(
                 .padding(bottom = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            Spacer(modifier = Modifier.height(24.dp))
+
             Row(
-                modifier = Modifier.padding( bottom = 32.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                modifier = Modifier.padding(bottom = 32.dp),
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 for (i in slides.indices) {
                     val isActive = i == pagerState.currentPage
                     val isCompleted = i < pagerState.currentPage
-                    val color =
-                        if (isActive || isCompleted) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant
+                    val color = when {
+                        isActive -> MaterialTheme.colorScheme.primary
+                        isCompleted -> MaterialTheme.colorScheme.tertiary
+                        else -> MaterialTheme.colorScheme.surfaceVariant
+                    }
                     Box(
                         modifier = Modifier
-                            .height(8.dp)
-                            .width(if (isActive) 24.dp else 8.dp)
-                            .clip(CircleShape)
+                            .height(6.dp)
+                            .width(if (isActive) 28.dp else 6.dp)
+                            .clip(RoundedCornerShape(3.dp))
                             .background(color)
                     )
                 }
@@ -336,32 +349,42 @@ fun PermissionSlideContent(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 32.dp),
+            .padding(horizontal = 24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-
         Box(
             modifier = Modifier
-                .size(160.dp)
+                .size(140.dp)
                 .background(MaterialTheme.colorScheme.surfaceVariant, CircleShape),
             contentAlignment = Alignment.Center
         ) {
-            Icon(
-                imageVector = slide.icon,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(80.dp)
-            )
+            Box(
+                modifier = Modifier
+                    .size(100.dp)
+                    .background(
+                        MaterialTheme.colorScheme.primary.copy(alpha = 0.15f),
+                        CircleShape
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = slide.icon,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(56.dp)
+                )
+            }
         }
 
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(40.dp))
 
         Text(
             text = slide.title,
-            style = com.carbon.prolocker.core.theme.AppTypography.headlineSmall,
+            style = MaterialTheme.typography.headlineSmall,
             color = MaterialTheme.colorScheme.onBackground,
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
+            fontWeight = FontWeight.Bold
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -369,64 +392,73 @@ fun PermissionSlideContent(
         Text(
             text = slide.description,
             style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f),
-            textAlign = TextAlign.Center
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center,
+            lineHeight = 26.sp
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(24.dp))
 
         Surface(
-            color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f),
-            shape = RoundedCornerShape(12.dp)
+            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.08f),
+            shape = RoundedCornerShape(16.dp)
         ) {
             Text(
                 text = slide.reason,
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(16.dp)
             )
         }
+
         if (!isLastPage) {
+            Spacer(modifier = Modifier.height(12.dp))
             Surface(
-                color = Color(0xFFfcfbfe),
-                modifier = Modifier.padding(top = 8.dp,),
-                shape = RoundedCornerShape(12.dp)
+                color = MaterialTheme.colorScheme.surfaceVariant,
+                shape = RoundedCornerShape(16.dp)
             ) {
                 GifFromRaw()
             }
         }
+
         Spacer(modifier = Modifier.weight(1f))
 
         if (state == PermissionState.GRANTED) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.fillMaxWidth()
+            AnimatedVisibility(
+                visible = true,
+                enter = fadeIn() + slideInVertically()
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Icon(
-                        Icons.Default.CheckCircle,
-                        contentDescription = null,
-                        tint = Color(0xFF4CAF50),
-                        modifier = Modifier.size(24.dp)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = stringResource(R.string.permission_granted),
-                        color = Color(0xFF4CAF50),
-                        style = com.carbon.prolocker.core.theme.AppTypography.titleMedium
-                    )
-                }
-                Spacer(modifier = Modifier.height(16.dp))
-                PrimaryButton(
-                    text = stringResource(if (isLastPage) R.string.finish else R.string.next),
-                    onClick = onNext,
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier.fillMaxWidth()
-                )
-                Spacer(modifier = Modifier.height(16.dp))
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Icon(
+                            Icons.Default.CheckCircle,
+                            contentDescription = null,
+                            tint = ProLockerTertiary,
+                            modifier = Modifier.size(24.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = stringResource(R.string.permission_granted),
+                            color = ProLockerTertiary,
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(20.dp))
+                    PrimaryButton(
+                        text = stringResource(if (isLastPage) R.string.finish else R.string.next),
+                        onClick = onNext,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
             }
         } else {
             PrimaryButton(

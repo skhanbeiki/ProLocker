@@ -8,6 +8,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -48,10 +49,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.LayoutDirection
@@ -64,6 +67,7 @@ import com.carbon.prolocker.ad.NativeAdType
 import com.carbon.prolocker.core.datastore.PreferencesRepository
 import com.carbon.prolocker.core.language.LanguageManager
 import com.carbon.prolocker.core.theme.AppTypography
+import com.carbon.prolocker.core.theme.ProLockerError
 import com.carbon.prolocker.core.ui.components.PatternLockView
 import com.carbon.prolocker.core.ui.components.PinLockView
 import com.carbon.prolocker.core.utils.toSafeBitmap
@@ -95,7 +99,6 @@ fun LockScreenContent(
     onNavigateToBackgrounds: () -> Unit = {},
     onNavigateToMemory: () -> Unit = {}
 ) {
-    // Fix existing bug: apply language preference on lock screen
     val languageManager: LanguageManager = koinInject()
     val preferencesRepository: PreferencesRepository = koinInject()
     val language by preferencesRepository.userPreferencesFlow
@@ -117,16 +120,14 @@ fun LockScreenContent(
             appName = pm.getApplicationLabel(appInfo).toString()
             appIcon = pm.getApplicationIcon(appInfo)
         } catch (_e: PackageManager.NameNotFoundException) {
-            // ignore
         }
     }
     Box(modifier = Modifier.fillMaxSize()) {
-        // Background layer - fills entire screen including system bars
         if (!selectedBackgroundUrl.isNullOrEmpty()) {
             coil.compose.AsyncImage(
                 model = selectedBackgroundUrl,
                 contentDescription = null,
-                contentScale = androidx.compose.ui.layout.ContentScale.Crop,
+                contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize()
             )
             Box(
@@ -138,7 +139,7 @@ fun LockScreenContent(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color(0xFF3E7FB5))
+                    .background(MaterialTheme.colorScheme.background)
             )
         }
         Scaffold(
@@ -241,7 +242,8 @@ fun LockScreenContent(
                                         credentialStr
                                     ),
                                     style = MaterialTheme.typography.bodyLarge,
-                                    color = if (isError) Color.Red else Color.White.copy(
+                                    fontWeight = FontWeight.Medium,
+                                    color = if (isError) ProLockerError else Color.White.copy(
                                         alpha = 0.7f
                                     ),
                                     textAlign = TextAlign.Center
@@ -267,11 +269,20 @@ fun LockScreenContent(
                                 }
                                 if (failedAttemptsCount >= threshold) {
                                     Spacer(modifier = Modifier.height(24.dp))
-                                    TextButton(onClick = { showForgotDialog = true }) {
-                                        Text(
-                                            stringResource(R.string.forgot_password),
-                                            color = Color.White
-                                        )
+                                    Card(
+                                        shape = RoundedCornerShape(24.dp),
+                                        colors = CardDefaults.cardColors(
+                                            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+                                        ),
+                                        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+                                    ) {
+                                        TextButton(onClick = { showForgotDialog = true }) {
+                                            Text(
+                                                stringResource(R.string.forgot_password),
+                                                color = Color.White,
+                                                fontWeight = FontWeight.Medium
+                                            )
+                                        }
                                     }
                                 }
                             }
@@ -388,7 +399,6 @@ fun LockScreenContent(
                             .weight(0.3f),
                         horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
-                        // Ad placement based on config
                         when (lockScreenAdPlace) {
                             "top" -> {
                                 if (adManager != null) {
@@ -464,7 +474,8 @@ fun LockScreenContent(
                                     credentialStr
                                 ),
                                 style = MaterialTheme.typography.bodyLarge,
-                                color = if (isError) Color.Red else Color.White.copy(
+                                fontWeight = FontWeight.Medium,
+                                color = if (isError) ProLockerError else Color.White.copy(
                                     alpha = 0.7f
                                 ),
                                 textAlign = TextAlign.Center
@@ -526,11 +537,20 @@ fun LockScreenContent(
                             verticalArrangement = Arrangement.Center
                         ) {
                             if (failedAttemptsCount >= threshold) {
-                                TextButton(onClick = { showForgotDialog = true }) {
-                                    Text(
-                                        stringResource(R.string.forgot_password),
-                                        color = Color.White
-                                    )
+                                Card(
+                                    shape = RoundedCornerShape(24.dp),
+                                    colors = CardDefaults.cardColors(
+                                        containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+                                    ),
+                                    elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+                                ) {
+                                    TextButton(onClick = { showForgotDialog = true }) {
+                                        Text(
+                                            stringResource(R.string.forgot_password),
+                                            color = Color.White,
+                                            fontWeight = FontWeight.Medium
+                                        )
+                                    }
                                 }
                             } else {
                                 if (lockScreenAdPlace == "bottom" && adManager != null) {
@@ -553,15 +573,13 @@ fun LockScreenContent(
         if (showForgotDialog) {
             var recoveryAnswer by remember { mutableStateOf("") }
             var recoveryError by remember { mutableStateOf(false) }
-            // Pure Compose dialog — avoids android.app.Dialog which needs an Activity token.
-            // The platform AlertDialog would crash in the overlay (Service) context.
             Box(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(Color.Black.copy(alpha = 0.5f))
                     .clickable(
                         indication = null,
-                        interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() }
+                        interactionSource = remember { MutableInteractionSource() }
                     ) {
                         showForgotDialog = false
                         recoveryError = false
@@ -643,4 +661,3 @@ fun LockScreenContent(
         }
     }
 }
-

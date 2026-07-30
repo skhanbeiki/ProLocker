@@ -1,7 +1,9 @@
 package com.carbon.prolocker.feature.account
 
 import android.content.res.Configuration
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -26,8 +28,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -36,13 +36,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.carbon.prolocker.R
 import com.carbon.prolocker.core.permissions.PermissionManager
 import com.carbon.prolocker.core.permissions.PermissionManager.isAccessibilityServiceEnabled
@@ -50,6 +50,11 @@ import com.carbon.prolocker.core.security.DeviceAdminManager
 import com.carbon.prolocker.core.security.EventLogManager
 import com.carbon.prolocker.core.security.SecurityScoreManager
 import com.carbon.prolocker.core.service.AppMonitorAccessibilityService
+import com.carbon.prolocker.core.theme.AppTypography
+import com.carbon.prolocker.core.theme.ProLockerPrimary
+import com.carbon.prolocker.core.theme.ProLockerSecondary
+import com.carbon.prolocker.core.theme.ProLockerTertiary
+import com.carbon.prolocker.core.ui.components.AppToolbar
 import org.koin.compose.koinInject
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -79,18 +84,17 @@ fun SecurityAuditScreen(onBack: () -> Unit) {
     val batteryOpt = if (isInspection) true else PermissionManager.isIgnoringBatteryOptimizations(context)
     val admin = if (isInspection) false else deviceAdminManager?.isAdminActive() ?: false
     val accessibility = if (isInspection) false else isAccessibilityServiceEnabled(context, AppMonitorAccessibilityService::class.java)
-    val service = true // Assumed true if app is running for this basic check
+    val service = true
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.security_audit), style = com.carbon.prolocker.core.theme.AppTypography.titleLarge, fontSize = 20.sp) },
+            AppToolbar(
+                title = stringResource(R.string.security_audit),
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background)
+                }
             )
         },
         containerColor = MaterialTheme.colorScheme.background
@@ -99,24 +103,53 @@ fun SecurityAuditScreen(onBack: () -> Unit) {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .padding(horizontal = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+                .padding(horizontal = 20.dp),
+            verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
             item {
                 Card(
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
-                    shape = RoundedCornerShape(12.dp),
+                    shape = RoundedCornerShape(20.dp),
                     elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-                    modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier.fillMaxWidth().padding(24.dp)
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(
+                                brush = Brush.verticalGradient(
+                                    colors = listOf(
+                                        ProLockerPrimary.copy(alpha = 0.25f),
+                                        ProLockerSecondary.copy(alpha = 0.12f)
+                                    )
+                                )
+                            )
                     ) {
-                        Text(stringResource(R.string.security_score), color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f), fontSize = 14.sp)
-                        Text(stringResource(R.string.score_format, score.toString()), color = MaterialTheme.colorScheme.onPrimaryContainer, style = com.carbon.prolocker.core.theme.AppTypography.titleMedium, fontSize = 36.sp)
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(if (score >= 90) stringResource(R.string.excellent_protection) else if (score >= 70) stringResource(R.string.good_protection) else stringResource(R.string.needs_attention), color = MaterialTheme.colorScheme.onPrimaryContainer, fontSize = 16.sp)
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier = Modifier.fillMaxWidth().padding(24.dp)
+                        ) {
+                            Text(
+                                stringResource(R.string.security_score),
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                                style = AppTypography.bodySmall
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                stringResource(R.string.score_format, score.toString()),
+                                color = MaterialTheme.colorScheme.onSurface,
+                                style = MaterialTheme.typography.displaySmall
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                if (score >= 90) stringResource(R.string.excellent_protection)
+                                else if (score >= 70) stringResource(R.string.good_protection)
+                                else stringResource(R.string.needs_attention),
+                                color = if (score >= 90) ProLockerTertiary
+                                       else if (score >= 70) ProLockerPrimary
+                                       else MaterialTheme.colorScheme.error,
+                                style = MaterialTheme.typography.titleMedium
+                            )
+                        }
                     }
                 }
             }
@@ -124,40 +157,43 @@ fun SecurityAuditScreen(onBack: () -> Unit) {
             item {
                 Text(
                     text = stringResource(R.string.protection_status),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    fontSize = 14.sp,
-                    style = com.carbon.prolocker.core.theme.AppTypography.titleLarge,
-                    modifier = Modifier.padding(start = 8.dp, bottom = 4.dp)
+                    style = MaterialTheme.typography.titleMedium,
+                    color = ProLockerPrimary,
+                    modifier = Modifier.padding(start = 4.dp)
                 )
             }
-            
+
             item { AuditItem(stringResource(R.string.audit_usage_access), stringResource(R.string.audit_usage_access_desc), usageStats) }
             item { AuditItem(stringResource(R.string.audit_draw_over_apps), stringResource(R.string.audit_draw_over_apps_desc), overlay) }
             item { AuditItem(stringResource(R.string.audit_battery_opt), stringResource(R.string.audit_battery_opt_desc), batteryOpt) }
             item { AuditItem(stringResource(R.string.audit_device_admin), stringResource(R.string.audit_device_admin_desc), admin, isWarningMode = true) }
             item { AuditItem(stringResource(R.string.audit_accessibility_mode), stringResource(R.string.audit_accessibility_mode_desc), accessibility, isWarningMode = true) }
             item { AuditItem(stringResource(R.string.audit_background_service), stringResource(R.string.audit_background_service_desc), service) }
-            
+
             item {
                 Text(
                     text = stringResource(R.string.event_log),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    fontSize = 14.sp,
-                    style = com.carbon.prolocker.core.theme.AppTypography.titleLarge,
-                    modifier = Modifier.padding(start = 8.dp, top = 16.dp, bottom = 4.dp)
+                    style = MaterialTheme.typography.titleMedium,
+                    color = ProLockerPrimary,
+                    modifier = Modifier.padding(start = 4.dp)
                 )
             }
 
             if (events.isEmpty()) {
                 item {
-                    Text(stringResource(R.string.no_events_recorded), color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(16.dp))
+                    Text(
+                        stringResource(R.string.no_events_recorded),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(16.dp)
+                    )
                 }
             } else {
                 items(events, key = { it.id }) { event ->
                     EventLogItem(event)
                 }
             }
-            
+
             item { Spacer(modifier = Modifier.height(24.dp)) }
         }
     }
@@ -166,25 +202,39 @@ fun SecurityAuditScreen(onBack: () -> Unit) {
 @Composable
 fun EventLogItem(event: com.carbon.prolocker.core.database.SecurityEventEntity) {
     Card(
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        shape = RoundedCornerShape(8.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+        shape = RoundedCornerShape(20.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         modifier = Modifier.fillMaxWidth()
     ) {
         Row(
-            modifier = Modifier.padding(12.dp),
+            modifier = Modifier.padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 val sdf = SimpleDateFormat("MMM dd, HH:mm:ss", Locale.getDefault())
-                Text(event.eventType, style = com.carbon.prolocker.core.theme.AppTypography.titleMedium, fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurface)
+                Text(event.eventType, style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onSurface)
+                Spacer(modifier = Modifier.height(4.dp))
                 if (event.packageName != null) {
-                    Text(stringResource(R.string.app_prefix, event.packageName), fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(
+                        stringResource(R.string.app_prefix, event.packageName),
+                        style = AppTypography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 }
                 if (event.details != null) {
-                    Text(stringResource(R.string.details_prefix, event.details), fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(
+                        stringResource(R.string.details_prefix, event.details),
+                        style = AppTypography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 }
-                Text(sdf.format(Date(event.timestamp)), fontSize = 10.sp, color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f))
+                Spacer(modifier = Modifier.height(2.dp))
+                Text(
+                    sdf.format(Date(event.timestamp)),
+                    style = AppTypography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+                )
             }
         }
     }
@@ -193,9 +243,9 @@ fun EventLogItem(event: com.carbon.prolocker.core.database.SecurityEventEntity) 
 @Composable
 fun AuditItem(title: String, description: String, isOk: Boolean, isWarningMode: Boolean = false) {
     Card(
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        shape = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+        shape = RoundedCornerShape(20.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Row(
             modifier = Modifier
@@ -204,14 +254,15 @@ fun AuditItem(title: String, description: String, isOk: Boolean, isWarningMode: 
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(modifier = Modifier.weight(1f)) {
-                Text(title, style = com.carbon.prolocker.core.theme.AppTypography.labelLarge, fontSize = 16.sp, color = MaterialTheme.colorScheme.onSurface)
-                Text(description, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(title, style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
+                Spacer(modifier = Modifier.height(2.dp))
+                Text(description, style = AppTypography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
             Spacer(modifier = Modifier.width(16.dp))
             if (isOk) {
-                Icon(Icons.Default.CheckCircle, contentDescription = stringResource(R.string.healthy), tint = Color(0xFF00AA00), modifier = Modifier.size(24.dp))
+                Icon(Icons.Default.CheckCircle, contentDescription = stringResource(R.string.healthy), tint = ProLockerTertiary, modifier = Modifier.size(24.dp))
             } else {
-                val tint = if (isWarningMode) Color(0xFFFFA000) else MaterialTheme.colorScheme.error
+                val tint = if (isWarningMode) ProLockerSecondary else MaterialTheme.colorScheme.error
                 Icon(Icons.Default.Warning, contentDescription = stringResource(R.string.missing_or_warning), tint = tint, modifier = Modifier.size(24.dp))
             }
         }
@@ -233,4 +284,3 @@ fun SecurityAuditScreenDarkPreview() {
         SecurityAuditScreen(onBack = {})
     }
 }
-

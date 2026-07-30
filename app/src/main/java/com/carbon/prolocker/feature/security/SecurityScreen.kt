@@ -11,7 +11,6 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -38,6 +37,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Security
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.AlertDialogDefaults
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -49,8 +49,11 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
+import androidx.compose.material3.TabRowDefaults
+import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -65,6 +68,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
@@ -73,6 +77,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -81,6 +86,10 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.carbon.prolocker.R
 import com.carbon.prolocker.core.database.IntruderEventEntity
+import com.carbon.prolocker.core.theme.ProLockerError
+import com.carbon.prolocker.core.theme.ProLockerPrimary
+import com.carbon.prolocker.core.theme.ProLockerSecondary
+import com.carbon.prolocker.core.theme.ProLockerTertiary
 import org.koin.androidx.compose.koinViewModel
 import saman.zamani.persiandate.PersianDate
 import saman.zamani.persiandate.PersianDateFormat
@@ -116,7 +125,6 @@ fun SecurityScreen(
         if (isGranted) {
             viewModel?.toggleCaptureSelfie(true)
         } else {
-            // User denied permission, do not toggle
         }
     }
 
@@ -163,7 +171,9 @@ fun SecurityScreen(
                             modifier = Modifier
                                 .size(40.dp)
                                 .background(
-                                    MaterialTheme.colorScheme.primary,
+                                    Brush.linearGradient(
+                                        colors = listOf(ProLockerPrimary, ProLockerSecondary)
+                                    ),
                                     RoundedCornerShape(12.dp)
                                 ),
                             contentAlignment = Alignment.Center
@@ -177,8 +187,8 @@ fun SecurityScreen(
                         Spacer(modifier = Modifier.width(12.dp))
                         Text(
                             stringResource(R.string.security_center),
-                            style = com.carbon.prolocker.core.theme.AppTypography.titleLarge,
-                            fontSize = 20.sp
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold
                         )
                     }
                 },
@@ -198,23 +208,26 @@ fun SecurityScreen(
                 enter = expandVertically() + fadeIn(),
                 exit = shrinkVertically() + fadeOut()
             ) {
-                Column(modifier = Modifier.padding(16.dp)) {
+                Column(
+                    modifier = Modifier.padding(
+                        horizontal = 20.dp,
+                        vertical = 8.dp
+                    )
+                ) {
                     Text(
                         text = stringResource(R.string.intruder_settings),
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        fontSize = 14.sp,
-                        style = com.carbon.prolocker.core.theme.AppTypography.titleLarge,
-                        modifier = Modifier.padding(bottom = 8.dp, start = 8.dp)
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold,
+                        modifier = Modifier.padding(bottom = 12.dp, start = 4.dp)
                     )
 
                     Card(
-                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                        shape = RoundedCornerShape(16.dp),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-                        border = BorderStroke(
-                            width = 1.dp,
-                            color = MaterialTheme.colorScheme.surfaceVariant
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant
                         ),
+                        shape = RoundedCornerShape(20.dp),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
                     ) {
                         Column(modifier = Modifier.fillMaxWidth()) {
                             Row(
@@ -227,12 +240,14 @@ fun SecurityScreen(
                                 Column(modifier = Modifier.weight(1f)) {
                                     Text(
                                         stringResource(R.string.capture_intruder_selfie),
-                                        style = com.carbon.prolocker.core.theme.AppTypography.labelLarge
+                                        style = MaterialTheme.typography.labelLarge,
+                                        fontWeight = FontWeight.SemiBold
                                     )
+                                    Spacer(modifier = Modifier.height(2.dp))
                                     Text(
                                         stringResource(R.string.capture_intruder_selfie_desc),
-                                        fontSize = 12.sp,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
                                     )
                                 }
                                 Switch(
@@ -251,12 +266,18 @@ fun SecurityScreen(
                                         } else {
                                             viewModel?.toggleCaptureSelfie(false)
                                         }
-                                    }
+                                    },
+                                    colors = SwitchDefaults.colors(
+                                        checkedTrackColor = ProLockerPrimary,
+                                        checkedThumbColor = MaterialTheme.colorScheme.onPrimary,
+                                        uncheckedTrackColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                                        uncheckedThumbColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+                                    )
                                 )
                             }
 
                             HorizontalDivider(
-                                color = MaterialTheme.colorScheme.surfaceVariant,
+                                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f),
                                 modifier = Modifier.padding(horizontal = 16.dp)
                             )
 
@@ -270,17 +291,25 @@ fun SecurityScreen(
                                 Column(modifier = Modifier.weight(1f)) {
                                     Text(
                                         stringResource(R.string.trigger_alarm),
-                                        style = com.carbon.prolocker.core.theme.AppTypography.labelLarge
+                                        style = MaterialTheme.typography.labelLarge,
+                                        fontWeight = FontWeight.SemiBold
                                     )
+                                    Spacer(modifier = Modifier.height(2.dp))
                                     Text(
                                         stringResource(R.string.trigger_alarm_desc),
-                                        fontSize = 12.sp,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
                                     )
                                 }
                                 Switch(
                                     checked = prefs.triggerAlarm,
-                                    onCheckedChange = { viewModel?.toggleAlarm(it) }
+                                    onCheckedChange = { viewModel?.toggleAlarm(it) },
+                                    colors = SwitchDefaults.colors(
+                                        checkedTrackColor = ProLockerPrimary,
+                                        checkedThumbColor = MaterialTheme.colorScheme.onPrimary,
+                                        uncheckedTrackColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                                        uncheckedThumbColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+                                    )
                                 )
                             }
 
@@ -290,12 +319,24 @@ fun SecurityScreen(
                 }
             }
 
+            Spacer(modifier = Modifier.height(8.dp))
 
             TabRow(
                 selectedTabIndex = selectedTab,
                 containerColor = Color.Transparent,
                 contentColor = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.padding(horizontal = 16.dp)
+                modifier = Modifier.padding(horizontal = 20.dp),
+                indicator = { tabPositions ->
+                    Box(
+                        modifier = Modifier
+                            .tabIndicatorOffset(tabPositions[selectedTab])
+                            .height(3.dp)
+                            .padding(horizontal = 24.dp)
+                            .clip(RoundedCornerShape(2.dp))
+                            .background(ProLockerPrimary)
+                    )
+                },
+                divider = {}
             ) {
                 Tab(
                     selected = selectedTab == 0,
@@ -303,7 +344,12 @@ fun SecurityScreen(
                     text = {
                         Text(
                             stringResource(R.string.intruders),
-                            style = com.carbon.prolocker.core.theme.AppTypography.titleMedium
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = if (selectedTab == 0) FontWeight.Bold else FontWeight.Medium,
+                            color = if (selectedTab == 0)
+                                MaterialTheme.colorScheme.onBackground
+                            else
+                                MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 )
@@ -313,11 +359,18 @@ fun SecurityScreen(
                     text = {
                         Text(
                             stringResource(R.string.lock_history),
-                            style = com.carbon.prolocker.core.theme.AppTypography.titleMedium
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = if (selectedTab == 1) FontWeight.Bold else FontWeight.Medium,
+                            color = if (selectedTab == 1)
+                                MaterialTheme.colorScheme.onBackground
+                            else
+                                MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 )
             }
+
+            Spacer(modifier = Modifier.height(4.dp))
 
             if (selectedTab == 0) {
                 if (events.isEmpty()) {
@@ -328,17 +381,32 @@ fun SecurityScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Icon(
-                                Icons.Default.Warning,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
-                                modifier = Modifier.size(48.dp)
-                            )
-                            Spacer(modifier = Modifier.height(16.dp))
+                            Box(
+                                modifier = Modifier
+                                    .size(72.dp)
+                                    .clip(RoundedCornerShape(20.dp))
+                                    .background(MaterialTheme.colorScheme.surfaceVariant),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    Icons.Default.Warning,
+                                    contentDescription = null,
+                                    tint = ProLockerPrimary.copy(alpha = 0.6f),
+                                    modifier = Modifier.size(32.dp)
+                                )
+                            }
+                            Spacer(modifier = Modifier.height(20.dp))
                             Text(
                                 stringResource(R.string.no_intruders_detected),
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                style = com.carbon.prolocker.core.theme.AppTypography.labelLarge
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                stringResource(R.string.no_intruders_detected),
+                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                                style = MaterialTheme.typography.bodySmall
                             )
                         }
                     }
@@ -346,23 +414,24 @@ fun SecurityScreen(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 24.dp),
+                            .padding(horizontal = 20.dp),
                         horizontalArrangement = Arrangement.End
                     ) {
                         TextButton(onClick = { showDeleteAllPhotosDialog = true }) {
                             Text(
                                 stringResource(R.string.clear_all),
-                                color = MaterialTheme.colorScheme.primary,
-                                fontSize = 12.sp
+                                color = ProLockerPrimary,
+                                style = MaterialTheme.typography.labelLarge,
+                                fontWeight = FontWeight.SemiBold
                             )
                         }
                     }
                     LazyVerticalGrid(
                         state = gridState,
                         columns = GridCells.Fixed(3),
-                        contentPadding = PaddingValues(16.dp, bottom = 160.dp),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                        contentPadding = PaddingValues(20.dp, bottom = 160.dp),
+                        horizontalArrangement = Arrangement.spacedBy(10.dp),
+                        verticalArrangement = Arrangement.spacedBy(10.dp),
                         modifier = Modifier.weight(1f)
                     ) {
                         items(events, key = { it.id }) { event ->
@@ -375,18 +444,12 @@ fun SecurityScreen(
                             Box(
                                 modifier = Modifier
                                     .aspectRatio(1f)
-                                    .clip(RoundedCornerShape(12.dp))
-                                    .background(MaterialTheme.colorScheme.surface)
+                                    .clip(RoundedCornerShape(16.dp))
+                                    .background(MaterialTheme.colorScheme.surfaceVariant)
                                     .clickable { onNavigateToPhotoDetail(event.id) }
                             ) {
                                 if (event.photoPath.isNotEmpty()) {
                                     Image(
-//                                    painter = rememberAsyncImagePainter(
-//                                        request = ImageRequest.Builder(LocalContext.current)
-//                                            .data(java.io.File(event.photoPath))
-//                                            .build(),
-//                                        key = event.id
-//                                    ),
                                         painter = rememberAsyncImagePainter(
                                             model = ImageRequest.Builder(LocalContext.current)
                                                 .data(java.io.File(event.photoPath))
@@ -414,8 +477,15 @@ fun SecurityScreen(
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .align(Alignment.BottomCenter)
-                                        .background(Color.Black.copy(alpha = 0.6f))
-                                        .padding(4.dp)
+                                        .background(
+                                            Brush.verticalGradient(
+                                                colors = listOf(
+                                                    Color.Transparent,
+                                                    Color.Black.copy(alpha = 0.7f)
+                                                )
+                                            )
+                                        )
+                                        .padding(horizontal = 6.dp, vertical = 6.dp)
                                 ) {
                                     val persianDate = PersianDate(event.timestamp)
                                     val dateText =
@@ -423,7 +493,8 @@ fun SecurityScreen(
                                     Text(
                                         text = dateText,
                                         color = Color.White,
-                                        fontSize = 10.sp,
+                                        style = MaterialTheme.typography.labelSmall,
+                                        fontWeight = FontWeight.Medium,
                                         modifier = Modifier.align(Alignment.Center)
                                     )
                                 }
@@ -434,15 +505,15 @@ fun SecurityScreen(
                                         .align(Alignment.TopStart)
                                         .size(24.dp)
                                         .background(
-                                            MaterialTheme.colorScheme.error.copy(alpha = 0.8f),
-                                            RoundedCornerShape(12.dp)
+                                            ProLockerError.copy(alpha = 0.85f),
+                                            RoundedCornerShape(8.dp)
                                         )
                                 ) {
                                     Icon(
                                         Icons.Default.Delete,
                                         contentDescription = "Delete",
                                         tint = MaterialTheme.colorScheme.onError,
-                                        modifier = Modifier.padding(start = 8.dp, top = 8.dp)
+                                        modifier = Modifier.size(14.dp)
                                     )
                                 }
                             }
@@ -457,45 +528,72 @@ fun SecurityScreen(
                             .weight(1f),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text(
-                            stringResource(R.string.no_security_events),
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            style = com.carbon.prolocker.core.theme.AppTypography.labelLarge
-                        )
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Box(
+                                modifier = Modifier
+                                    .size(72.dp)
+                                    .clip(RoundedCornerShape(20.dp))
+                                    .background(MaterialTheme.colorScheme.surfaceVariant),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    Icons.Default.Security,
+                                    contentDescription = null,
+                                    tint = ProLockerPrimary.copy(alpha = 0.6f),
+                                    modifier = Modifier.size(32.dp)
+                                )
+                            }
+                            Spacer(modifier = Modifier.height(20.dp))
+                            Text(
+                                stringResource(R.string.no_security_events),
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                stringResource(R.string.no_security_events),
+                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                        }
                     }
                 } else {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 24.dp),
+                            .padding(horizontal = 20.dp, vertical = 4.dp),
                         horizontalArrangement = Arrangement.End
                     ) {
                         TextButton(onClick = { showDeleteAllHistoryDialog = true }) {
                             Text(
                                 stringResource(R.string.delete_all_history),
-                                color = MaterialTheme.colorScheme.primary,
-                                fontSize = 12.sp
+                                color = ProLockerPrimary,
+                                style = MaterialTheme.typography.labelLarge,
+                                fontWeight = FontWeight.SemiBold
                             )
                         }
                     }
                     LazyColumn(
                         modifier = Modifier
                             .weight(1f)
-                            .padding(horizontal = 16.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                            .padding(horizontal = 20.dp),
+                        verticalArrangement = Arrangement.spacedBy(10.dp),
                         contentPadding = PaddingValues(bottom = 160.dp),
                     ) {
                         item { Spacer(modifier = Modifier.height(8.dp)) }
                         items(lockEvents.size) { index ->
                             val event = lockEvents[index]
                             Card(
-                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                                shape = RoundedCornerShape(8.dp),
-                                elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+                                colors = CardDefaults.cardColors(
+                                    containerColor = MaterialTheme.colorScheme.surfaceVariant
+                                ),
+                                shape = RoundedCornerShape(20.dp),
+                                elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
                                 modifier = Modifier.fillMaxWidth()
                             ) {
                                 Row(
-                                    modifier = Modifier.padding(12.dp),
+                                    modifier = Modifier.padding(16.dp),
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     Column(modifier = Modifier.weight(1f)) {
@@ -504,8 +602,8 @@ fun SecurityScreen(
                                             PersianDateFormat("Y/m/d H:i").format(persianDate)
                                         Text(
                                             stringResource(getEventTypeStringId(event.eventType)),
-                                            style = com.carbon.prolocker.core.theme.AppTypography.titleMedium,
-                                            fontSize = 14.sp
+                                            style = MaterialTheme.typography.titleMedium,
+                                            fontWeight = FontWeight.SemiBold
                                         )
                                         if (event.packageName != null) {
                                             Text(
@@ -513,8 +611,9 @@ fun SecurityScreen(
                                                     R.string.app_prefix,
                                                     event.packageName
                                                 ),
-                                                fontSize = 12.sp,
-                                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                                style = MaterialTheme.typography.bodySmall,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                                modifier = Modifier.padding(top = 2.dp)
                                             )
                                         }
                                         if (event.details != null) {
@@ -523,16 +622,18 @@ fun SecurityScreen(
                                                     R.string.details_prefix,
                                                     event.details
                                                 ),
-                                                fontSize = 12.sp,
-                                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                                style = MaterialTheme.typography.bodySmall,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                                modifier = Modifier.padding(top = 2.dp)
                                             )
                                         }
                                         Text(
                                             text = dateText,
-                                            fontSize = 10.sp,
+                                            style = MaterialTheme.typography.labelSmall,
                                             color = MaterialTheme.colorScheme.onSurfaceVariant.copy(
-                                                alpha = 0.6f
-                                            )
+                                                alpha = 0.5f
+                                            ),
+                                            modifier = Modifier.padding(top = 4.dp)
                                         )
                                     }
                                 }
@@ -548,25 +649,44 @@ fun SecurityScreen(
     if (showDeleteAllPhotosDialog) {
         AlertDialog(
             onDismissRequest = { showDeleteAllPhotosDialog = false },
-            title = { Text(stringResource(R.string.delete_all_intruder_photos_title)) },
-            text = { Text(stringResource(R.string.delete_all_intruder_photos_message)) },
+            shape = RoundedCornerShape(20.dp),
+            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+            titleContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            textContentColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
+            title = {
+                Text(
+                    stringResource(R.string.delete_all_intruder_photos_title),
+                    fontWeight = FontWeight.Bold
+                )
+            },
+            text = {
+                Text(
+                    stringResource(R.string.delete_all_intruder_photos_message),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            },
             confirmButton = {
                 Button(
                     onClick = {
                         showDeleteAllPhotosDialog = false
                         viewModel?.clearAllIntruderEvents()
                     },
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
+                    colors = ButtonDefaults.buttonColors(containerColor = ProLockerError),
+                    shape = RoundedCornerShape(16.dp)
                 ) {
                     Text(
                         stringResource(R.string.delete),
-                        color = MaterialTheme.colorScheme.onError
+                        color = MaterialTheme.colorScheme.onError,
+                        fontWeight = FontWeight.SemiBold
                     )
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDeleteAllPhotosDialog = false }) {
-                    Text(stringResource(R.string.cancel))
+                    Text(
+                        stringResource(R.string.cancel),
+                        fontWeight = FontWeight.Medium
+                    )
                 }
             }
         )
@@ -576,8 +696,22 @@ fun SecurityScreen(
     if (showDeleteSinglePhotoDialog != null) {
         AlertDialog(
             onDismissRequest = { showDeleteSinglePhotoDialog = null },
-            title = { Text(stringResource(R.string.delete_photo_title)) },
-            text = { Text(stringResource(R.string.delete_photo_message)) },
+            shape = RoundedCornerShape(20.dp),
+            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+            titleContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            textContentColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
+            title = {
+                Text(
+                    stringResource(R.string.delete_photo_title),
+                    fontWeight = FontWeight.Bold
+                )
+            },
+            text = {
+                Text(
+                    stringResource(R.string.delete_photo_message),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            },
             confirmButton = {
                 Button(
                     onClick = {
@@ -585,17 +719,22 @@ fun SecurityScreen(
                         showDeleteSinglePhotoDialog = null
                         event?.let { viewModel?.deleteIntruderEvent(it) }
                     },
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
+                    colors = ButtonDefaults.buttonColors(containerColor = ProLockerError),
+                    shape = RoundedCornerShape(16.dp)
                 ) {
                     Text(
                         stringResource(R.string.delete),
-                        color = MaterialTheme.colorScheme.onError
+                        color = MaterialTheme.colorScheme.onError,
+                        fontWeight = FontWeight.SemiBold
                     )
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDeleteSinglePhotoDialog = null }) {
-                    Text(stringResource(R.string.cancel))
+                    Text(
+                        stringResource(R.string.cancel),
+                        fontWeight = FontWeight.Medium
+                    )
                 }
             }
         )
@@ -605,25 +744,44 @@ fun SecurityScreen(
     if (showDeleteAllHistoryDialog) {
         AlertDialog(
             onDismissRequest = { showDeleteAllHistoryDialog = false },
-            title = { Text(stringResource(R.string.delete_lock_history_title)) },
-            text = { Text(stringResource(R.string.delete_lock_history_message)) },
+            shape = RoundedCornerShape(20.dp),
+            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+            titleContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            textContentColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
+            title = {
+                Text(
+                    stringResource(R.string.delete_lock_history_title),
+                    fontWeight = FontWeight.Bold
+                )
+            },
+            text = {
+                Text(
+                    stringResource(R.string.delete_lock_history_message),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            },
             confirmButton = {
                 Button(
                     onClick = {
                         showDeleteAllHistoryDialog = false
                         viewModel?.clearAllLockHistory()
                     },
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
+                    colors = ButtonDefaults.buttonColors(containerColor = ProLockerError),
+                    shape = RoundedCornerShape(16.dp)
                 ) {
                     Text(
                         stringResource(R.string.delete),
-                        color = MaterialTheme.colorScheme.onError
+                        color = MaterialTheme.colorScheme.onError,
+                        fontWeight = FontWeight.SemiBold
                     )
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDeleteAllHistoryDialog = false }) {
-                    Text(stringResource(R.string.cancel))
+                    Text(
+                        stringResource(R.string.cancel),
+                        fontWeight = FontWeight.Medium
+                    )
                 }
             }
         )
@@ -658,4 +816,3 @@ fun SecurityScreenDarkPreview() {
         SecurityScreen()
     }
 }
-

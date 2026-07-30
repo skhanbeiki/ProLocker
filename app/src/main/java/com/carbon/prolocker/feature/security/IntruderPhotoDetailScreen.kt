@@ -37,9 +37,9 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -50,8 +50,6 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -78,6 +76,9 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.carbon.prolocker.R
 import com.carbon.prolocker.core.database.IntruderEventEntity
+import com.carbon.prolocker.core.theme.ProLockerError
+import com.carbon.prolocker.core.theme.ProLockerPrimary
+import com.carbon.prolocker.core.ui.components.AppToolbar
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -111,8 +112,8 @@ fun IntruderPhotoDetailScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.intruder_details)) },
+            AppToolbar(
+                title = stringResource(R.string.intruder_details),
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(
@@ -126,14 +127,12 @@ fun IntruderPhotoDetailScreen(
                         IconButton(onClick = { showDeleteDialog = true }) {
                             Icon(
                                 Icons.Default.Delete,
-                                contentDescription = stringResource(R.string.delete)
+                                contentDescription = stringResource(R.string.delete),
+                                tint = ProLockerError
                             )
                         }
                     }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background
-                )
+                }
             )
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -203,31 +202,32 @@ fun IntruderPhotoDetailScreen(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(20.dp))
 
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                    shape = RoundedCornerShape(16.dp),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                        .padding(horizontal = 20.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+                    shape = RoundedCornerShape(20.dp),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
                 ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
+                    Column(modifier = Modifier.padding(20.dp)) {
                         Text(
                             stringResource(R.string.capture_time),
-                            style = MaterialTheme.typography.labelMedium,
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
-                        Spacer(modifier = Modifier.height(4.dp))
+                        Spacer(modifier = Modifier.height(12.dp))
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(
                                 Icons.Default.CalendarMonth,
                                 contentDescription = null,
-                                modifier = Modifier.size(16.dp),
-                                tint = MaterialTheme.colorScheme.primary
+                                modifier = Modifier.size(20.dp),
+                                tint = ProLockerPrimary
                             )
-                            Spacer(modifier = Modifier.width(8.dp))
+                            Spacer(modifier = Modifier.width(10.dp))
                             val persianDate = PersianDate(event.timestamp)
                             val dateText = PersianDateFormat("Y/m/d H:i").format(persianDate)
                             Text(
@@ -238,24 +238,25 @@ fun IntruderPhotoDetailScreen(
                         }
 
                         HorizontalDivider(
-                            modifier = Modifier.padding(vertical = 12.dp),
-                            color = MaterialTheme.colorScheme.surfaceVariant
+                            modifier = Modifier.padding(vertical = 16.dp),
+                            color = MaterialTheme.colorScheme.outlineVariant
                         )
 
                         Text(
                             stringResource(R.string.related_app),
-                            style = MaterialTheme.typography.labelMedium,
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
-                        Spacer(modifier = Modifier.height(4.dp))
+                        Spacer(modifier = Modifier.height(12.dp))
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(
                                 Icons.Default.Smartphone,
                                 contentDescription = null,
-                                modifier = Modifier.size(16.dp),
-                                tint = MaterialTheme.colorScheme.primary
+                                modifier = Modifier.size(20.dp),
+                                tint = ProLockerPrimary
                             )
-                            Spacer(modifier = Modifier.width(8.dp))
+                            Spacer(modifier = Modifier.width(10.dp))
                             Text(
                                 text = event.targetAppPackage.ifEmpty { stringResource(R.string.unknown_app) },
                                 style = MaterialTheme.typography.bodyLarge,
@@ -263,60 +264,36 @@ fun IntruderPhotoDetailScreen(
                             )
                         }
 
-//                        HorizontalDivider(
-//                            modifier = Modifier.padding(vertical = 12.dp),
-//                            color = MaterialTheme.colorScheme.surfaceVariant
-//                        )
-
-//                        Text(
-//                            stringResource(R.string.event_type),
-//                            style = MaterialTheme.typography.labelMedium,
-//                            color = MaterialTheme.colorScheme.onSurfaceVariant
-//                        )
-//                        Spacer(modifier = Modifier.height(4.dp))
-//                        Row(verticalAlignment = Alignment.CenterVertically) {
-//                            Icon(
-//                                Icons.Default.Info,
-//                                contentDescription = null,
-//                                modifier = Modifier.size(16.dp),
-//                                tint = MaterialTheme.colorScheme.primary
-//                            )
-//                            Spacer(modifier = Modifier.width(8.dp))
-//                            Text(
-//                                text = stringResource(R.string.event_intruder_detected),
-//                                style = MaterialTheme.typography.bodyLarge,
-//                                fontWeight = FontWeight.Medium
-//                            )
-//                        }
-
                         if (event.lockType.isNotEmpty()) {
                             HorizontalDivider(
-                                modifier = Modifier.padding(vertical = 12.dp),
-                                color = MaterialTheme.colorScheme.surfaceVariant
+                                modifier = Modifier.padding(vertical = 16.dp),
+                                color = MaterialTheme.colorScheme.outlineVariant
                             )
 
                             Text(
                                 stringResource(R.string.package_name),
-                                style = MaterialTheme.typography.labelMedium,
+                                style = MaterialTheme.typography.titleLarge,
+                                fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
-                            Spacer(modifier = Modifier.height(4.dp))
+                            Spacer(modifier = Modifier.height(12.dp))
                             Text(
                                 text = event.lockType,
-                                style = MaterialTheme.typography.bodyMedium,
+                                style = MaterialTheme.typography.bodyLarge,
+                                fontWeight = FontWeight.Medium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                     }
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(20.dp))
 
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        .padding(horizontal = 20.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     Button(
                         onClick = {
@@ -327,9 +304,14 @@ fun IntruderPhotoDetailScreen(
                                 )
                             }
                         },
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f),
+                        shape = RoundedCornerShape(14.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = ProLockerPrimary)
                     ) {
-                        Text(stringResource(R.string.save_to_gallery))
+                        Text(
+                            stringResource(R.string.save_to_gallery),
+                            fontWeight = FontWeight.Bold
+                        )
                     }
 
                     OutlinedButton(
@@ -338,9 +320,14 @@ fun IntruderPhotoDetailScreen(
                                 sharePhoto(context, event)
                             }
                         },
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f),
+                        shape = RoundedCornerShape(14.dp),
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = ProLockerPrimary)
                     ) {
-                        Text(stringResource(R.string.share))
+                        Text(
+                            stringResource(R.string.share),
+                            fontWeight = FontWeight.Bold
+                        )
                     }
                 }
 
@@ -352,7 +339,13 @@ fun IntruderPhotoDetailScreen(
     if (showDeleteDialog && event != null) {
         AlertDialog(
             onDismissRequest = { showDeleteDialog = false },
-            title = { Text(stringResource(R.string.delete_photo_title)) },
+            shape = RoundedCornerShape(20.dp),
+            title = {
+                Text(
+                    stringResource(R.string.delete_photo_title),
+                    fontWeight = FontWeight.Bold
+                )
+            },
             text = { Text(stringResource(R.string.delete_photo_message)) },
             confirmButton = {
                 Button(
@@ -364,11 +357,13 @@ fun IntruderPhotoDetailScreen(
                             onBack()
                         }
                     },
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
+                    shape = RoundedCornerShape(14.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = ProLockerError)
                 ) {
                     Text(
                         stringResource(R.string.delete),
-                        color = MaterialTheme.colorScheme.onError
+                        color = MaterialTheme.colorScheme.onError,
+                        fontWeight = FontWeight.Bold
                     )
                 }
             },

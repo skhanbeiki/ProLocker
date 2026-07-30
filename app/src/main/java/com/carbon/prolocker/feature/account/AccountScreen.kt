@@ -3,11 +3,9 @@ package com.carbon.prolocker.feature.account
 import android.content.Intent
 import android.content.res.Configuration
 import android.net.Uri
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -16,7 +14,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -25,7 +22,6 @@ import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Card
@@ -37,10 +33,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -54,10 +48,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.carbon.prolocker.R
 import com.carbon.prolocker.core.config.MarketConfig
 import com.carbon.prolocker.core.theme.AppTypography
+import com.carbon.prolocker.core.theme.ProLockerPrimary
+import com.carbon.prolocker.core.theme.ProLockerTertiary
+import com.carbon.prolocker.core.ui.components.AppToolbar
 import com.carbon.prolocker.core.ui.components.RecoverySetupDialog
 import org.koin.androidx.compose.koinViewModel
 
@@ -84,29 +80,8 @@ fun AccountScreen(
     Scaffold(
         modifier = Modifier.padding(bottom = paddingValues.calculateBottomPadding()),
         topBar = {
-            TopAppBar(
-//                title = { Text(stringResource(R.string.account_title), style =  AppTypography.titleLarge, fontSize = 20.sp) },
-
-                title = {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Box(
-                            modifier = Modifier
-                                .size(40.dp)
-                                .background(MaterialTheme.colorScheme.primary, RoundedCornerShape(12.dp)),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(Icons.Default.Settings, contentDescription = null, tint = MaterialTheme.colorScheme.onPrimary)
-                        }
-                        Spacer(modifier = Modifier.width(12.dp))
-                        Text(
-                            stringResource(R.string.account_title),
-                            style = AppTypography.titleLarge,
-                            fontSize = 20.sp
-                        )
-                    }
-                },
-
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background)
+            AppToolbar(
+                title = stringResource(R.string.account_title)
             )
         }
     ) { innerPadding ->
@@ -115,15 +90,14 @@ fun AccountScreen(
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
                 .padding(innerPadding)
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                .padding(horizontal = 20.dp),
+            verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
             item {
                 Card(
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+                    shape = RoundedCornerShape(20.dp),
                     elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-                    border = BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.surfaceVariant),
                 ) {
                     Row(
                         modifier = Modifier
@@ -135,16 +109,17 @@ fun AccountScreen(
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
                                 stringResource(R.string.app_lock_protection),
-                                style = AppTypography.labelLarge
+                                style = MaterialTheme.typography.titleMedium,
+                                color = MaterialTheme.colorScheme.onSurface
                             )
-                            Spacer(modifier = Modifier.height(2.dp))
+                            Spacer(modifier = Modifier.height(4.dp))
                             Text(
                                 stringResource(
                                     if (protectionEnabled) R.string.protection_active
                                     else R.string.protection_disabled
                                 ),
                                 style = AppTypography.bodySmall,
-                                color = if (protectionEnabled) MaterialTheme.colorScheme.primary
+                                color = if (protectionEnabled) ProLockerTertiary
                                 else MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
@@ -161,29 +136,24 @@ fun AccountScreen(
 
             item {
                 Card(
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+                    shape = RoundedCornerShape(20.dp),
                     elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-                    border = BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.surfaceVariant),
                 ) {
                     Column(modifier = Modifier.fillMaxWidth()) {
-
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .clickable {
-                                    onNavigateToLockSetup()
-                                }
-                                .padding(16.dp),
+                                .clickable { onNavigateToLockSetup() }
+                                .padding(horizontal = 16.dp, vertical = 14.dp),
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text(
-                                    stringResource(R.string.change_lock_type),
-                                    style = AppTypography.labelLarge
-                                )
-                            }
+                            Text(
+                                stringResource(R.string.change_lock_type),
+                                style = MaterialTheme.typography.titleMedium,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
                             Icon(
                                 imageVector = if (isRtl) Icons.Default.ChevronLeft else Icons.Default.ChevronRight,
                                 contentDescription = null,
@@ -192,26 +162,23 @@ fun AccountScreen(
                         }
 
                         HorizontalDivider(
-                            color = MaterialTheme.colorScheme.surfaceVariant,
+                            color = MaterialTheme.colorScheme.outlineVariant,
                             modifier = Modifier.padding(horizontal = 16.dp)
                         )
 
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .clickable {
-                                    showRecoverySetupDialog = true
-                                }
-                                .padding(16.dp),
+                                .clickable { showRecoverySetupDialog = true }
+                                .padding(horizontal = 16.dp, vertical = 14.dp),
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text(
-                                    stringResource(R.string.recovery_settings),
-                                    style = AppTypography.labelLarge
-                                )
-                            }
+                            Text(
+                                stringResource(R.string.recovery_settings),
+                                style = MaterialTheme.typography.titleMedium,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
                             Icon(
                                 imageVector = if (isRtl) Icons.Default.ChevronLeft else Icons.Default.ChevronRight,
                                 contentDescription = null,
@@ -220,7 +187,7 @@ fun AccountScreen(
                         }
 
                         HorizontalDivider(
-                            color = MaterialTheme.colorScheme.surfaceVariant,
+                            color = MaterialTheme.colorScheme.outlineVariant,
                             modifier = Modifier.padding(horizontal = 16.dp)
                         )
 
@@ -228,16 +195,15 @@ fun AccountScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clickable { onNavigateToAppSettings() }
-                                .padding(16.dp),
+                                .padding(horizontal = 16.dp, vertical = 14.dp),
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text(
-                                    stringResource(R.string.app_settings),
-                                    style = AppTypography.labelLarge
-                                )
-                            }
+                            Text(
+                                stringResource(R.string.app_settings),
+                                style = MaterialTheme.typography.titleMedium,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
                             Icon(
                                 imageVector = if (isRtl) Icons.Default.ChevronLeft else Icons.Default.ChevronRight,
                                 contentDescription = null,
@@ -251,33 +217,34 @@ fun AccountScreen(
             item {
                 Text(
                     text = stringResource(R.string.other),
-                    style = AppTypography.titleMedium,
-                    color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp)
+                    style = MaterialTheme.typography.titleMedium,
+                    color = ProLockerPrimary,
+                    modifier = Modifier.padding(horizontal = 4.dp)
                 )
+                Spacer(modifier = Modifier.height(8.dp))
                 Card(
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+                    shape = RoundedCornerShape(20.dp),
                     elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-                    border = BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.surfaceVariant),
                 ) {
                     Column(modifier = Modifier.fillMaxWidth()) {
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clickable { MarketConfig.rateApp(context) }
-                                .padding(16.dp),
+                                .padding(horizontal = 16.dp, vertical = 14.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Icon(
                                 Icons.Default.Star,
                                 contentDescription = null,
-                                tint = MaterialTheme.colorScheme.primary
+                                tint = ProLockerPrimary
                             )
                             Spacer(modifier = Modifier.width(16.dp))
                             Text(
                                 stringResource(R.string.rate_app),
-                                style = AppTypography.labelLarge,
+                                style = MaterialTheme.typography.titleMedium,
+                                color = MaterialTheme.colorScheme.onSurface,
                                 modifier = Modifier.weight(1f)
                             )
                             Icon(
@@ -288,7 +255,7 @@ fun AccountScreen(
                         }
 
                         HorizontalDivider(
-                            color = MaterialTheme.colorScheme.surfaceVariant,
+                            color = MaterialTheme.colorScheme.outlineVariant,
                             modifier = Modifier.padding(horizontal = 16.dp)
                         )
 
@@ -307,18 +274,19 @@ fun AccountScreen(
                                         )
                                     )
                                 }
-                                .padding(16.dp),
+                                .padding(horizontal = 16.dp, vertical = 14.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Icon(
                                 Icons.Default.Share,
                                 contentDescription = null,
-                                tint = MaterialTheme.colorScheme.primary
+                                tint = ProLockerPrimary
                             )
                             Spacer(modifier = Modifier.width(16.dp))
                             Text(
                                 stringResource(R.string.share_app),
-                                style = AppTypography.labelLarge,
+                                style = MaterialTheme.typography.titleMedium,
+                                color = MaterialTheme.colorScheme.onSurface,
                                 modifier = Modifier.weight(1f)
                             )
                             Icon(
@@ -329,7 +297,7 @@ fun AccountScreen(
                         }
 
                         HorizontalDivider(
-                            color = MaterialTheme.colorScheme.surfaceVariant,
+                            color = MaterialTheme.colorScheme.outlineVariant,
                             modifier = Modifier.padding(horizontal = 16.dp)
                         )
 
@@ -344,21 +312,21 @@ fun AccountScreen(
                                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                                     try {
                                         context.startActivity(intent)
-                                    } catch (_: Exception) {
-                                    }
+                                    } catch (_: Exception) {}
                                 }
-                                .padding(16.dp),
+                                .padding(horizontal = 16.dp, vertical = 14.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Icon(
                                 Icons.Default.Email,
                                 contentDescription = null,
-                                tint = MaterialTheme.colorScheme.primary
+                                tint = ProLockerPrimary
                             )
                             Spacer(modifier = Modifier.width(16.dp))
                             Text(
                                 stringResource(R.string.contact_us),
-                                style = AppTypography.labelLarge,
+                                style = MaterialTheme.typography.titleMedium,
+                                color = MaterialTheme.colorScheme.onSurface,
                                 modifier = Modifier.weight(1f)
                             )
                             Icon(
@@ -369,7 +337,7 @@ fun AccountScreen(
                         }
 
                         HorizontalDivider(
-                            color = MaterialTheme.colorScheme.surfaceVariant,
+                            color = MaterialTheme.colorScheme.outlineVariant,
                             modifier = Modifier.padding(horizontal = 16.dp)
                         )
 
@@ -377,18 +345,19 @@ fun AccountScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clickable { onNavigateToAboutUs() }
-                                .padding(16.dp),
+                                .padding(horizontal = 16.dp, vertical = 14.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Icon(
                                 Icons.Default.Info,
                                 contentDescription = null,
-                                tint = MaterialTheme.colorScheme.primary
+                                tint = ProLockerPrimary
                             )
                             Spacer(modifier = Modifier.width(16.dp))
                             Text(
                                 stringResource(R.string.about_us),
-                                style = AppTypography.labelLarge,
+                                style = MaterialTheme.typography.titleMedium,
+                                color = MaterialTheme.colorScheme.onSurface,
                                 modifier = Modifier.weight(1f)
                             )
                             Icon(
@@ -430,4 +399,3 @@ fun AccountScreenDarkPreview() {
         AccountScreen(onNavigateToLockSetup = {}, onNavigateToAppSettings = {})
     }
 }
-
