@@ -134,8 +134,8 @@ fun AppNavigation(
                 onNavigateToPermissions = { pkg ->
                     navController.navigate(PermissionsRoute(pendingPackage = pkg))
                 },
-                onNavigateToPhotoDetail = { eventId ->
-                    navController.navigate(IntruderPhotoDetailRoute(eventId = eventId))
+                onNavigateToSecurity = {
+                    navController.navigate(SecurityRoute)
                 },
                 onNavigateToAboutUs = {
                     navController.navigate(AboutUsRoute)
@@ -147,6 +147,16 @@ fun AppNavigation(
             com.carbon.prolocker.feature.security.IntruderPhotoDetailScreen(
                 eventId = route.eventId,
                 onBack = { navController.popBackStack() }
+            )
+        }
+        composable<SecurityRoute> {
+            com.carbon.prolocker.feature.security.SecurityScreen(
+                onNavigateToGallery = {
+                    navController.navigate(BackgroundGalleryRoute)
+                },
+                onNavigateToPhotoDetail = { eventId ->
+                    navController.navigate(IntruderPhotoDetailRoute(eventId = eventId))
+                }
             )
         }
         composable<LockedAppsRoute> {

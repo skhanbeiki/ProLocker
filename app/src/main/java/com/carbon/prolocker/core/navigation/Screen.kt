@@ -16,4 +16,5 @@ import kotlinx.serialization.Serializable
 @Serializable data object MemoryOptimizerRoute
 @Serializable data object BackgroundGalleryRoute
 @Serializable data class BackgroundPreviewRoute(val url: String, val id: Int)
+@Serializable data object SecurityRoute
 @Serializable data class IntruderPhotoDetailRoute(val eventId: Long)

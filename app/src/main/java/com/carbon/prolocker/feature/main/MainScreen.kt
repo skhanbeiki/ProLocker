@@ -19,8 +19,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.GridView
 import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Security
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AlertDialogDefaults
@@ -74,7 +74,7 @@ import com.carbon.prolocker.core.theme.ProLockerSecondary
 import com.carbon.prolocker.core.theme.ProLockerSurfaceVariant
 import com.carbon.prolocker.feature.account.AccountScreen
 import com.carbon.prolocker.feature.home.HomeScreen
-import com.carbon.prolocker.feature.security.SecurityScreen
+import com.carbon.prolocker.feature.tools.ToolsScreen
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
@@ -89,7 +89,7 @@ fun MainScreen(
     onNavigateToMemoryOptimizer: () -> Unit = {},
     onNavigateToGallery: () -> Unit = {},
     onNavigateToPermissions: (String) -> Unit = {},
-    onNavigateToPhotoDetail: (Long) -> Unit = {},
+    onNavigateToSecurity: () -> Unit = {},
     onNavigateToAboutUs: () -> Unit = {},
     viewModel: MainViewModel = koinViewModel()
 ) {
@@ -134,7 +134,7 @@ fun MainScreen(
         if (initialTab != null) {
             viewModel.setSelectedTab(
                 when (initialTab) {
-                    "security" -> MainTab.SECURITY
+                    "security" -> MainTab.TOOLS
                     "account" -> MainTab.ACCOUNT
                     else -> MainTab.HOME
                 }
@@ -268,7 +268,7 @@ fun MainScreen(
                     key(adKey) {
                         val placement = when (selectedTab) {
                             MainTab.HOME -> AdPlacement.HOME_TAB_APPS
-                            MainTab.SECURITY -> AdPlacement.HOME_TAB_THEMES
+                            MainTab.TOOLS -> AdPlacement.HOME_TAB_THEMES
                             MainTab.ACCOUNT -> AdPlacement.HOME_TAB_SETTINGS
                         }
                         NativeAdContainer(
@@ -318,13 +318,13 @@ fun MainScreen(
                             )
                         )
                         NavigationBarItem(
-                            selected = selectedTab == MainTab.SECURITY,
-                            onClick = { viewModel.setSelectedTab(MainTab.SECURITY) },
+                            selected = selectedTab == MainTab.TOOLS,
+                            onClick = { viewModel.setSelectedTab(MainTab.TOOLS) },
                             icon = {
                                 Icon(
-                                    Icons.Default.Security,
+                                    Icons.Default.GridView,
                                     contentDescription = null,
-                                    tint = if (selectedTab == MainTab.SECURITY)
+                                    tint = if (selectedTab == MainTab.TOOLS)
                                         MaterialTheme.colorScheme.primary
                                     else
                                         MaterialTheme.colorScheme.onSurfaceVariant
@@ -332,9 +332,9 @@ fun MainScreen(
                             },
                             label = {
                                 Text(
-                                    stringResource(R.string.security),
+                                    stringResource(R.string.tools),
                                     style = MaterialTheme.typography.labelSmall,
-                                    fontWeight = if (selectedTab == MainTab.SECURITY)
+                                    fontWeight = if (selectedTab == MainTab.TOOLS)
                                         FontWeight.SemiBold
                                     else
                                         FontWeight.Medium
@@ -393,10 +393,9 @@ fun MainScreen(
                     onNavigateToPermissions = onNavigateToPermissions,
                 )
 
-                MainTab.SECURITY -> SecurityScreen(
+                MainTab.TOOLS -> ToolsScreen(
                     paddingValues = PaddingValues(0.dp),
-                    onNavigateToGallery = onNavigateToGallery,
-                    onNavigateToPhotoDetail = onNavigateToPhotoDetail
+                    onNavigateToSecurity = onNavigateToSecurity
                 )
 
                 MainTab.ACCOUNT -> AccountScreen(
@@ -535,7 +534,7 @@ fun openMarket(context: android.content.Context) {
 
 
 enum class MainTab {
-    HOME, SECURITY, ACCOUNT
+    HOME, TOOLS, ACCOUNT
 }
 
 
