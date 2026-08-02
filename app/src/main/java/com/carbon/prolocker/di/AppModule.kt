@@ -119,6 +119,7 @@ val appModule = module {
         serviceModule,
         viewModelModule,
         adModule,
-        com.carbon.prolocker.feature.hidefile.di.hideFileModule
+        com.carbon.prolocker.feature.hidefile.di.hideFileModule,
+        com.carbon.prolocker.feature.backup.di.backupModule
     )
 }

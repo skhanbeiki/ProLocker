@@ -21,3 +21,7 @@ import kotlinx.serialization.Serializable
 @Serializable data object HideFilesRoute
 @Serializable data class HiddenItemsRoute(val category: String)
 @Serializable data class MediaPickerRoute(val category: String)
+@Serializable data object BackupHomeRoute
+@Serializable data class BackupDetailRoute(val categoryName: String)
+@Serializable data object BackupAppsRoute
+@Serializable data object BackupAppsProgressRoute

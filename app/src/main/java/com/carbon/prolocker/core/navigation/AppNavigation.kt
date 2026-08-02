@@ -142,7 +142,41 @@ fun AppNavigation(
                 },
                 onNavigateToAboutUs = {
                     navController.navigate(AboutUsRoute)
+                },
+                onNavigateToBackup = {
+                    navController.navigate(BackupHomeRoute)
                 }
+            )
+        }
+        composable<BackupHomeRoute> {
+            com.carbon.prolocker.feature.backup.ui.BackupHomeScreen(
+                onBack = { navController.popBackStack() },
+                onOpenCategory = { category ->
+                    if (category == com.carbon.prolocker.feature.backup.model.BackupCategory.APPLICATIONS) {
+                        navController.navigate(BackupAppsRoute)
+                    } else {
+                        navController.navigate(BackupDetailRoute(category.name))
+                    }
+                }
+            )
+        }
+        composable<BackupDetailRoute> { backStackEntry ->
+            val route = backStackEntry.toRoute<BackupDetailRoute>()
+            val cat = com.carbon.prolocker.feature.backup.model.BackupCategory.valueOf(route.categoryName)
+            com.carbon.prolocker.feature.backup.ui.BackupCategoryDetailScreen(
+                category = cat,
+                onBack = { navController.popBackStack() }
+            )
+        }
+        composable<BackupAppsRoute> {
+            com.carbon.prolocker.feature.backup.ui.BackupAppsScreen(
+                onBack = { navController.popBackStack() },
+                onNavigateToProgress = { navController.navigate(BackupAppsProgressRoute) }
+            )
+        }
+        composable<BackupAppsProgressRoute> {
+            com.carbon.prolocker.feature.backup.ui.BackupAppsProgressScreen(
+                onBack = { navController.popBackStack() }
             )
         }
         composable<HideFilesRoute> {

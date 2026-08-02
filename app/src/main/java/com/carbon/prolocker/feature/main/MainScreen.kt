@@ -92,6 +92,7 @@ fun MainScreen(
     onNavigateToSecurity: () -> Unit = {},
     onNavigateToAboutUs: () -> Unit = {},
     onNavigateToHideFiles: () -> Unit = {},
+    onNavigateToBackup: () -> Unit = {},
     viewModel: MainViewModel = koinViewModel()
 ) {
     val updateState by viewModel.updateState.collectAsState()
@@ -397,7 +398,8 @@ fun MainScreen(
                 MainTab.TOOLS -> ToolsScreen(
                     paddingValues = PaddingValues(0.dp),
                     onNavigateToSecurity = onNavigateToSecurity,
-                    onNavigateToHideFiles = onNavigateToHideFiles
+                    onNavigateToHideFiles = onNavigateToHideFiles,
+                    onNavigateToBackup = onNavigateToBackup
                 )
 
                 MainTab.ACCOUNT -> AccountScreen(

@@ -198,12 +198,14 @@ fun ToolsGrid(
 fun ToolsScreen(
     paddingValues: PaddingValues = PaddingValues(0.dp),
     onNavigateToSecurity: () -> Unit = {},
-    onNavigateToHideFiles: () -> Unit = {}
+    onNavigateToHideFiles: () -> Unit = {},
+    onNavigateToBackup: () -> Unit = {}
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     val comingSoonLabel = stringResource(R.string.coming_soon)
     val hideFilesTitle = stringResource(R.string.tools_hide_files)
+    val backupTitle = stringResource(R.string.tools_backup)
 
     val features = listOf(
         ToolsFeatureItem(
@@ -220,19 +222,19 @@ fun ToolsScreen(
             gradient = listOf(Color(0xFF00D1B2), Color(0xFF00A896)),
             available = true
         ),
-        ToolsFeatureItem(
-            title = stringResource(R.string.tools_hide_apps),
-            subtitle = stringResource(R.string.tools_hide_apps_subtitle),
-            icon = Icons.Outlined.Lock,
-            gradient = listOf(Color(0xFFF472B6), Color(0xFFEC4899)),
-            available = false
-        ),
+//        ToolsFeatureItem(
+//            title = stringResource(R.string.tools_hide_apps),
+//            subtitle = stringResource(R.string.tools_hide_apps_subtitle),
+//            icon = Icons.Outlined.Lock,
+//            gradient = listOf(Color(0xFFF472B6), Color(0xFFEC4899)),
+//            available = false
+//        ),
         ToolsFeatureItem(
             title = stringResource(R.string.tools_backup),
             subtitle = stringResource(R.string.tools_backup_subtitle),
             icon = Icons.Outlined.Backup,
-            gradient = listOf(Color(0xFF4F8CFF), Color(0xFF2563EB)),
-            available = false
+            gradient = listOf(Color(0xFFF472B6), Color(0xFFEC4899)),
+            available = true
         ),
         ToolsFeatureItem(
             title = stringResource(R.string.tools_app_blocking),
@@ -316,6 +318,8 @@ fun ToolsScreen(
             onFeatureClick = { item ->
                 if (item.available && item.title == hideFilesTitle) {
                     onNavigateToHideFiles()
+                } else if (item.available && item.title == backupTitle) {
+                    onNavigateToBackup()
                 } else if (item.available) {
                     onNavigateToSecurity()
                 } else {
