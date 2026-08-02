@@ -33,6 +33,7 @@ import androidx.compose.material.icons.outlined.Backup
 import androidx.compose.material.icons.outlined.Block
 import androidx.compose.material.icons.outlined.FiberManualRecord
 import androidx.compose.material.icons.outlined.GridView
+import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.Security
 import androidx.compose.material.icons.outlined.VisibilityOff
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -196,25 +197,34 @@ fun ToolsGrid(
 @Composable
 fun ToolsScreen(
     paddingValues: PaddingValues = PaddingValues(0.dp),
-    onNavigateToSecurity: () -> Unit = {}
+    onNavigateToSecurity: () -> Unit = {},
+    onNavigateToHideFiles: () -> Unit = {}
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     val comingSoonLabel = stringResource(R.string.coming_soon)
+    val hideFilesTitle = stringResource(R.string.tools_hide_files)
 
     val features = listOf(
+        ToolsFeatureItem(
+            title = stringResource(R.string.tools_hide_files),
+            subtitle = stringResource(R.string.tools_hide_files_subtitle),
+            icon = Icons.Outlined.VisibilityOff,
+            gradient = listOf(Color(0xFF7B61FF), Color(0xFF5B6CFF)),
+            available = true
+        ),
         ToolsFeatureItem(
             title = stringResource(R.string.tools_intruder_detection),
             subtitle = stringResource(R.string.tools_intruder_detection_subtitle),
             icon = Icons.Outlined.Security,
-            gradient = listOf(Color(0xFF7B61FF), Color(0xFF5B6CFF)),
+            gradient = listOf(Color(0xFF00D1B2), Color(0xFF00A896)),
             available = true
         ),
         ToolsFeatureItem(
             title = stringResource(R.string.tools_hide_apps),
             subtitle = stringResource(R.string.tools_hide_apps_subtitle),
-            icon = Icons.Outlined.VisibilityOff,
-            gradient = listOf(Color(0xFF00D1B2), Color(0xFF00A896)),
+            icon = Icons.Outlined.Lock,
+            gradient = listOf(Color(0xFFF472B6), Color(0xFFEC4899)),
             available = false
         ),
         ToolsFeatureItem(
@@ -235,14 +245,14 @@ fun ToolsScreen(
             title = stringResource(R.string.tools_screen_recording),
             subtitle = stringResource(R.string.tools_screen_recording_subtitle),
             icon = Icons.Outlined.FiberManualRecord,
-            gradient = listOf(Color(0xFFF472B6), Color(0xFFEC4899)),
+            gradient = listOf(Color(0xFF34D399), Color(0xFF10B981)),
             available = false
         ),
         ToolsFeatureItem(
             title = stringResource(R.string.tools_app_manager),
             subtitle = stringResource(R.string.tools_app_manager_subtitle),
             icon = Icons.Outlined.Apps,
-            gradient = listOf(Color(0xFF34D399), Color(0xFF10B981)),
+            gradient = listOf(Color(0xFFF59E0B), Color(0xFFF97316)),
             available = false
         )
     )
@@ -304,7 +314,9 @@ fun ToolsScreen(
         ToolsGrid(
             features = features,
             onFeatureClick = { item ->
-                if (item.available) {
+                if (item.available && item.title == hideFilesTitle) {
+                    onNavigateToHideFiles()
+                } else if (item.available) {
                     onNavigateToSecurity()
                 } else {
                     scope.launch {

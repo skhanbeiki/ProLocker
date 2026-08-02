@@ -137,10 +137,52 @@ fun AppNavigation(
                 onNavigateToSecurity = {
                     navController.navigate(SecurityRoute)
                 },
+                onNavigateToHideFiles = {
+                    navController.navigate(HideFilesRoute)
+                },
                 onNavigateToAboutUs = {
                     navController.navigate(AboutUsRoute)
                 }
             )
+        }
+        composable<HideFilesRoute> {
+            com.carbon.prolocker.feature.hidefile.ui.HideFilesScreen(
+                onBack = {
+                    navController.popBackStack()
+                },
+                onOpenCategory = { category ->
+                    navController.navigate(HiddenItemsRoute(category))
+                }
+            )
+        }
+        composable<HiddenItemsRoute> { backStackEntry ->
+            val route = backStackEntry.toRoute<HiddenItemsRoute>()
+            com.carbon.prolocker.feature.hidefile.ui.HiddenItemsScreen(
+                type = route.category,
+                onBack = {
+                    navController.popBackStack()
+                },
+                onOpenPicker = { category ->
+                    navController.navigate(MediaPickerRoute(category))
+                }
+            )
+        }
+        composable<MediaPickerRoute> { backStackEntry ->
+            val route = backStackEntry.toRoute<MediaPickerRoute>()
+            if (route.category == com.carbon.prolocker.feature.hidefile.data.HideItem.TYPE_FILE) {
+                com.carbon.prolocker.feature.hidefile.ui.FilePickerScreen(
+                    onBack = {
+                        navController.popBackStack()
+                    }
+                )
+            } else {
+                com.carbon.prolocker.feature.hidefile.ui.MediaPickerScreen(
+                    type = route.category,
+                    onBack = {
+                        navController.popBackStack()
+                    }
+                )
+            }
         }
         composable<IntruderPhotoDetailRoute> { backStackEntry ->
             val route = backStackEntry.toRoute<IntruderPhotoDetailRoute>()

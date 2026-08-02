@@ -111,5 +111,14 @@ val viewModelModule = module {
 
 
 val appModule = module {
-    includes(databaseModule, dataStoreModule, repositoryModule, useCaseModule, serviceModule, viewModelModule, adModule)
+    includes(
+        databaseModule,
+        dataStoreModule,
+        repositoryModule,
+        useCaseModule,
+        serviceModule,
+        viewModelModule,
+        adModule,
+        com.carbon.prolocker.feature.hidefile.di.hideFileModule
+    )
 }

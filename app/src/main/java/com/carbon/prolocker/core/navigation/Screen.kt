@@ -18,3 +18,6 @@ import kotlinx.serialization.Serializable
 @Serializable data class BackgroundPreviewRoute(val url: String, val id: Int)
 @Serializable data object SecurityRoute
 @Serializable data class IntruderPhotoDetailRoute(val eventId: Long)
+@Serializable data object HideFilesRoute
+@Serializable data class HiddenItemsRoute(val category: String)
+@Serializable data class MediaPickerRoute(val category: String)
