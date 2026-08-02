@@ -199,13 +199,15 @@ fun ToolsScreen(
     paddingValues: PaddingValues = PaddingValues(0.dp),
     onNavigateToSecurity: () -> Unit = {},
     onNavigateToHideFiles: () -> Unit = {},
-    onNavigateToBackup: () -> Unit = {}
+    onNavigateToBackup: () -> Unit = {},
+    onNavigateToCallBlocker: () -> Unit = {}
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     val comingSoonLabel = stringResource(R.string.coming_soon)
     val hideFilesTitle = stringResource(R.string.tools_hide_files)
     val backupTitle = stringResource(R.string.tools_backup)
+    val callBlockerTitle = stringResource(R.string.call_blocker_title)
 
     val features = listOf(
         ToolsFeatureItem(
@@ -222,13 +224,6 @@ fun ToolsScreen(
             gradient = listOf(Color(0xFF00D1B2), Color(0xFF00A896)),
             available = true
         ),
-//        ToolsFeatureItem(
-//            title = stringResource(R.string.tools_hide_apps),
-//            subtitle = stringResource(R.string.tools_hide_apps_subtitle),
-//            icon = Icons.Outlined.Lock,
-//            gradient = listOf(Color(0xFFF472B6), Color(0xFFEC4899)),
-//            available = false
-//        ),
         ToolsFeatureItem(
             title = stringResource(R.string.tools_backup),
             subtitle = stringResource(R.string.tools_backup_subtitle),
@@ -237,11 +232,11 @@ fun ToolsScreen(
             available = true
         ),
         ToolsFeatureItem(
-            title = stringResource(R.string.tools_app_blocking),
-            subtitle = stringResource(R.string.tools_app_blocking_subtitle),
+            title = stringResource(R.string.call_blocker_title),
+            subtitle = stringResource(R.string.call_blocker_subtitle),
             icon = Icons.Outlined.Block,
             gradient = listOf(Color(0xFFFF6B6B), Color(0xFFFF8E53)),
-            available = false
+            available = true
         ),
         ToolsFeatureItem(
             title = stringResource(R.string.tools_screen_recording),
@@ -320,6 +315,8 @@ fun ToolsScreen(
                     onNavigateToHideFiles()
                 } else if (item.available && item.title == backupTitle) {
                     onNavigateToBackup()
+                } else if (item.available && item.title == callBlockerTitle) {
+                    onNavigateToCallBlocker()
                 } else if (item.available) {
                     onNavigateToSecurity()
                 } else {

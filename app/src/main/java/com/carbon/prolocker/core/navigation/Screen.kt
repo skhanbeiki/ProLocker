@@ -25,3 +25,4 @@ import kotlinx.serialization.Serializable
 @Serializable data class BackupDetailRoute(val categoryName: String)
 @Serializable data object BackupAppsRoute
 @Serializable data object BackupAppsProgressRoute
+@Serializable data object CallBlockerRoute

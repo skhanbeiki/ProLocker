@@ -67,6 +67,7 @@ val databaseModule = module {
     single { get<AppDatabase>().intruderEventDao() }
     single { get<AppDatabase>().securityEventDao() }
     single { get<AppDatabase>().crashDao() }
+    single { get<AppDatabase>().callBlockerDao() }
     single { LockedAppsRepository(get()) }
 }
 
@@ -120,6 +121,7 @@ val appModule = module {
         viewModelModule,
         adModule,
         com.carbon.prolocker.feature.hidefile.di.hideFileModule,
-        com.carbon.prolocker.feature.backup.di.backupModule
+        com.carbon.prolocker.feature.backup.di.backupModule,
+        com.carbon.prolocker.feature.callblocker.di.callBlockerModule
     )
 }

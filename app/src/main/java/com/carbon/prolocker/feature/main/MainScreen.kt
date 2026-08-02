@@ -93,6 +93,7 @@ fun MainScreen(
     onNavigateToAboutUs: () -> Unit = {},
     onNavigateToHideFiles: () -> Unit = {},
     onNavigateToBackup: () -> Unit = {},
+    onNavigateToCallBlocker: () -> Unit = {},
     viewModel: MainViewModel = koinViewModel()
 ) {
     val updateState by viewModel.updateState.collectAsState()
@@ -399,7 +400,8 @@ fun MainScreen(
                     paddingValues = PaddingValues(0.dp),
                     onNavigateToSecurity = onNavigateToSecurity,
                     onNavigateToHideFiles = onNavigateToHideFiles,
-                    onNavigateToBackup = onNavigateToBackup
+                    onNavigateToBackup = onNavigateToBackup,
+                    onNavigateToCallBlocker = onNavigateToCallBlocker
                 )
 
                 MainTab.ACCOUNT -> AccountScreen(

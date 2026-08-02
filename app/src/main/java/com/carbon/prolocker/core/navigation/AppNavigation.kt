@@ -145,7 +145,15 @@ fun AppNavigation(
                 },
                 onNavigateToBackup = {
                     navController.navigate(BackupHomeRoute)
+                },
+                onNavigateToCallBlocker = {
+                    navController.navigate(CallBlockerRoute)
                 }
+            )
+        }
+        composable<CallBlockerRoute> {
+            com.carbon.prolocker.feature.callblocker.ui.CallBlockerHomeScreen(
+                onBack = { navController.popBackStack() }
             )
         }
         composable<BackupHomeRoute> {
