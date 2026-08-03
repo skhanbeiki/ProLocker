@@ -238,20 +238,20 @@ fun ToolsScreen(
             gradient = listOf(Color(0xFFFF6B6B), Color(0xFFFF8E53)),
             available = true
         ),
-        ToolsFeatureItem(
-            title = stringResource(R.string.tools_screen_recording),
-            subtitle = stringResource(R.string.tools_screen_recording_subtitle),
-            icon = Icons.Outlined.FiberManualRecord,
-            gradient = listOf(Color(0xFF34D399), Color(0xFF10B981)),
-            available = false
-        ),
-        ToolsFeatureItem(
-            title = stringResource(R.string.tools_app_manager),
-            subtitle = stringResource(R.string.tools_app_manager_subtitle),
-            icon = Icons.Outlined.Apps,
-            gradient = listOf(Color(0xFFF59E0B), Color(0xFFF97316)),
-            available = false
-        )
+//        ToolsFeatureItem(
+//            title = stringResource(R.string.tools_screen_recording),
+//            subtitle = stringResource(R.string.tools_screen_recording_subtitle),
+//            icon = Icons.Outlined.FiberManualRecord,
+//            gradient = listOf(Color(0xFF34D399), Color(0xFF10B981)),
+//            available = false
+//        ),
+//        ToolsFeatureItem(
+//            title = stringResource(R.string.tools_app_manager),
+//            subtitle = stringResource(R.string.tools_app_manager_subtitle),
+//            icon = Icons.Outlined.Apps,
+//            gradient = listOf(Color(0xFFF59E0B), Color(0xFFF97316)),
+//            available = false
+//        )
     )
 
     var contentVisible by remember { mutableStateOf(false) }

@@ -73,8 +73,8 @@
     <string name="security_center">مرکز امنیت</string>
     <string name="tools">ابزارها</string>
     <string name="tools_subtitle">ابزارهای قدرتمند برای دستگاه شما</string>
-    <string name="tools_intruder_detection">تشخیص مزاحم</string>
-    <string name="tools_intruder_detection_subtitle">عکس برداری از مزاحمان</string>
+    <string name="tools_intruder_detection">فضول گیر</string>
+    <string name="tools_intruder_detection_subtitle">عکس برداری از فضول ها</string>
     <string name="tools_hide_apps">مخفی کردن برنامه ها</string>
     <string name="tools_hide_apps_subtitle">برنامه ها را نامرئی نگه دارید</string>
     <string name="tools_hide_files">مخفی کردن فایل</string>

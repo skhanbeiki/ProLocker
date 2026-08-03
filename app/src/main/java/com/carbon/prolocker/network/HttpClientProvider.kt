@@ -42,7 +42,7 @@ object HttpClientProvider {
                 url.takeFrom(NetworkConfig.BASE_URL)
                 header("Accept", "application/json")
                 header("Content-Type", "application/json")
-                header("Authorization", "Token 87eb5523-97a2-4c2f-8c19-01005e2ae414")
+                header("Authorization", "Token 429800da-d712-43b7-b6ed-p72181506752")
                 val market = when {
                     com.carbon.prolocker.core.config.MarketConfig.isBazaar -> "bazaar"
                     com.carbon.prolocker.core.config.MarketConfig.isMyket -> "myket"

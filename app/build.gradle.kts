@@ -58,9 +58,9 @@ android {
     signingConfigs {
         create("release") {
             storeFile = rootProject.file("keystore.jks")
-            storePassword = "@1394.12.10@prolocker@s&r&m#"
+            storePassword = "-Prolocker$^carbon>siamak<reza>mahmoud<mehdi!"
             keyAlias = "prolocker"
-            keyPassword = "@1394.12.10@prolocker@s&r&m#"
+            keyPassword = "-Prolocker$^carbon>siamak<reza>mahmoud<mehdi!"
         }
     }
 
