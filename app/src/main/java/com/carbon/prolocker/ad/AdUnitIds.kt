@@ -24,24 +24,24 @@ object AdUnitIds {
     }
 
     object Adivery {
-        const val APP_ID = "965169ad-a306-431c-b9d6-21dae1047548"
+        const val APP_ID = "cedf4bd2-281c-432b-b4fe-4b801e282fa1"
 
-        const val HOME_TAB_APPS = "cc623d7b-cbb1-4ed0-88c6-cdf604cfb30a"
-        const val HOME_TAB_THEMES = "7525f213-2abd-4bfe-b53d-80749bae4426"
-        const val HOME_TAB_SETTINGS = "9ddb4986-7aad-41b9-8dff-110e42602787"
+        const val HOME_TAB_APPS = "e7e478bc-9d29-450f-bc07-c5cb9d17fd8a"
+        const val HOME_TAB_THEMES = "34316224-00ad-4356-9ff6-66e10f3c7684"
+        const val HOME_TAB_SETTINGS = "a3b26e5c-7831-4072-92ac-2142c96e9385"
 
-        const val LOCKSCREEN_TOP = "574efa21-d954-484a-a630-0497ece06a71"
-        const val LOCKSCREEN_BOTTOM = "49794562-54b3-4d69-9a5e-3c9e5d932c3a"
+        const val LOCKSCREEN_TOP = "fe2d013d-c312-4975-af6f-3603c391322c"
+        const val LOCKSCREEN_BOTTOM = "bb9ec650-4eab-4270-8c04-62125b27fbe0"
 
-        const val RAM_CLEANER_NATIVE = "36ed5a35-4710-4d3c-be36-766aa5f8db0c"
+        const val RAM_CLEANER_NATIVE = "0320a6be-56a4-425b-ac93-a840fe4cef47"
 
-        const val BACKGROUND_LIST_NATIVE = "36ed5a35-4710-4d3c-be36-766aa5f8db0c"
-        const val BACKGROUND_PREVIEW_NATIVE = "70d2db3a-4a83-44ed-8c58-a47189e82352"
+        const val BACKGROUND_LIST_NATIVE = "0320a6be-56a4-425b-ac93-a840fe4cef47"
+        const val BACKGROUND_PREVIEW_NATIVE = "a836ea9f-91fe-4004-9bb8-09827a49065d"
 
-        const val EXIT_NATIVE = "8e41aaec-a61c-488b-9a43-c8d11e2e75a8"
+        const val EXIT_NATIVE = "9a59c2f7-2102-4984-9bc7-93ce073e6214"
 
-        const val INTERSTITIAL_BACKGROUND = "b25facca-a829-4a40-9398-e5a2a2c66d1c"
-        const val INTERSTITIAL_RAM_CLEANER = "83a8f44a-69fa-471f-bf45-27c48c80d383"
+        const val INTERSTITIAL_BACKGROUND = "c1a36f39-d816-46e2-96bf-e65ddb166dff"
+        const val INTERSTITIAL_RAM_CLEANER = "49190757-16eb-42f2-aace-13627611750c"
     }
 
     object AdMob {
