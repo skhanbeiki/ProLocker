@@ -1,6 +1,7 @@
 package com.carbon.prolocker.feature.tools
 
 import android.content.res.Configuration
+import androidx.annotation.RawRes
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
@@ -28,10 +29,15 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.Backup
+import androidx.compose.material.icons.outlined.ChevronLeft
 import androidx.compose.material.icons.outlined.ChevronRight
-import androidx.compose.material.icons.outlined.PhoneDisabled
 import androidx.compose.material.icons.outlined.Lock
+import androidx.compose.material.icons.outlined.PhoneDisabled
+import androidx.compose.material.icons.outlined.PrivacyTip
 import androidx.compose.material.icons.outlined.Security
 import androidx.compose.material.icons.outlined.Speed
 import androidx.compose.material.icons.outlined.VisibilityOff
@@ -60,28 +66,35 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.AsyncImage
-import coil.request.ImageRequest
 import com.carbon.prolocker.R
 import com.carbon.prolocker.core.theme.ProLockerPrimary
 import com.carbon.prolocker.core.theme.ProLockerSecondary
+import com.carbon.prolocker.core.ui.ToolbarLottieIcon
 import kotlinx.coroutines.launch
 
+enum class FeatureId {
+    HIDE_FILES,
+    INTRUDER,
+    BACKUP,
+    CALL_BLOCKER,
+    MEMORY_OPTIMIZER,
+    PRIVACY_AUDITOR
+}
+
 data class ToolsFeatureItem(
+    val id: FeatureId = FeatureId.HIDE_FILES,
     val title: String,
     val subtitle: String,
     val icon: ImageVector,
     val gradient: List<Color>,
     val available: Boolean,
-    val gifRes: Int? = null
+    @RawRes val lottieRes: Int? = null
 )
 
 @Composable
@@ -101,149 +114,75 @@ fun FeatureCard(
         label = "featureCardScale"
     )
 
-    Box(
+    Surface(
         modifier = modifier
             .graphicsLayer {
                 scaleX = scale
                 scaleY = scale
-            }
-            .clip(RoundedCornerShape(24.dp))
-            .background(Brush.linearGradient(item.gradient))
-            .clickable(
-                interactionSource = interactionSource,
-                indication = ripple(bounded = true),
-                enabled = true,
-                onClick = onClick
-            )
-            .padding(14.dp)
+            },
+        shape = RoundedCornerShape(22.dp),
+        color = MaterialTheme.colorScheme.surfaceVariant,
+        tonalElevation = 2.dp
     ) {
-        Column(modifier = Modifier.fillMaxSize()) {
-            Box(
-                modifier = Modifier
-                    .size(44.dp)
-                    .background(Color.White.copy(alpha = 0.22f), CircleShape),
-                contentAlignment = Alignment.Center
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Brush.linearGradient(item.gradient))
+                .clickable(
+                    interactionSource = interactionSource,
+                    indication = ripple(bounded = true),
+                    enabled = true,
+                    onClick = onClick
+                )
+                .padding(14.dp)
+        ) {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.SpaceBetween
             ) {
-                Icon(
-                    imageVector = item.icon,
-                    contentDescription = null,
-                    tint = Color.White,
-                    modifier = Modifier.size(24.dp)
-                )
+                Box(
+                    modifier = Modifier
+                        .size(44.dp)
+                        .background(Color.White.copy(alpha = 0.24f), CircleShape),
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (item.lottieRes != null) {
+                        ToolbarLottieIcon(
+                            animationRes = item.lottieRes,
+                            onClick = onClick,
+                            modifier = Modifier.size(28.dp)
+                        )
+                    } else {
+                        Icon(
+                            imageVector = item.icon,
+                            contentDescription = null,
+                            tint = Color.White,
+                            modifier = Modifier.size(22.dp)
+                        )
+                    }
+                }
+                Column {
+                    Text(
+                        text = item.title,
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Text(
+                        text = item.subtitle,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color.White.copy(alpha = 0.85f),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        fontSize = 11.sp,
+                        lineHeight = 14.sp
+                    )
+                }
             }
-            Spacer(modifier = Modifier.height(12.dp))
-            Text(
-                text = item.title,
-                style = MaterialTheme.typography.titleSmall,
-                fontWeight = FontWeight.Bold,
-                color = Color.White,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-            Spacer(modifier = Modifier.height(2.dp))
-            Text(
-                text = item.subtitle,
-                style = MaterialTheme.typography.bodySmall,
-                color = Color.White.copy(alpha = 0.85f),
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis
-            )
         }
-
-//        if (!item.available) {
-//            Surface(
-//                color = Color.Black.copy(alpha = 0.28f),
-//                shape = RoundedCornerShape(50),
-//                modifier = Modifier.align(Alignment.TopEnd)
-//            ) {
-//                Text(
-//                    text = stringResource(R.string.coming_soon),
-//                    fontSize = 9.sp,
-//                    fontWeight = FontWeight.SemiBold,
-//                    color = Color.White,
-//                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
-//                )
-//            }
-//        }
-    }
-}
-
-@Composable
-fun MemoryOptimizerCard(
-    item: ToolsFeatureItem,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    val interactionSource = remember { MutableInteractionSource() }
-    val isPressed by interactionSource.collectIsPressedAsState()
-    val scale by animateFloatAsState(
-        targetValue = if (isPressed) 0.96f else 1f,
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessMedium
-        ),
-        label = "memoryOptimizerCardScale"
-    )
-    val context = LocalContext.current
-    val gifRequest = remember(item.gifRes) {
-        ImageRequest.Builder(context)
-            .data("android.resource://${context.packageName}/${item.gifRes}")
-            .decoderFactory(coil.decode.GifDecoder.Factory())
-            .build()
-    }
-
-    Column(
-        modifier = modifier
-            .graphicsLayer {
-                scaleX = scale
-                scaleY = scale
-            }
-            .clip(RoundedCornerShape(24.dp))
-            .background(Brush.linearGradient(item.gradient))
-            .clickable(
-                interactionSource = interactionSource,
-                indication = ripple(bounded = true),
-                onClick = onClick
-            )
-            .padding(16.dp)
-    ) {
-        Spacer(modifier = Modifier.height(8.dp))
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Box(
-                modifier = Modifier
-                    .size(44.dp)
-                    .background(Color.White.copy(alpha = 0.22f), CircleShape),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = item.icon,
-                    contentDescription = null,
-                    tint = Color.White,
-                    modifier = Modifier.size(24.dp)
-                )
-            }
-            Spacer(modifier = Modifier.width(12.dp))
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = item.title,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-                Spacer(modifier = Modifier.height(2.dp))
-                Text(
-                    text = item.subtitle,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = Color.White.copy(alpha = 0.85f),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-            }
-            Spacer(modifier = Modifier.width(12.dp))
-        }
-        Spacer(modifier = Modifier.height(8.dp))
     }
 }
 
@@ -265,70 +204,123 @@ fun AppLockHeroCard(
         label = "appLockHeroScale"
     )
 
-    Box(
+    Surface(
         modifier = modifier
             .fillMaxWidth()
             .graphicsLayer {
                 scaleX = scale
                 scaleY = scale
-            }
-            .clip(RoundedCornerShape(24.dp))
-            .background(
-                Brush.linearGradient(
-                    colors = listOf(ProLockerPrimary, ProLockerSecondary)
-                )
-            )
-            .clickable(
-                interactionSource = interactionSource,
-                indication = ripple(bounded = true),
-                onClick = onClick
-            )
-            .padding(horizontal = 20.dp, vertical = 18.dp)
+            },
+        shape = RoundedCornerShape(28.dp),
+        color = MaterialTheme.colorScheme.surfaceVariant,
+        tonalElevation = 6.dp
     ) {
-
-        Column {
-            Spacer(modifier = Modifier.height(16.dp))
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Box(
-                    modifier = Modifier
-                        .size(44.dp)
-                        .background(Color.White.copy(alpha = 0.22f), CircleShape),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.Outlined.Lock,
-                        contentDescription = null,
-                        tint = Color.White,
-                        modifier = Modifier.size(28.dp)
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(
+                    Brush.linearGradient(
+                        colors = listOf(Color(0xFF4F46E5), Color(0xFF7C3AED), Color(0xFF9333EA))
                     )
-                }
-                Spacer(modifier = Modifier.width(16.dp))
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = title,
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = subtitle,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = Color.White.copy(alpha = 0.85f),
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                }
-                Spacer(modifier = Modifier.width(12.dp))
-                Icon(
-                    imageVector = Icons.Outlined.ChevronRight,
-                    contentDescription = null,
-                    tint = Color.White.copy(alpha = 0.9f)
                 )
+                .clickable(
+                    interactionSource = interactionSource,
+                    indication = ripple(bounded = true),
+                    onClick = onClick
+                )
+                .padding(20.dp)
+        ) {
+            Column {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Surface(
+                        color = Color.White.copy(alpha = 0.22f),
+                        shape = RoundedCornerShape(50)
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                Icons.Default.Star,
+                                contentDescription = null,
+                                tint = Color(0xFFFFD700),
+                                modifier = Modifier.size(12.dp)
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                "ابزار اصلی برنامه",
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White
+                            )
+                        }
+                    }
+
+                    Box(
+                        modifier = Modifier
+                            .size(52.dp)
+                            .background(Color.White.copy(alpha = 0.25f), CircleShape),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.Lock,
+                            contentDescription = null,
+                            tint = Color.White,
+                            modifier = Modifier.size(30.dp)
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(14.dp))
+
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = Color.White,
+                    fontSize = 22.sp
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = subtitle,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.White.copy(alpha = 0.90f),
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    fontSize = 13.sp,
+                    lineHeight = 18.sp
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Surface(
+                    color = Color.White,
+                    shape = RoundedCornerShape(16.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Row(
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            "ورود و مدیریت برنامه‌ها",
+                            fontWeight = FontWeight.Bold,
+                            color = Color(0xFF4F46E5),
+                            fontSize = 13.sp
+                        )
+                        Icon(
+                            imageVector = Icons.Outlined.ChevronLeft,
+                            contentDescription = null,
+                            tint = Color(0xFF4F46E5)
+                        )
+                    }
+                }
             }
-            Spacer(modifier = Modifier.height(16.dp))
         }
     }
 }
@@ -356,29 +348,18 @@ fun ToolsGrid(
                 onClick = onHeroClick,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 4.dp)
+                    .padding(bottom = 6.dp)
             )
         }
         features.forEach { item ->
-            if (item.gifRes == null) {
-                item(key = item.title) {
-                    FeatureCard(
-                        item = item,
-                        onClick = { onFeatureClick(item) },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .aspectRatio(1.3f)
-                    )
-                }
-
-            } else {
-                item(span = { GridItemSpan(2) }, key = item.title) {
-                    MemoryOptimizerCard(
-                        item = item,
-                        onClick = { onFeatureClick(item) },
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
+            item(key = item.id.name) {
+                FeatureCard(
+                    item = item,
+                    onClick = { onFeatureClick(item) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .aspectRatio(1.25f)
+                )
             }
         }
 
@@ -401,19 +382,17 @@ fun ToolsScreen(
     onNavigateToBackup: () -> Unit = {},
     onNavigateToAppLock: () -> Unit = {},
     onNavigateToMemoryOptimizer: () -> Unit = {},
-    onNavigateToCallBlocker: () -> Unit = {}
+    onNavigateToCallBlocker: () -> Unit = {},
+    onNavigateToAudit: () -> Unit = {}
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     val comingSoonLabel = stringResource(R.string.coming_soon)
-    val hideFilesTitle = stringResource(R.string.tools_hide_files)
-    val backupTitle = stringResource(R.string.tools_backup)
-    val memoryOptimizerTitle = stringResource(R.string.tools_memory_optimizer)
     val appLockTitle = stringResource(R.string.tools_app_lock)
-    val callBlockerTitle = stringResource(R.string.tools_app_blocking)
 
     val features = listOf(
         ToolsFeatureItem(
+            id = FeatureId.HIDE_FILES,
             title = stringResource(R.string.tools_hide_files),
             subtitle = stringResource(R.string.tools_hide_files_subtitle),
             icon = Icons.Outlined.VisibilityOff,
@@ -421,6 +400,7 @@ fun ToolsScreen(
             available = true
         ),
         ToolsFeatureItem(
+            id = FeatureId.INTRUDER,
             title = stringResource(R.string.tools_intruder_detection),
             subtitle = stringResource(R.string.tools_intruder_detection_subtitle),
             icon = Icons.Outlined.Security,
@@ -428,6 +408,7 @@ fun ToolsScreen(
             available = true
         ),
         ToolsFeatureItem(
+            id = FeatureId.BACKUP,
             title = stringResource(R.string.tools_backup),
             subtitle = stringResource(R.string.tools_backup_subtitle),
             icon = Icons.Outlined.Backup,
@@ -435,6 +416,7 @@ fun ToolsScreen(
             available = true
         ),
         ToolsFeatureItem(
+            id = FeatureId.CALL_BLOCKER,
             title = stringResource(R.string.tools_app_blocking),
             subtitle = stringResource(R.string.tools_app_blocking_subtitle),
             icon = Icons.Outlined.PhoneDisabled,
@@ -442,12 +424,21 @@ fun ToolsScreen(
             available = true
         ),
         ToolsFeatureItem(
+            id = FeatureId.MEMORY_OPTIMIZER,
             title = stringResource(R.string.tools_memory_optimizer),
             subtitle = stringResource(R.string.tools_memory_optimizer_subtitle),
             icon = Icons.Outlined.Speed,
             gradient = listOf(Color(0xFF34D399), Color(0xFF10B981)),
             available = true,
-            gifRes = R.raw.gif_guide
+            lottieRes = R.raw.trash_clean
+        ),
+        ToolsFeatureItem(
+            id = FeatureId.PRIVACY_AUDITOR,
+            title = stringResource(R.string.tools_privacy_auditor),
+            subtitle = stringResource(R.string.tools_privacy_auditor_subtitle),
+            icon = Icons.Outlined.PrivacyTip,
+            gradient = listOf(Color(0xFF3B82F6), Color(0xFF1D4ED8)),
+            available = true
         )
     )
 
@@ -511,20 +502,13 @@ fun ToolsScreen(
             heroSubtitle = stringResource(R.string.tools_app_lock_subtitle),
             onHeroClick = onNavigateToAppLock,
             onFeatureClick = { item ->
-                if (item.available && item.title == hideFilesTitle) {
-                    onNavigateToHideFiles()
-                } else if (item.available && item.title == backupTitle) {
-                    onNavigateToBackup()
-                } else if (item.available && item.title == memoryOptimizerTitle) {
-                    onNavigateToMemoryOptimizer()
-                } else if (item.available && item.title == callBlockerTitle) {
-                    onNavigateToCallBlocker()
-                } else if (item.available) {
-                    onNavigateToSecurity()
-                } else {
-                    scope.launch {
-                        snackbarHostState.showSnackbar("$comingSoonLabel · ${item.title}")
-                    }
+                when (item.id) {
+                    FeatureId.HIDE_FILES -> onNavigateToHideFiles()
+                    FeatureId.INTRUDER -> onNavigateToSecurity()
+                    FeatureId.BACKUP -> onNavigateToBackup()
+                    FeatureId.CALL_BLOCKER -> onNavigateToCallBlocker()
+                    FeatureId.MEMORY_OPTIMIZER -> onNavigateToMemoryOptimizer()
+                    FeatureId.PRIVACY_AUDITOR -> onNavigateToAudit()
                 }
             },
             modifier = Modifier

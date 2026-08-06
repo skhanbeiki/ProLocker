@@ -91,6 +91,8 @@
     <string name="tools_screen_recording_subtitle">نظارت بر فعالیت صفحه</string>
     <string name="tools_app_manager">مدیریت برنامه ها</string>
     <string name="tools_app_manager_subtitle">مدیریت برنامه های نصب شده</string>
+    <string name="tools_privacy_auditor">آنالیز حریم خصوصی</string>
+    <string name="tools_privacy_auditor_subtitle">تحلیل و بررسی دسترسی برنامه‌ها</string>
     <string name="coming_soon">به زودی</string>
     <string name="hide_files_title">مخفی کردن فایل</string>
     <string name="hide_files_subtitle">فایل های خصوصی خود را ایمن نگه دارید</string>

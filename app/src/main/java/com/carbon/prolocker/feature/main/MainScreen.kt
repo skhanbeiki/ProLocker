@@ -395,7 +395,8 @@ fun MainScreen(
                     onNavigateToBackup = onNavigateToBackup,
                     onNavigateToAppLock = { viewModel.setSelectedTab(MainTab.HOME) },
                     onNavigateToMemoryOptimizer = onNavigateToMemoryOptimizer,
-                    onNavigateToCallBlocker = onNavigateToCallBlocker
+                    onNavigateToCallBlocker = onNavigateToCallBlocker,
+                    onNavigateToAudit = onNavigateToAudit
                 )
 
                 MainTab.HOME -> HomeScreen(

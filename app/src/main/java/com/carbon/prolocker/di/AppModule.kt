@@ -95,6 +95,7 @@ val repositoryModule = module {
     single { com.carbon.prolocker.core.repository.UpdateRepository(get()) }
     single { com.carbon.prolocker.core.repository.BackgroundRepository(get()) }
     single { com.carbon.prolocker.core.analytics.AnalyticsManager(androidContext()) }
+    single { com.carbon.prolocker.feature.privacyauditor.PrivacyAuditorRepository(androidContext()) }
 }
 
 val viewModelModule = module {
@@ -108,6 +109,7 @@ val viewModelModule = module {
     viewModel { com.carbon.prolocker.feature.main.MainViewModel(get(), get()) }
     viewModel { com.carbon.prolocker.feature.gallery.BackgroundGalleryViewModel(get(), get(), get(), get()) }
     viewModel { com.carbon.prolocker.feature.entrylock.EntryLockViewModel(get()) }
+    viewModel { com.carbon.prolocker.feature.privacyauditor.PrivacyAuditorViewModel(get()) }
 }
 
 

@@ -26,3 +26,4 @@ import kotlinx.serialization.Serializable
 @Serializable data object BackupAppsRoute
 @Serializable data object BackupAppsProgressRoute
 @Serializable data object CallBlockerRoute
+@Serializable data object PrivacyAuditorRoute

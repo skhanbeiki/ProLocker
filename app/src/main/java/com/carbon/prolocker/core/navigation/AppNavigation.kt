@@ -121,7 +121,7 @@ fun AppNavigation(
                     navController.navigate(LockTypeSelectionRoute)
                 },
                 onNavigateToAudit = {
-                    navController.navigate(SecurityAuditRoute)
+                    navController.navigate(PrivacyAuditorRoute)
                 },
                 onNavigateToAppSettings = {
                     navController.navigate(AppSettingsRoute)
@@ -307,6 +307,13 @@ fun AppNavigation(
         }
         composable<AboutUsRoute> {
             com.carbon.prolocker.feature.account.AboutUsScreen(
+                onBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+        composable<PrivacyAuditorRoute> {
+            com.carbon.prolocker.feature.privacyauditor.PrivacyAuditorScreen(
                 onBack = {
                     navController.popBackStack()
                 }
