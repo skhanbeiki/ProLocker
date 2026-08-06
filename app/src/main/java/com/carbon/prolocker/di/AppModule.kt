@@ -106,7 +106,7 @@ val viewModelModule = module {
     viewModel { com.carbon.prolocker.feature.home.HomeViewModel(get(), get(), get(), androidContext(), get(), get(), get()) }
     viewModel { com.carbon.prolocker.feature.account.AccountViewModel(get(), get(), get(), get(), get()) }
     viewModel { com.carbon.prolocker.feature.security.SecurityViewModel(get(), get(), get(), get()) }
-    viewModel { com.carbon.prolocker.feature.main.MainViewModel(get(), get()) }
+    viewModel { com.carbon.prolocker.feature.main.MainViewModel(get(), get(), get()) }
     viewModel { com.carbon.prolocker.feature.gallery.BackgroundGalleryViewModel(get(), get(), get(), get()) }
     viewModel { com.carbon.prolocker.feature.entrylock.EntryLockViewModel(get()) }
     viewModel { com.carbon.prolocker.feature.privacyauditor.PrivacyAuditorViewModel(get()) }

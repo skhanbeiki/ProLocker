@@ -6,11 +6,14 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class RemoteConfigResponse(
     @SerialName("interval") val interval: Long = 360,
-    @SerialName("configs") val configs: RemoteConfigs = RemoteConfigs()
+    @SerialName("configs") val configs: RemoteConfigs = RemoteConfigs(),
+    @SerialName("defaultHomeTab") val defaultHomeTab: String = "tools"
 ) {
     companion object {
         val DEFAULT = RemoteConfigResponse(
+            defaultHomeTab = "tools",
             configs = RemoteConfigs(
+                defaultHomeTab = "tools",
                 displayAdTypeMyketApp = "adivery",
                 displayAdTypeBazaarApp = "adivery",
                 displayAdTypeGooglePlayApp = "adivery",
@@ -26,10 +29,19 @@ data class RemoteConfigResponse(
             )
         )
     }
+
+    fun getEffectiveDefaultHomeTab(): String {
+        return if (defaultHomeTab.isNotBlank() && defaultHomeTab != "tools") {
+            defaultHomeTab
+        } else {
+            configs.defaultHomeTab
+        }
+    }
 }
 
 @Serializable
 data class RemoteConfigs(
+    @SerialName("defaultHomeTab") val defaultHomeTab: String = "tools",
     @SerialName("RamCleanerNotifyTimes") val ramCleanerNotifyTimes: List<Int> = emptyList(),
     @SerialName("displayAdTypeMyketApp") val displayAdTypeMyketApp: String = "adivery",
     @SerialName("displayAdTypeBazaarApp") val displayAdTypeBazaarApp: String = "adivery",

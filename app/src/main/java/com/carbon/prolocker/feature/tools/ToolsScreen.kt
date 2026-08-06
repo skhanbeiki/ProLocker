@@ -436,7 +436,7 @@ fun ToolsScreen(
             title = stringResource(R.string.tools_privacy_auditor),
             subtitle = stringResource(R.string.tools_privacy_auditor_subtitle),
             icon = Icons.Outlined.PrivacyTip,
-            gradient = listOf(Color(0xFF3B82F6), Color(0xFF1D4ED8)),
+            gradient = listOf(Color(0xFFFFC107), Color(0xFFFF9800)),
             available = true
         )
     )
