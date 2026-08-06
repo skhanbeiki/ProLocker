@@ -85,7 +85,16 @@ import com.carbon.prolocker.feature.callblocker.data.BlockRuleType
 import com.carbon.prolocker.feature.callblocker.data.BlockSourceCategory
 import com.carbon.prolocker.feature.callblocker.data.BlockedCallLogEntity
 import com.carbon.prolocker.feature.callblocker.data.BlockedNumberEntity
+import androidx.activity.compose.BackHandler
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.runtime.rememberCoroutineScope
+import com.carbon.prolocker.ad.AdManager
+import com.carbon.prolocker.ad.AdPlacement
+import com.carbon.prolocker.ad.triggerExitInterstitialAd
+import com.carbon.prolocker.core.datastore.PreferencesRepository
+import com.carbon.prolocker.network.repository.RemoteConfigRepository
 import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -93,6 +102,27 @@ fun CallBlockerHomeScreen(
     onBack: () -> Unit,
     viewModel: CallBlockerViewModel = koinViewModel()
 ) {
+    val adManager: AdManager = koinInject()
+    val preferencesRepository: PreferencesRepository = koinInject()
+    val remoteConfigRepository: RemoteConfigRepository = koinInject()
+
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+
+    val handleExit = {
+        triggerExitInterstitialAd(
+            context = context,
+            coroutineScope = scope,
+            preferencesRepository = preferencesRepository,
+            remoteConfigRepository = remoteConfigRepository,
+            adManager = adManager,
+            placement = AdPlacement.INTERSTITIAL_CALL_BLOCKER,
+            onBack = onBack
+        )
+    }
+
+    BackHandler { handleExit() }
+
     val uiState by viewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -163,7 +193,7 @@ fun CallBlockerHomeScreen(
                         )
                     },
                     navigationIcon = {
-                        IconButton(onClick = onBack) {
+                        IconButton(onClick = handleExit) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                                 contentDescription = stringResource(R.string.back)

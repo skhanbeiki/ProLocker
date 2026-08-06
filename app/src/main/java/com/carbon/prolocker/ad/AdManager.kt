@@ -162,6 +162,13 @@ class AdManager(
                 AdPlacement.EXIT_NATIVE -> AdUnitIds.Tapsell.EXIT_NATIVE
                 AdPlacement.INTERSTITIAL_BACKGROUND -> AdUnitIds.Tapsell.INTERSTITIAL_BACKGROUND
                 AdPlacement.INTERSTITIAL_RAM_CLEANER -> AdUnitIds.Tapsell.INTERSTITIAL_RAM_CLEANER
+                AdPlacement.INTERSTITIAL_HIDDEN_ITEMS -> AdUnitIds.Tapsell.INTERSTITIAL_HIDDEN_ITEMS
+                AdPlacement.INTERSTITIAL_HIDE_FILES -> AdUnitIds.Tapsell.INTERSTITIAL_HIDE_FILES
+                AdPlacement.INTERSTITIAL_CALL_BLOCKER -> AdUnitIds.Tapsell.INTERSTITIAL_CALL_BLOCKER
+                AdPlacement.INTERSTITIAL_PRIVACY_AUDITOR -> AdUnitIds.Tapsell.INTERSTITIAL_PRIVACY_AUDITOR
+                AdPlacement.INTERSTITIAL_BACKUP_HOME -> AdUnitIds.Tapsell.INTERSTITIAL_BACKUP_HOME
+                AdPlacement.INTERSTITIAL_BACKUP_APPS -> AdUnitIds.Tapsell.INTERSTITIAL_BACKUP_APPS
+                AdPlacement.INTERSTITIAL_BACKUP_CATEGORY_DETAIL -> AdUnitIds.Tapsell.INTERSTITIAL_BACKUP_CATEGORY_DETAIL
                 else -> ""
             }
             "adivery" -> when (placement) {
@@ -176,6 +183,13 @@ class AdManager(
                 AdPlacement.EXIT_NATIVE -> AdUnitIds.Adivery.EXIT_NATIVE
                 AdPlacement.INTERSTITIAL_BACKGROUND -> AdUnitIds.Adivery.INTERSTITIAL_BACKGROUND
                 AdPlacement.INTERSTITIAL_RAM_CLEANER -> AdUnitIds.Adivery.INTERSTITIAL_RAM_CLEANER
+                AdPlacement.INTERSTITIAL_HIDDEN_ITEMS -> AdUnitIds.Adivery.INTERSTITIAL_HIDDEN_ITEMS
+                AdPlacement.INTERSTITIAL_HIDE_FILES -> AdUnitIds.Adivery.INTERSTITIAL_HIDE_FILES
+                AdPlacement.INTERSTITIAL_CALL_BLOCKER -> AdUnitIds.Adivery.INTERSTITIAL_CALL_BLOCKER
+                AdPlacement.INTERSTITIAL_PRIVACY_AUDITOR -> AdUnitIds.Adivery.INTERSTITIAL_PRIVACY_AUDITOR
+                AdPlacement.INTERSTITIAL_BACKUP_HOME -> AdUnitIds.Adivery.INTERSTITIAL_BACKUP_HOME
+                AdPlacement.INTERSTITIAL_BACKUP_APPS -> AdUnitIds.Adivery.INTERSTITIAL_BACKUP_APPS
+                AdPlacement.INTERSTITIAL_BACKUP_CATEGORY_DETAIL -> AdUnitIds.Adivery.INTERSTITIAL_BACKUP_CATEGORY_DETAIL
                 else -> ""
             }
             "admob" -> when (placement) {
@@ -190,6 +204,13 @@ class AdManager(
                 AdPlacement.EXIT_NATIVE -> AdUnitIds.AdMob.EXIT_NATIVE
                 AdPlacement.INTERSTITIAL_BACKGROUND -> AdUnitIds.AdMob.INTERSTITIAL_BACKGROUND
                 AdPlacement.INTERSTITIAL_RAM_CLEANER -> AdUnitIds.AdMob.INTERSTITIAL_RAM_CLEANER
+                AdPlacement.INTERSTITIAL_HIDDEN_ITEMS -> AdUnitIds.AdMob.INTERSTITIAL_HIDDEN_ITEMS
+                AdPlacement.INTERSTITIAL_HIDE_FILES -> AdUnitIds.AdMob.INTERSTITIAL_HIDE_FILES
+                AdPlacement.INTERSTITIAL_CALL_BLOCKER -> AdUnitIds.AdMob.INTERSTITIAL_CALL_BLOCKER
+                AdPlacement.INTERSTITIAL_PRIVACY_AUDITOR -> AdUnitIds.AdMob.INTERSTITIAL_PRIVACY_AUDITOR
+                AdPlacement.INTERSTITIAL_BACKUP_HOME -> AdUnitIds.AdMob.INTERSTITIAL_BACKUP_HOME
+                AdPlacement.INTERSTITIAL_BACKUP_APPS -> AdUnitIds.AdMob.INTERSTITIAL_BACKUP_APPS
+                AdPlacement.INTERSTITIAL_BACKUP_CATEGORY_DETAIL -> AdUnitIds.AdMob.INTERSTITIAL_BACKUP_CATEGORY_DETAIL
                 else -> ""
             }
             else -> ""

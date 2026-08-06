@@ -82,8 +82,15 @@ import com.carbon.prolocker.core.theme.ProLockerPrimary
 import com.carbon.prolocker.core.ui.components.EmptyState
 import com.carbon.prolocker.feature.hidefile.HideFileViewModel
 import com.carbon.prolocker.feature.hidefile.data.HideItem
+import androidx.activity.compose.BackHandler
+import com.carbon.prolocker.ad.AdManager
+import com.carbon.prolocker.ad.AdPlacement
+import com.carbon.prolocker.ad.triggerExitInterstitialAd
+import com.carbon.prolocker.core.datastore.PreferencesRepository
+import com.carbon.prolocker.network.repository.RemoteConfigRepository
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.koinInject
 import java.io.File
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -94,6 +101,10 @@ fun HiddenItemsScreen(
     onOpenPicker: (String) -> Unit = {}
 ) {
     val viewModel: HideFileViewModel = koinViewModel()
+    val adManager: AdManager = koinInject()
+    val preferencesRepository: PreferencesRepository = koinInject()
+    val remoteConfigRepository: RemoteConfigRepository = koinInject()
+
     val allItems by viewModel.items.collectAsState()
     val items = remember(allItems, type) { allItems.filter { it.type == type } }
 
@@ -105,6 +116,20 @@ fun HiddenItemsScreen(
     val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
+
+    val handleExit = {
+        triggerExitInterstitialAd(
+            context = context,
+            coroutineScope = scope,
+            preferencesRepository = preferencesRepository,
+            remoteConfigRepository = remoteConfigRepository,
+            adManager = adManager,
+            placement = AdPlacement.INTERSTITIAL_HIDDEN_ITEMS,
+            onBack = onBack
+        )
+    }
+
+    BackHandler { handleExit() }
 
     val requester = rememberStoragePermissionRequester(
         onGranted = { category ->
@@ -130,7 +155,7 @@ fun HiddenItemsScreen(
         topBar = {
             TopAppBar(
                 navigationIcon = {
-                    IconButton(onClick = onBack) {
+                    IconButton(onClick = handleExit) {
                         Icon(
                             Icons.AutoMirrored.Outlined.ArrowBack,
                             contentDescription = stringResource(R.string.back)

@@ -83,7 +83,15 @@ import com.carbon.prolocker.R
 import com.carbon.prolocker.core.theme.ProLockerError
 import com.carbon.prolocker.core.theme.ProLockerPrimary
 import com.carbon.prolocker.core.theme.ProLockerSecondary
+import androidx.activity.compose.BackHandler
+import androidx.compose.runtime.rememberCoroutineScope
+import com.carbon.prolocker.ad.AdManager
+import com.carbon.prolocker.ad.AdPlacement
+import com.carbon.prolocker.ad.triggerExitInterstitialAd
+import com.carbon.prolocker.core.datastore.PreferencesRepository
+import com.carbon.prolocker.network.repository.RemoteConfigRepository
 import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -92,6 +100,9 @@ fun PrivacyAuditorScreen(
 ) {
     val isInspection = LocalInspectionMode.current
     val viewModel: PrivacyAuditorViewModel? = if (isInspection) null else koinViewModel()
+    val adManager: AdManager? = if (isInspection) null else koinInject<AdManager>()
+    val preferencesRepository: PreferencesRepository? = if (isInspection) null else koinInject<PreferencesRepository>()
+    val remoteConfigRepository: RemoteConfigRepository? = if (isInspection) null else koinInject<RemoteConfigRepository>()
 
     val filteredApps by viewModel?.filteredApps?.collectAsState()
         ?: remember { mutableStateOf(emptyList()) }
@@ -103,12 +114,31 @@ fun PrivacyAuditorScreen(
         ?: remember { mutableStateOf(false) }
 
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+
+    val handleExit = {
+        if (isInspection || adManager == null || preferencesRepository == null || remoteConfigRepository == null) {
+            onBack()
+        } else {
+            triggerExitInterstitialAd(
+                context = context,
+                coroutineScope = scope,
+                preferencesRepository = preferencesRepository,
+                remoteConfigRepository = remoteConfigRepository,
+                adManager = adManager,
+                placement = AdPlacement.INTERSTITIAL_PRIVACY_AUDITOR,
+                onBack = onBack
+            )
+        }
+    }
+
+    BackHandler { handleExit() }
 
     Scaffold(
         topBar = {
             TopAppBar(
                 navigationIcon = {
-                    IconButton(onClick = onBack) {
+                    IconButton(onClick = handleExit) {
                         Icon(
                             Icons.AutoMirrored.Outlined.ArrowBack,
                             contentDescription = stringResource(R.string.back)

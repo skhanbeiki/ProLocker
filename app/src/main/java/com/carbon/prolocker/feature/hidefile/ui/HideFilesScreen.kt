@@ -60,6 +60,15 @@ import com.carbon.prolocker.feature.hidefile.data.HideItem
 import com.carbon.prolocker.feature.tools.FeatureCard
 import com.carbon.prolocker.feature.tools.ToolsFeatureItem
 import org.koin.androidx.compose.koinViewModel
+import androidx.activity.compose.BackHandler
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.runtime.rememberCoroutineScope
+import com.carbon.prolocker.ad.AdManager
+import com.carbon.prolocker.ad.AdPlacement
+import com.carbon.prolocker.ad.triggerExitInterstitialAd
+import com.carbon.prolocker.core.datastore.PreferencesRepository
+import com.carbon.prolocker.network.repository.RemoteConfigRepository
+import org.koin.compose.koinInject
 
 private data class HideCategory(
     val type: String,
@@ -76,6 +85,27 @@ fun HideFilesScreen(
     onOpenCategory: (String) -> Unit = {}
 ) {
     val viewModel: HideFileViewModel = koinViewModel()
+    val adManager: AdManager = koinInject()
+    val preferencesRepository: PreferencesRepository = koinInject()
+    val remoteConfigRepository: RemoteConfigRepository = koinInject()
+
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+
+    val handleExit = {
+        triggerExitInterstitialAd(
+            context = context,
+            coroutineScope = scope,
+            preferencesRepository = preferencesRepository,
+            remoteConfigRepository = remoteConfigRepository,
+            adManager = adManager,
+            placement = AdPlacement.INTERSTITIAL_HIDE_FILES,
+            onBack = onBack
+        )
+    }
+
+    BackHandler { handleExit() }
+
     val counts by viewModel.counts.collectAsState()
 
     var pendingCategoryType by remember { mutableStateOf<String?>(null) }
@@ -129,7 +159,7 @@ fun HideFilesScreen(
         topBar = {
             TopAppBar(
                 navigationIcon = {
-                    IconButton(onClick = onBack) {
+                    IconButton(onClick = handleExit) {
                         Icon(
                             Icons.AutoMirrored.Outlined.ArrowBack,
                             contentDescription = stringResource(R.string.back)

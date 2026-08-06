@@ -72,6 +72,16 @@ import com.carbon.prolocker.feature.backup.model.BackupCategory
 import com.carbon.prolocker.feature.backup.model.BackupFileInfo
 import org.koin.androidx.compose.koinViewModel
 
+import androidx.activity.compose.BackHandler
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.runtime.rememberCoroutineScope
+import com.carbon.prolocker.ad.AdManager
+import com.carbon.prolocker.ad.AdPlacement
+import com.carbon.prolocker.ad.triggerExitInterstitialAd
+import com.carbon.prolocker.core.datastore.PreferencesRepository
+import com.carbon.prolocker.network.repository.RemoteConfigRepository
+import org.koin.compose.koinInject
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BackupCategoryDetailScreen(
@@ -79,6 +89,27 @@ fun BackupCategoryDetailScreen(
     onBack: () -> Unit,
     viewModel: BackupCategoryViewModel = koinViewModel()
 ) {
+    val adManager: AdManager = koinInject()
+    val preferencesRepository: PreferencesRepository = koinInject()
+    val remoteConfigRepository: RemoteConfigRepository = koinInject()
+
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+
+    val handleExit = {
+        triggerExitInterstitialAd(
+            context = context,
+            coroutineScope = scope,
+            preferencesRepository = preferencesRepository,
+            remoteConfigRepository = remoteConfigRepository,
+            adManager = adManager,
+            placement = AdPlacement.INTERSTITIAL_BACKUP_CATEGORY_DETAIL,
+            onBack = onBack
+        )
+    }
+
+    BackHandler { handleExit() }
+
     val uiState by viewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -122,7 +153,7 @@ fun BackupCategoryDetailScreen(
                         )
                     },
                     navigationIcon = {
-                        IconButton(onClick = onBack) {
+                        IconButton(onClick = handleExit) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                                 contentDescription = stringResource(R.string.back)

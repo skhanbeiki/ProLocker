@@ -21,6 +21,14 @@ object AdUnitIds {
 
         const val INTERSTITIAL_BACKGROUND = "6a326c7c356fa85c72c131af"
         const val INTERSTITIAL_RAM_CLEANER = "6a326caec401c752d197d5ec"
+
+        const val INTERSTITIAL_HIDDEN_ITEMS = "6a326c7c356fa85c72c131af"
+        const val INTERSTITIAL_HIDE_FILES = "6a326c7c356fa85c72c131af"
+        const val INTERSTITIAL_CALL_BLOCKER = "6a326caec401c752d197d5ec"
+        const val INTERSTITIAL_PRIVACY_AUDITOR = "6a326caec401c752d197d5ec"
+        const val INTERSTITIAL_BACKUP_HOME = "6a326c7c356fa85c72c131af"
+        const val INTERSTITIAL_BACKUP_APPS = "6a326c7c356fa85c72c131af"
+        const val INTERSTITIAL_BACKUP_CATEGORY_DETAIL = "6a326c7c356fa85c72c131af"
     }
 
     object Adivery {
@@ -42,6 +50,14 @@ object AdUnitIds {
 
         const val INTERSTITIAL_BACKGROUND = "c1a36f39-d816-46e2-96bf-e65ddb166dff"
         const val INTERSTITIAL_RAM_CLEANER = "49190757-16eb-42f2-aace-13627611750c"
+
+        const val INTERSTITIAL_HIDDEN_ITEMS = "c1a36f39-d816-46e2-96bf-e65ddb166dff"
+        const val INTERSTITIAL_HIDE_FILES = "c1a36f39-d816-46e2-96bf-e65ddb166dff"
+        const val INTERSTITIAL_CALL_BLOCKER = "49190757-16eb-42f2-aace-13627611750c"
+        const val INTERSTITIAL_PRIVACY_AUDITOR = "49190757-16eb-42f2-aace-13627611750c"
+        const val INTERSTITIAL_BACKUP_HOME = "c1a36f39-d816-46e2-96bf-e65ddb166dff"
+        const val INTERSTITIAL_BACKUP_APPS = "c1a36f39-d816-46e2-96bf-e65ddb166dff"
+        const val INTERSTITIAL_BACKUP_CATEGORY_DETAIL = "c1a36f39-d816-46e2-96bf-e65ddb166dff"
     }
 
     object AdMob {
@@ -63,5 +79,13 @@ object AdUnitIds {
 
         const val INTERSTITIAL_BACKGROUND = "ca-app-pub-3940256099942544/1033173712"
         const val INTERSTITIAL_RAM_CLEANER = "ca-app-pub-3940256099942544/1033173712"
+
+        const val INTERSTITIAL_HIDDEN_ITEMS = "ca-app-pub-3940256099942544/1033173712"
+        const val INTERSTITIAL_HIDE_FILES = "ca-app-pub-3940256099942544/1033173712"
+        const val INTERSTITIAL_CALL_BLOCKER = "ca-app-pub-3940256099942544/1033173712"
+        const val INTERSTITIAL_PRIVACY_AUDITOR = "ca-app-pub-3940256099942544/1033173712"
+        const val INTERSTITIAL_BACKUP_HOME = "ca-app-pub-3940256099942544/1033173712"
+        const val INTERSTITIAL_BACKUP_APPS = "ca-app-pub-3940256099942544/1033173712"
+        const val INTERSTITIAL_BACKUP_CATEGORY_DETAIL = "ca-app-pub-3940256099942544/1033173712"
     }
 }

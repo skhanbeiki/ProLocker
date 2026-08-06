@@ -1,5 +1,6 @@
 package com.carbon.prolocker.feature.backup.ui
 
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.Spring
@@ -48,6 +49,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -55,16 +57,23 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.carbon.prolocker.R
+import com.carbon.prolocker.ad.AdManager
+import com.carbon.prolocker.ad.AdPlacement
+import com.carbon.prolocker.ad.triggerExitInterstitialAd
+import com.carbon.prolocker.core.datastore.PreferencesRepository
 import com.carbon.prolocker.core.theme.ProLockerPrimary
 import com.carbon.prolocker.core.theme.ProLockerSecondary
 import com.carbon.prolocker.feature.backup.model.BackupCategory
+import com.carbon.prolocker.network.repository.RemoteConfigRepository
 import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.koinInject
 
 data class BackupCategoryCardItem(
     val category: BackupCategory,
@@ -92,60 +101,67 @@ fun BackupCategoryCard(
         label = "backupCardScale"
     )
 
-    Box(
+    Surface(
         modifier = modifier
             .graphicsLayer {
                 scaleX = scale
                 scaleY = scale
-            }
-            .clip(RoundedCornerShape(24.dp))
-            .background(Brush.linearGradient(item.gradient))
-            .clickable(
-                interactionSource = interactionSource,
-                indication = ripple(bounded = true),
-                onClick = onClick
-            )
-            .padding(18.dp)
+            },
+        shape = RoundedCornerShape(22.dp),
+        color = MaterialTheme.colorScheme.surfaceVariant,
+        tonalElevation = 2.dp
     ) {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.SpaceBetween
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Brush.linearGradient(item.gradient))
+                .clickable(
+                    interactionSource = interactionSource,
+                    indication = ripple(bounded = true),
+                    onClick = onClick
+                )
+                .padding(16.dp)
         ) {
-            Box(
-                modifier = Modifier
-                    .size(52.dp)
-                    .background(Color.White.copy(alpha = 0.22f), CircleShape),
-                contentAlignment = Alignment.Center
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.SpaceBetween
             ) {
-                Icon(
-                    imageVector = item.icon,
-                    contentDescription = null,
-                    tint = Color.White,
-                    modifier = Modifier.size(28.dp)
-                )
-            }
+                Box(
+                    modifier = Modifier
+                        .size(44.dp)
+                        .background(Color.White.copy(alpha = 0.24f), CircleShape),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = item.icon,
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
 
-            Column {
-                Text(
-                    text = stringResource(item.titleRes),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = if (isLoadingCount) {
-                        stringResource(R.string.backup_loading)
-                    } else {
-                        stringResource(R.string.backup_items_available, count)
-                    },
-                    style = MaterialTheme.typography.bodySmall,
-                    color = Color.White.copy(alpha = 0.85f),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
+                Column {
+                    Text(
+                        text = stringResource(item.titleRes),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Text(
+                        text = if (isLoadingCount) {
+                            stringResource(R.string.backup_loading)
+                        } else {
+                            stringResource(R.string.backup_items_available, count)
+                        },
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color.White.copy(alpha = 0.85f),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
             }
         }
     }
@@ -158,6 +174,27 @@ fun BackupHomeScreen(
     onOpenCategory: (BackupCategory) -> Unit,
     viewModel: BackupHomeViewModel = koinViewModel()
 ) {
+    val adManager: AdManager = koinInject()
+    val preferencesRepository: PreferencesRepository = koinInject()
+    val remoteConfigRepository: RemoteConfigRepository = koinInject()
+
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+
+    val handleExit = {
+        triggerExitInterstitialAd(
+            context = context,
+            coroutineScope = scope,
+            preferencesRepository = preferencesRepository,
+            remoteConfigRepository = remoteConfigRepository,
+            adManager = adManager,
+            placement = AdPlacement.INTERSTITIAL_BACKUP_HOME,
+            onBack = onBack
+        )
+    }
+
+    BackHandler { handleExit() }
+
     val uiState by viewModel.uiState.collectAsState()
 
     val safLauncher = rememberLauncherForActivityResult(
@@ -182,16 +219,16 @@ fun BackupHomeScreen(
                 gradient = listOf(Color(0xFF00D1B2), Color(0xFF00A896))
             ),
             BackupCategoryCardItem(
-                category = BackupCategory.APPLICATIONS,
-                titleRes = R.string.backup_category_applications,
-                icon = Icons.Outlined.Android,
-                gradient = listOf(Color(0xFF7B61FF), Color(0xFF5B6CFF))
-            ),
-            BackupCategoryCardItem(
                 category = BackupCategory.SMS,
                 titleRes = R.string.backup_category_sms,
                 icon = Icons.Outlined.Sms,
                 gradient = listOf(Color(0xFFF472B6), Color(0xFFEC4899))
+            ),
+            BackupCategoryCardItem(
+                category = BackupCategory.APPLICATIONS,
+                titleRes = R.string.backup_category_applications,
+                icon = Icons.Outlined.Android,
+                gradient = listOf(Color(0xFF7B61FF), Color(0xFF5B6CFF))
             )
         )
     }
@@ -207,7 +244,7 @@ fun BackupHomeScreen(
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = onBack) {
+                    IconButton(onClick = handleExit) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(R.string.back)
@@ -243,32 +280,33 @@ fun BackupHomeScreen(
                         onClick = { onOpenCategory(item.category) },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .aspectRatio(0.95f)
+                            .aspectRatio(1.1f)
                     )
                 }
             }
 
-            // Backup Location Card Section
+            // Storage Location Card at Bottom
             Surface(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 20.dp, vertical = 16.dp),
-                shape = RoundedCornerShape(24.dp),
+                shape = RoundedCornerShape(20.dp),
                 color = MaterialTheme.colorScheme.surfaceVariant,
                 tonalElevation = 2.dp
             ) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable { safLauncher.launch(null) }
-                        .padding(20.dp),
+                        .padding(16.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Box(
                         modifier = Modifier
-                            .size(48.dp)
+                            .size(44.dp)
                             .background(
-                                Brush.linearGradient(listOf(ProLockerPrimary, ProLockerSecondary)),
+                                Brush.linearGradient(
+                                    colors = listOf(ProLockerPrimary, ProLockerSecondary)
+                                ),
                                 CircleShape
                             ),
                         contentAlignment = Alignment.Center
@@ -276,38 +314,40 @@ fun BackupHomeScreen(
                         Icon(
                             imageVector = Icons.Outlined.FolderSpecial,
                             contentDescription = null,
-                            tint = Color.White,
+                            tint = MaterialTheme.colorScheme.onPrimary,
                             modifier = Modifier.size(24.dp)
                         )
                     }
-
-                    Spacer(modifier = Modifier.width(16.dp))
-
+                    Spacer(modifier = Modifier.width(14.dp))
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
                             text = stringResource(R.string.backup_storage_location_title),
                             style = MaterialTheme.typography.titleSmall,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            fontWeight = FontWeight.Bold
                         )
-                        Spacer(modifier = Modifier.height(4.dp))
+                        Spacer(modifier = Modifier.height(2.dp))
                         Text(
-                            text = uiState.locationPath.ifEmpty { stringResource(R.string.backup_default_storage) },
+                            text = uiState.locationPath.ifBlank { stringResource(R.string.backup_default_storage) },
                             style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.75f),
-                            maxLines = 2,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
                     }
-
                     Spacer(modifier = Modifier.width(8.dp))
-
-                    Text(
-                        text = stringResource(R.string.backup_change_location),
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = ProLockerPrimary
-                    )
+                    Surface(
+                        onClick = { safLauncher.launch(null) },
+                        shape = RoundedCornerShape(12.dp),
+                        color = MaterialTheme.colorScheme.primaryContainer
+                    ) {
+                        Text(
+                            text = stringResource(R.string.backup_change_location),
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
+                        )
+                    }
                 }
             }
         }
