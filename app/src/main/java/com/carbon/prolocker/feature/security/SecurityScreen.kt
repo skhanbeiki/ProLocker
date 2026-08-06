@@ -33,6 +33,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Security
 import androidx.compose.material.icons.filled.Warning
@@ -98,6 +99,7 @@ import saman.zamani.persiandate.PersianDateFormat
 @Composable
 fun SecurityScreen(
     paddingValues: PaddingValues = PaddingValues(0.dp),
+    onBack: () -> Unit = {},
     onNavigateToGallery: () -> Unit = {},
     onNavigateToPhotoDetail: (Long) -> Unit = {}
 ) {
@@ -165,6 +167,14 @@ fun SecurityScreen(
         modifier = Modifier.padding(bottom = paddingValues.calculateBottomPadding()),
         topBar = {
             TopAppBar(
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(
+                            Icons.AutoMirrored.Outlined.ArrowBack,
+                            contentDescription = stringResource(R.string.back)
+                        )
+                    }
+                },
                 title = {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Box(

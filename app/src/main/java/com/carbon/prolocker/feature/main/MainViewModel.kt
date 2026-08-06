@@ -17,7 +17,7 @@ class MainViewModel(
     private val _updateState = MutableStateFlow<UpdateResponse?>(null)
     val updateState: StateFlow<UpdateResponse?> = _updateState.asStateFlow()
 
-    private val _selectedTab = MutableStateFlow(MainTab.HOME)
+    private val _selectedTab = MutableStateFlow(MainTab.TOOLS)
     val selectedTab: StateFlow<MainTab> = _selectedTab.asStateFlow()
 
     init {

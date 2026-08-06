@@ -236,6 +236,9 @@ fun AppNavigation(
         }
         composable<SecurityRoute> {
             com.carbon.prolocker.feature.security.SecurityScreen(
+                onBack = {
+                    navController.popBackStack()
+                },
                 onNavigateToGallery = {
                     navController.navigate(BackgroundGalleryRoute)
                 },
