@@ -142,7 +142,7 @@ fun EntryLockContent(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF6C7CFF))
+            .background(Color(0xFF612FB6))
     ) {
         Column(
             modifier = Modifier

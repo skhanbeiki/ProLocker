@@ -24,7 +24,7 @@ class RamCleanerNotificationManager(private val context: Context) {
     companion object {
         private const val TAG = "Moslemprolocker"
         const val CHANNEL_ID = "ram_cleaner_notification"
-        const val NOTIFICATION_ID = 9001
+        const val NOTIFICATION_ID = 9002
         const val EXTRA_FROM_NOTIFICATION = "extra_from_notification"
     }
 
