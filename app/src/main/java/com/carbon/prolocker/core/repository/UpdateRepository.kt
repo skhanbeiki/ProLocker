@@ -28,13 +28,23 @@ class UpdateRepository(private val updateApi: UpdateApi) {
             )
 
             if (response.status.value in 200..299) {
-                val json = Json { ignoreUnknownKeys = true }
-                json.decodeFromString<UpdateResponse>(response.bodyAsText())
+                val body = response.bodyAsText().trim()
+                if (body.isEmpty() || body == "null") {
+                    null
+                } else {
+                    try {
+                        val json = Json { ignoreUnknownKeys = true }
+                        json.decodeFromString<UpdateResponse>(body)
+                    } catch (e: Exception) {
+                        Log.d("UpdateRepository", "No valid update JSON payload: $body")
+                        null
+                    }
+                }
             } else {
                 null
             }
         } catch (e: Exception) {
-            Log.e("UpdateRepository", "Failed to check update", e)
+            Log.d("UpdateRepository", "Check update failed: ${e.message}")
             null
         }
     }

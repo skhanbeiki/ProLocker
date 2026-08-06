@@ -173,9 +173,6 @@ fun HiddenItemsScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            StorageAccessBanner(
-                modifier = Modifier.padding(horizontal = 20.dp, vertical = 4.dp)
-            )
             if (items.isEmpty()) {
                 EmptyState(
                     title = stringResource(R.string.hide_files_empty_title),

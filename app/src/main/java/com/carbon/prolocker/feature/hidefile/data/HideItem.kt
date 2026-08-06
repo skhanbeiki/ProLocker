@@ -10,19 +10,27 @@ import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 
-object Base64ByteArraySerializer : KSerializer<ByteArray> {
+object Base64ByteArraySerializer : KSerializer<ByteArray?> {
     override val descriptor: SerialDescriptor =
-        PrimitiveSerialDescriptor("ByteArray", PrimitiveKind.STRING)
+        PrimitiveSerialDescriptor("Base64ByteArray", PrimitiveKind.STRING)
 
-    override fun serialize(encoder: Encoder, value: ByteArray) {
-        encoder.encodeString(Base64.encodeToString(value, Base64.NO_WRAP))
+    override fun serialize(encoder: Encoder, value: ByteArray?) {
+        if (value != null) {
+            encoder.encodeString(Base64.encodeToString(value, Base64.NO_WRAP))
+        } else {
+            encoder.encodeNull()
+        }
     }
 
-    override fun deserialize(decoder: Decoder): ByteArray {
+    override fun deserialize(decoder: Decoder): ByteArray? {
         return try {
-            Base64.decode(decoder.decodeString(), Base64.NO_WRAP)
+            if (decoder.decodeNotNullMark()) {
+                Base64.decode(decoder.decodeString(), Base64.NO_WRAP)
+            } else {
+                decoder.decodeNull()
+            }
         } catch (e: Exception) {
-            ByteArray(0)
+            null
         }
     }
 }

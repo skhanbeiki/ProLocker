@@ -102,7 +102,7 @@
     <string name="hide_files_files">فایل‌ها</string>
     <string name="hide_files_no_items">مورد مخفی وجود ندارد</string>
     <string name="hide_files_item_count">%1$d مورد مخفی</string>
-    <string name="hide_files_add">مخفی کردن فایل</string>
+    <string name="hide_files_add">انتخاب فایل</string>
     <string name="hide_files_empty_title">هنوز چیزی مخفی نشده</string>
     <string name="hide_files_empty_description">برای مخفی کردن فایل جدید دکمه را بزنید</string>
     <string name="hide_files_open">باز کردن</string>

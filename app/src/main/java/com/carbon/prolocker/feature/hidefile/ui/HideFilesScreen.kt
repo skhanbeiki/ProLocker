@@ -78,6 +78,17 @@ fun HideFilesScreen(
     val viewModel: HideFileViewModel = koinViewModel()
     val counts by viewModel.counts.collectAsState()
 
+    var pendingCategoryType by remember { mutableStateOf<String?>(null) }
+    var showPermissionDialog by remember { mutableStateOf(false) }
+
+    val requester = rememberStoragePermissionRequester(
+        onGranted = { category ->
+            val cat = category ?: pendingCategoryType
+            if (cat != null) onOpenCategory(cat)
+        },
+        onDenied = { }
+    )
+
     val categories = listOf(
         HideCategory(
             type = HideItem.TYPE_IMAGE,
@@ -171,13 +182,10 @@ fun HideFilesScreen(
                 .padding(innerPadding)
                 .graphicsLayer { alpha = contentAlpha }
         ) {
-            StorageAccessBanner(
-                modifier = Modifier.padding(horizontal = 20.dp, vertical = 4.dp)
-            )
             LazyVerticalGrid(
                 columns = GridCells.Fixed(2),
                 modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 24.dp),
+                contentPadding = PaddingValues(start = 20.dp, end = 20.dp, top = 16.dp, bottom = 24.dp),
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
@@ -196,7 +204,14 @@ fun HideFilesScreen(
                             gradient = category.gradient,
                             available = true
                         ),
-                        onClick = { onOpenCategory(category.type) },
+                        onClick = {
+                            if (requester.needsPermission(category.type)) {
+                                pendingCategoryType = category.type
+                                showPermissionDialog = true
+                            } else {
+                                onOpenCategory(category.type)
+                            }
+                        },
                         modifier = Modifier
                             .fillMaxWidth()
                             .aspectRatio(1.2f)
@@ -204,6 +219,19 @@ fun HideFilesScreen(
                 }
             }
         }
+    }
+
+    if (showPermissionDialog) {
+        StorageAccessDialog(
+            category = pendingCategoryType,
+            onConfirm = {
+                showPermissionDialog = false
+                requester.request(pendingCategoryType) {
+                    pendingCategoryType?.let(onOpenCategory)
+                }
+            },
+            onDismiss = { showPermissionDialog = false }
+        )
     }
 }
 

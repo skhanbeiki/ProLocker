@@ -88,29 +88,16 @@ class StoragePermissionRequester(
     private val allFilesLauncher: ActivityResultLauncher<Intent>,
     private val runtimeLauncher: ActivityResultLauncher<Array<String>>
 ) {
-    fun needsPermission(category: String?): Boolean {
-        if (category != null && category != HideItem.TYPE_FILE &&
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
-        ) {
-            return false
-        }
+    fun needsPermission(category: String? = null): Boolean {
         return !storage.hasStorageAccess()
     }
 
     fun request(category: String?, onImmediateGrant: () -> Unit) {
         pendingCategory.value = category
-        when {
-            !needsPermission(category) -> onImmediateGrant()
-            category != null && category != HideItem.TYPE_FILE &&
-                Build.VERSION.SDK_INT < Build.VERSION_CODES.R -> {
-                runtimeLauncher.launch(
-                    arrayOf(
-                        android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                        android.Manifest.permission.READ_EXTERNAL_STORAGE
-                    )
-                )
-            }
-            else -> launchAllFilesSettings()
+        if (!needsPermission(category)) {
+            onImmediateGrant()
+        } else {
+            launchAllFilesSettings()
         }
     }
 
