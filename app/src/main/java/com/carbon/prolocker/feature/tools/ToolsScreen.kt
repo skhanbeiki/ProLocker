@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -29,8 +28,6 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.Backup
 import androidx.compose.material.icons.outlined.ChevronLeft
@@ -61,7 +58,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
@@ -76,7 +72,6 @@ import com.carbon.prolocker.R
 import com.carbon.prolocker.core.theme.ProLockerPrimary
 import com.carbon.prolocker.core.theme.ProLockerSecondary
 import com.carbon.prolocker.core.ui.ToolbarLottieIcon
-import kotlinx.coroutines.launch
 
 enum class FeatureId {
     HIDE_FILES,
@@ -120,7 +115,7 @@ fun FeatureCard(
                 scaleX = scale
                 scaleY = scale
             },
-        shape = RoundedCornerShape(22.dp),
+        shape = RoundedCornerShape(20.dp),
         color = MaterialTheme.colorScheme.surfaceVariant,
         tonalElevation = 2.dp
     ) {
@@ -134,53 +129,59 @@ fun FeatureCard(
                     enabled = true,
                     onClick = onClick
                 )
-                .padding(14.dp)
+                .padding(horizontal = 12.dp, vertical = 10.dp)
         ) {
             Column(
                 modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.SpaceBetween
+                verticalArrangement = Arrangement.Center
             ) {
-                Box(
-                    modifier = Modifier
-                        .size(44.dp)
-                        .background(Color.White.copy(alpha = 0.24f), CircleShape),
-                    contentAlignment = Alignment.Center
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    if (item.lottieRes != null) {
-                        ToolbarLottieIcon(
-                            animationRes = item.lottieRes,
-                            onClick = onClick,
-                            modifier = Modifier.size(28.dp)
-                        )
-                    } else {
-                        Icon(
-                            imageVector = item.icon,
-                            contentDescription = null,
-                            tint = Color.White,
-                            modifier = Modifier.size(22.dp)
-                        )
+                    Box(
+                        modifier = Modifier
+                            .size(36.dp)
+                            .background(Color.White.copy(alpha = 0.24f), CircleShape),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        if (item.lottieRes != null) {
+                            ToolbarLottieIcon(
+                                animationRes = item.lottieRes,
+                                onClick = onClick,
+                                modifier = Modifier.size(24.dp)
+                            )
+                        } else {
+                            Icon(
+                                imageVector = item.icon,
+                                contentDescription = null,
+                                tint = Color.White,
+                                modifier = Modifier.size(20.dp)
+                            )
+                        }
                     }
-                }
-                Column {
+                    Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = item.title,
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.Bold,
                         color = Color.White,
                         maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                    Spacer(modifier = Modifier.height(2.dp))
-                    Text(
-                        text = item.subtitle,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = Color.White.copy(alpha = 0.85f),
-                        maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        fontSize = 11.sp,
-                        lineHeight = 14.sp
+                        fontSize = 13.sp,
+                        modifier = Modifier.weight(1f)
                     )
                 }
+                Spacer(modifier = Modifier.height(6.dp))
+                Text(
+                    text = item.subtitle,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Color.White.copy(alpha = 0.88f),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    fontSize = 11.sp,
+                    lineHeight = 14.sp
+                )
             }
         }
     }
@@ -338,8 +339,8 @@ fun ToolsGrid(
         columns = GridCells.Fixed(2),
         modifier = modifier,
         contentPadding = PaddingValues(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 24.dp),
-        horizontalArrangement = Arrangement.spacedBy(14.dp),
-        verticalArrangement = Arrangement.spacedBy(14.dp)
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         item(span = { GridItemSpan(2) }) {
             AppLockHeroCard(
@@ -348,7 +349,7 @@ fun ToolsGrid(
                 onClick = onHeroClick,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 6.dp)
+                    .padding(bottom = 4.dp)
             )
         }
         features.forEach { item ->
@@ -358,7 +359,7 @@ fun ToolsGrid(
                     onClick = { onFeatureClick(item) },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .aspectRatio(1.25f)
+                        .height(92.dp)
                 )
             }
         }
@@ -386,8 +387,6 @@ fun ToolsScreen(
     onNavigateToAudit: () -> Unit = {}
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
-    val scope = rememberCoroutineScope()
-    val comingSoonLabel = stringResource(R.string.coming_soon)
     val appLockTitle = stringResource(R.string.tools_app_lock)
 
     val features = listOf(
