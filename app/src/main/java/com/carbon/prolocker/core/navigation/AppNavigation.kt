@@ -2,6 +2,7 @@ package com.carbon.prolocker.core.navigation
 
 import android.app.Activity
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -29,7 +30,7 @@ fun AppNavigation(
 
     val effectiveDeepLink = trustedLaunchDestination ?: deepLinkType
 
-    androidx.compose.runtime.LaunchedEffect(effectiveDeepLink) {
+    LaunchedEffect(effectiveDeepLink) {
         if (effectiveDeepLink != null) {
             when (effectiveDeepLink) {
                 "home" -> navController.navigate(HomeRoute()) { popUpTo(startDest) { inclusive = true } }

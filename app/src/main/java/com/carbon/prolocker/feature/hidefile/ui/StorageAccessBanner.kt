@@ -1,16 +1,11 @@
 package com.carbon.prolocker.feature.hidefile.ui
 
-import android.content.Intent
-import android.net.Uri
-import android.os.Build
-import android.provider.Settings
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.FolderOpen
@@ -43,6 +38,7 @@ fun StorageAccessBanner(modifier: Modifier = Modifier) {
     val context = LocalContext.current
     val storage = remember { HideFileStorage(context.applicationContext) }
     var hasAccess by remember { mutableStateOf(storage.hasStorageAccess()) }
+    var showDialog by remember { mutableStateOf(false) }
     val lifecycleOwner = LocalLifecycleOwner.current
 
     DisposableEffect(lifecycleOwner) {
@@ -55,17 +51,10 @@ fun StorageAccessBanner(modifier: Modifier = Modifier) {
         onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
 
-    val allFilesLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.StartActivityForResult()
-    ) { }
-
-    val runtimeLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestMultiplePermissions()
-    ) { granted ->
-        if (granted.values.any { it }) {
-            hasAccess = storage.hasStorageAccess()
-        }
-    }
+    val requester = rememberStoragePermissionRequester(
+        onGranted = { hasAccess = true },
+        onDenied = { hasAccess = storage.hasStorageAccess() }
+    )
 
     if (!hasAccess) {
         Card(
@@ -87,7 +76,7 @@ fun StorageAccessBanner(modifier: Modifier = Modifier) {
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.primary
                     )
-                    Spacer(modifier = Modifier.padding(horizontal = 4.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         stringResource(R.string.hide_files_permission_needed),
                         style = MaterialTheme.typography.bodyMedium,
@@ -95,30 +84,7 @@ fun StorageAccessBanner(modifier: Modifier = Modifier) {
                     )
                 }
                 TextButton(
-                    onClick = {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                            try {
-                                val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION).apply {
-                                    addCategory("android.intent.category.DEFAULT")
-                                    setData(Uri.parse("package:${context.packageName}"))
-                                }
-                                allFilesLauncher.launch(intent)
-                            } catch (e: Exception) {
-                                try {
-                                    allFilesLauncher.launch(Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION))
-                                } catch (e2: Exception) {
-                                    // cannot open settings
-                                }
-                            }
-                        } else {
-                            runtimeLauncher.launch(
-                                arrayOf(
-                                    android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                                    android.Manifest.permission.READ_EXTERNAL_STORAGE
-                                )
-                            )
-                        }
-                    }
+                    onClick = { showDialog = true }
                 ) {
                     Text(
                         stringResource(R.string.hide_files_allow_access),
@@ -128,5 +94,16 @@ fun StorageAccessBanner(modifier: Modifier = Modifier) {
                 }
             }
         }
+    }
+
+    if (showDialog) {
+        StorageAccessDialog(
+            category = null,
+            onConfirm = {
+                showDialog = false
+                requester.request(null) { hasAccess = true }
+            },
+            onDismiss = { showDialog = false }
+        )
     }
 }

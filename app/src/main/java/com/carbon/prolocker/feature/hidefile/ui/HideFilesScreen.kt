@@ -199,7 +199,7 @@ fun HideFilesScreen(
                         onClick = { onOpenCategory(category.type) },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .aspectRatio(0.9f)
+                            .aspectRatio(1.2f)
                     )
                 }
             }

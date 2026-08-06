@@ -23,18 +23,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Apps
 import androidx.compose.material.icons.outlined.Backup
-import androidx.compose.material.icons.outlined.Block
-import androidx.compose.material.icons.outlined.FiberManualRecord
-import androidx.compose.material.icons.outlined.GridView
+import androidx.compose.material.icons.outlined.ChevronRight
+import androidx.compose.material.icons.outlined.PhoneDisabled
 import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.Security
+import androidx.compose.material.icons.outlined.Speed
 import androidx.compose.material.icons.outlined.VisibilityOff
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -61,12 +60,16 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.carbon.prolocker.R
 import com.carbon.prolocker.core.theme.ProLockerPrimary
 import com.carbon.prolocker.core.theme.ProLockerSecondary
@@ -77,7 +80,8 @@ data class ToolsFeatureItem(
     val subtitle: String,
     val icon: ImageVector,
     val gradient: List<Color>,
-    val available: Boolean
+    val available: Boolean,
+    val gifRes: Int? = null
 )
 
 @Composable
@@ -111,15 +115,12 @@ fun FeatureCard(
                 enabled = true,
                 onClick = onClick
             )
-            .padding(16.dp)
+            .padding(14.dp)
     ) {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.SpaceBetween
-        ) {
+        Column(modifier = Modifier.fillMaxSize()) {
             Box(
                 modifier = Modifier
-                    .size(48.dp)
+                    .size(44.dp)
                     .background(Color.White.copy(alpha = 0.22f), CircleShape),
                 contentAlignment = Alignment.Center
             ) {
@@ -127,10 +128,102 @@ fun FeatureCard(
                     imageVector = item.icon,
                     contentDescription = null,
                     tint = Color.White,
-                    modifier = Modifier.size(26.dp)
+                    modifier = Modifier.size(24.dp)
                 )
             }
-            Column {
+            Spacer(modifier = Modifier.height(12.dp))
+            Text(
+                text = item.title,
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.Bold,
+                color = Color.White,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+            Spacer(modifier = Modifier.height(2.dp))
+            Text(
+                text = item.subtitle,
+                style = MaterialTheme.typography.bodySmall,
+                color = Color.White.copy(alpha = 0.85f),
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
+
+//        if (!item.available) {
+//            Surface(
+//                color = Color.Black.copy(alpha = 0.28f),
+//                shape = RoundedCornerShape(50),
+//                modifier = Modifier.align(Alignment.TopEnd)
+//            ) {
+//                Text(
+//                    text = stringResource(R.string.coming_soon),
+//                    fontSize = 9.sp,
+//                    fontWeight = FontWeight.SemiBold,
+//                    color = Color.White,
+//                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
+//                )
+//            }
+//        }
+    }
+}
+
+@Composable
+fun MemoryOptimizerCard(
+    item: ToolsFeatureItem,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+    val scale by animateFloatAsState(
+        targetValue = if (isPressed) 0.96f else 1f,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessMedium
+        ),
+        label = "memoryOptimizerCardScale"
+    )
+    val context = LocalContext.current
+    val gifRequest = remember(item.gifRes) {
+        ImageRequest.Builder(context)
+            .data("android.resource://${context.packageName}/${item.gifRes}")
+            .decoderFactory(coil.decode.GifDecoder.Factory())
+            .build()
+    }
+
+    Column(
+        modifier = modifier
+            .graphicsLayer {
+                scaleX = scale
+                scaleY = scale
+            }
+            .clip(RoundedCornerShape(24.dp))
+            .background(Brush.linearGradient(item.gradient))
+            .clickable(
+                interactionSource = interactionSource,
+                indication = ripple(bounded = true),
+                onClick = onClick
+            )
+            .padding(16.dp)
+    ) {
+        Spacer(modifier = Modifier.height(8.dp))
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Box(
+                modifier = Modifier
+                    .size(44.dp)
+                    .background(Color.White.copy(alpha = 0.22f), CircleShape),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = item.icon,
+                    contentDescription = null,
+                    tint = Color.White,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+            Spacer(modifier = Modifier.width(12.dp))
+            Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = item.title,
                     style = MaterialTheme.typography.titleMedium,
@@ -139,31 +232,103 @@ fun FeatureCard(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(2.dp))
                 Text(
                     text = item.subtitle,
                     style = MaterialTheme.typography.bodySmall,
                     color = Color.White.copy(alpha = 0.85f),
-                    maxLines = 2,
+                    maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
             }
+            Spacer(modifier = Modifier.width(12.dp))
         }
+        Spacer(modifier = Modifier.height(8.dp))
+    }
+}
 
-        if (!item.available) {
-            Surface(
-                color = Color.Black.copy(alpha = 0.28f),
-                shape = RoundedCornerShape(50),
-                modifier = Modifier.align(Alignment.TopEnd)
-            ) {
-                Text(
-                    text = stringResource(R.string.coming_soon),
-                    fontSize = 9.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = Color.White,
-                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
+@Composable
+fun AppLockHeroCard(
+    title: String,
+    subtitle: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+    val scale by animateFloatAsState(
+        targetValue = if (isPressed) 0.96f else 1f,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessMedium
+        ),
+        label = "appLockHeroScale"
+    )
+
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .graphicsLayer {
+                scaleX = scale
+                scaleY = scale
+            }
+            .clip(RoundedCornerShape(24.dp))
+            .background(
+                Brush.linearGradient(
+                    colors = listOf(ProLockerPrimary, ProLockerSecondary)
+                )
+            )
+            .clickable(
+                interactionSource = interactionSource,
+                indication = ripple(bounded = true),
+                onClick = onClick
+            )
+            .padding(horizontal = 20.dp, vertical = 18.dp)
+    ) {
+
+        Column {
+            Spacer(modifier = Modifier.height(16.dp))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(
+                    modifier = Modifier
+                        .size(44.dp)
+                        .background(Color.White.copy(alpha = 0.22f), CircleShape),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.Lock,
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier.size(28.dp)
+                    )
+                }
+                Spacer(modifier = Modifier.width(16.dp))
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = title,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = subtitle,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color.White.copy(alpha = 0.85f),
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+                Spacer(modifier = Modifier.width(12.dp))
+                Icon(
+                    imageVector = Icons.Outlined.ChevronRight,
+                    contentDescription = null,
+                    tint = Color.White.copy(alpha = 0.9f)
                 )
             }
+            Spacer(modifier = Modifier.height(16.dp))
         }
     }
 }
@@ -171,6 +336,9 @@ fun FeatureCard(
 @Composable
 fun ToolsGrid(
     features: List<ToolsFeatureItem>,
+    heroTitle: String,
+    heroSubtitle: String,
+    onHeroClick: () -> Unit,
     onFeatureClick: (ToolsFeatureItem) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -178,16 +346,47 @@ fun ToolsGrid(
         columns = GridCells.Fixed(2),
         modifier = modifier,
         contentPadding = PaddingValues(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 24.dp),
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        horizontalArrangement = Arrangement.spacedBy(14.dp),
+        verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
-        items(features, key = { it.title }) { item ->
-            FeatureCard(
-                item = item,
-                onClick = { onFeatureClick(item) },
+        item(span = { GridItemSpan(2) }) {
+            AppLockHeroCard(
+                title = heroTitle,
+                subtitle = heroSubtitle,
+                onClick = onHeroClick,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .aspectRatio(0.9f)
+                    .padding(bottom = 4.dp)
+            )
+        }
+        features.forEach { item ->
+            if (item.gifRes == null) {
+                item(key = item.title) {
+                    FeatureCard(
+                        item = item,
+                        onClick = { onFeatureClick(item) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .aspectRatio(1.3f)
+                    )
+                }
+
+            } else {
+                item(span = { GridItemSpan(2) }, key = item.title) {
+                    MemoryOptimizerCard(
+                        item = item,
+                        onClick = { onFeatureClick(item) },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            }
+        }
+
+        item(span = { GridItemSpan(2) }) {
+            Spacer(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(128.dp)
             )
         }
     }
@@ -200,6 +399,8 @@ fun ToolsScreen(
     onNavigateToSecurity: () -> Unit = {},
     onNavigateToHideFiles: () -> Unit = {},
     onNavigateToBackup: () -> Unit = {},
+    onNavigateToAppLock: () -> Unit = {},
+    onNavigateToMemoryOptimizer: () -> Unit = {},
     onNavigateToCallBlocker: () -> Unit = {}
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
@@ -207,7 +408,9 @@ fun ToolsScreen(
     val comingSoonLabel = stringResource(R.string.coming_soon)
     val hideFilesTitle = stringResource(R.string.tools_hide_files)
     val backupTitle = stringResource(R.string.tools_backup)
-    val callBlockerTitle = stringResource(R.string.call_blocker_title)
+    val memoryOptimizerTitle = stringResource(R.string.tools_memory_optimizer)
+    val appLockTitle = stringResource(R.string.tools_app_lock)
+    val callBlockerTitle = stringResource(R.string.tools_app_blocking)
 
     val features = listOf(
         ToolsFeatureItem(
@@ -232,26 +435,20 @@ fun ToolsScreen(
             available = true
         ),
         ToolsFeatureItem(
-            title = stringResource(R.string.call_blocker_title),
-            subtitle = stringResource(R.string.call_blocker_subtitle),
-            icon = Icons.Outlined.Block,
+            title = stringResource(R.string.tools_app_blocking),
+            subtitle = stringResource(R.string.tools_app_blocking_subtitle),
+            icon = Icons.Outlined.PhoneDisabled,
             gradient = listOf(Color(0xFFFF6B6B), Color(0xFFFF8E53)),
             available = true
         ),
-//        ToolsFeatureItem(
-//            title = stringResource(R.string.tools_screen_recording),
-//            subtitle = stringResource(R.string.tools_screen_recording_subtitle),
-//            icon = Icons.Outlined.FiberManualRecord,
-//            gradient = listOf(Color(0xFF34D399), Color(0xFF10B981)),
-//            available = false
-//        ),
-//        ToolsFeatureItem(
-//            title = stringResource(R.string.tools_app_manager),
-//            subtitle = stringResource(R.string.tools_app_manager_subtitle),
-//            icon = Icons.Outlined.Apps,
-//            gradient = listOf(Color(0xFFF59E0B), Color(0xFFF97316)),
-//            available = false
-//        )
+        ToolsFeatureItem(
+            title = stringResource(R.string.tools_memory_optimizer),
+            subtitle = stringResource(R.string.tools_memory_optimizer_subtitle),
+            icon = Icons.Outlined.Speed,
+            gradient = listOf(Color(0xFF34D399), Color(0xFF10B981)),
+            available = true,
+            gifRes = R.raw.gif_guide
+        )
     )
 
     var contentVisible by remember { mutableStateOf(false) }
@@ -280,7 +477,7 @@ fun ToolsScreen(
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
-                                Icons.Outlined.GridView,
+                                Icons.Outlined.Lock,
                                 contentDescription = null,
                                 tint = MaterialTheme.colorScheme.onPrimary,
                                 modifier = Modifier.size(22.dp)
@@ -310,11 +507,16 @@ fun ToolsScreen(
     ) { innerPadding ->
         ToolsGrid(
             features = features,
+            heroTitle = appLockTitle,
+            heroSubtitle = stringResource(R.string.tools_app_lock_subtitle),
+            onHeroClick = onNavigateToAppLock,
             onFeatureClick = { item ->
                 if (item.available && item.title == hideFilesTitle) {
                     onNavigateToHideFiles()
                 } else if (item.available && item.title == backupTitle) {
                     onNavigateToBackup()
+                } else if (item.available && item.title == memoryOptimizerTitle) {
+                    onNavigateToMemoryOptimizer()
                 } else if (item.available && item.title == callBlockerTitle) {
                     onNavigateToCallBlocker()
                 } else if (item.available) {

@@ -47,6 +47,10 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -57,6 +61,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -77,6 +82,7 @@ import com.carbon.prolocker.core.theme.ProLockerPrimary
 import com.carbon.prolocker.core.ui.components.EmptyState
 import com.carbon.prolocker.feature.hidefile.HideFileViewModel
 import com.carbon.prolocker.feature.hidefile.data.HideItem
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import java.io.File
 
@@ -93,7 +99,30 @@ fun HiddenItemsScreen(
 
     var selectedItem by remember { mutableStateOf<HideItem?>(null) }
     var showDeleteDialog by remember { mutableStateOf<HideItem?>(null) }
+    var showPermissionDialog by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+    val context = LocalContext.current
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+
+    val requester = rememberStoragePermissionRequester(
+        onGranted = { category ->
+            if (category == null || category == type) onOpenPicker(type)
+        },
+        onDenied = {
+            scope.launch {
+                val result = snackbarHostState.showSnackbar(
+                    message = context.getString(R.string.hide_files_permission_denied),
+                    actionLabel = context.getString(R.string.hide_files_retry),
+                    duration = SnackbarDuration.Long
+                )
+                if (result == SnackbarResult.ActionPerformed) {
+                    showPermissionDialog = true
+                }
+            }
+        }
+    )
 
     val isMedia = type == HideItem.TYPE_IMAGE || type == HideItem.TYPE_VIDEO
 
@@ -122,7 +151,13 @@ fun HiddenItemsScreen(
         },
         floatingActionButton = {
             ExtendedFloatingActionButton(
-                onClick = { onOpenPicker(type) },
+                onClick = {
+                    if (requester.needsPermission(type)) {
+                        showPermissionDialog = true
+                    } else {
+                        onOpenPicker(type)
+                    }
+                },
                 containerColor = ProLockerPrimary,
                 contentColor = MaterialTheme.colorScheme.onPrimary,
                 shape = RoundedCornerShape(18.dp),
@@ -130,6 +165,7 @@ fun HiddenItemsScreen(
                 text = { Text(stringResource(R.string.hide_files_add)) }
             )
         },
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         containerColor = MaterialTheme.colorScheme.background
     ) { innerPadding ->
         Column(
@@ -257,6 +293,17 @@ fun HiddenItemsScreen(
                     Text(stringResource(R.string.cancel))
                 }
             }
+        )
+    }
+
+    if (showPermissionDialog) {
+        StorageAccessDialog(
+            category = type,
+            onConfirm = {
+                showPermissionDialog = false
+                requester.request(type) { onOpenPicker(type) }
+            },
+            onDismiss = { showPermissionDialog = false }
         )
     }
 }

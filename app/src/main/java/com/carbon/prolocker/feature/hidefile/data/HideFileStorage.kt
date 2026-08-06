@@ -17,7 +17,7 @@ import java.io.File
 import java.io.FileInputStream
 import java.util.Date
 
-class HideFileStorage(private val context: Context) {
+class HideFileStorage(val context: Context) {
 
     companion object {
         const val HIDE_FILE_DIR = ".hideFile"

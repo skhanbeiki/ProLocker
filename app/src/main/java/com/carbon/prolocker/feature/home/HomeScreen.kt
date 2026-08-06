@@ -86,7 +86,6 @@ import org.koin.androidx.compose.koinViewModel
 fun HomeScreen(
     paddingValues: PaddingValues = PaddingValues(0.dp),
     onNavigateToLockedApps: () -> Unit,
-    onNavigateToMemoryOptimizer: () -> Unit = {},
     onNavigateToGallery: () -> Unit = {},
     onNavigateToPermissions: (String) -> Unit = {}
 ) {
@@ -196,7 +195,7 @@ fun HomeScreen(
                         galleryViewModel?.checkNewBackgrounds()
                     }
 
-                    Box(modifier = Modifier.size(40.dp), contentAlignment = Alignment.Center) {
+                    Box(modifier = Modifier.padding(horizontal = 12.dp).size(40.dp), contentAlignment = Alignment.Center) {
                         com.carbon.prolocker.core.ui.ToolbarLottieIcon(
                             animationRes = R.raw.background,
                             onClick = onNavigateToGallery
@@ -211,11 +210,6 @@ fun HomeScreen(
                             }
                         }
                     }
-                    com.carbon.prolocker.core.ui.ToolbarLottieIcon(
-                        animationRes = R.raw.trash_clean,
-                        onClick = onNavigateToMemoryOptimizer,
-                        modifier = Modifier.padding(end = 8.dp, start = 12.dp)
-                    )
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.background
@@ -573,8 +567,7 @@ fun HomeScreen(
 fun HomeScreenPreview() {
     com.carbon.prolocker.core.theme.ProLockerTheme {
         HomeScreen(
-            onNavigateToLockedApps = {},
-            onNavigateToMemoryOptimizer = {}
+            onNavigateToLockedApps = {}
         )
     }
 }
@@ -584,8 +577,7 @@ fun HomeScreenPreview() {
 fun HomeScreenDarkPreview() {
     com.carbon.prolocker.core.theme.ProLockerTheme {
         HomeScreen(
-            onNavigateToLockedApps = {},
-            onNavigateToMemoryOptimizer = {}
+            onNavigateToLockedApps = {}
         )
     }
 }

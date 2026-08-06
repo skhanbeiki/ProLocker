@@ -137,7 +137,7 @@ fun MainScreen(
         if (initialTab != null) {
             viewModel.setSelectedTab(
                 when (initialTab) {
-                    "security" -> MainTab.HOME
+                    "security" -> MainTab.TOOLS
                     "account" -> MainTab.ACCOUNT
                     else -> MainTab.TOOLS
                 }
@@ -393,13 +393,14 @@ fun MainScreen(
                     onNavigateToSecurity = onNavigateToSecurity,
                     onNavigateToHideFiles = onNavigateToHideFiles,
                     onNavigateToBackup = onNavigateToBackup,
+                    onNavigateToAppLock = { viewModel.setSelectedTab(MainTab.HOME) },
+                    onNavigateToMemoryOptimizer = onNavigateToMemoryOptimizer,
                     onNavigateToCallBlocker = onNavigateToCallBlocker
                 )
 
                 MainTab.HOME -> HomeScreen(
                     paddingValues = PaddingValues(0.dp),
                     onNavigateToLockedApps = onNavigateToLockedApps,
-                    onNavigateToMemoryOptimizer = onNavigateToMemoryOptimizer,
                     onNavigateToGallery = onNavigateToGallery,
                     onNavigateToPermissions = onNavigateToPermissions,
                 )
@@ -540,8 +541,16 @@ fun openMarket(context: android.content.Context) {
 }
 
 
-enum class MainTab {
-    HOME, TOOLS, ACCOUNT
+enum class MainTab(val tabName: String) {
+    HOME("home"), TOOLS("tools"), ACCOUNT("account");
+
+    companion object {
+        fun fromName(name: String?): MainTab = when (name) {
+            "home" -> HOME
+            "account" -> ACCOUNT
+            else -> TOOLS
+        }
+    }
 }
 
 

@@ -97,15 +97,17 @@ class MainActivity : AppCompatActivity() {
         if (navType != null) {
             analyticsManager.trackNotificationOpened(navType)
         }
-        // If content is already shown, re-trigger navigation via recomposition
-        if (isContentShown) {
+        // Force re-inflation only when a navigation is actually requested (deep link /
+        // trusted internal destination). A plain re-launch (e.g. tapping the launcher
+        // icon) must keep the current screen and back stack intact.
+        val hasNavTarget = pendingNavType != null || trustedInternalDestination != null
+        if (hasNavTarget && isContentShown) {
             isContentShown = false
         }
     }
 
     override fun onResume() {
         super.onResume()
-        if (isContentShown) return
 
         // Handle trusted internal navigation from LockService
         if (trustedInternalDestination != null) {
@@ -153,7 +155,6 @@ class MainActivity : AppCompatActivity() {
             }
             if (TrustedReturnManager.consumeTrustedReturn()) {
                 AppEntryLockActivity.markAuthenticated()
-                isContentShown = true
                 return
             }
             val lockIntent = Intent(this, AppEntryLockActivity::class.java)
@@ -167,7 +168,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onStop() {
         super.onStop()
-        isContentShown = false
         storedLockedPackage?.let {
             sessionManager.disarmUnlock(it)
             storedLockedPackage = null
@@ -191,6 +191,14 @@ class MainActivity : AppCompatActivity() {
         // Apply locale BEFORE setContent so string resources resolve in the correct language
         languageManager.applyLanguage(prefs.language)
 
+        // Snapshot deep-link state, then clear it so a re-inflated navigation (e.g. after the
+        // activity is recreated) does not re-apply a stale destination.
+        val deepLink = pendingNavType
+        val trustedDest = trustedInternalDestination ?: trustedLaunchDestination
+        pendingNavType = null
+        trustedInternalDestination = null
+        trustedLaunchDestination = null
+
         setContent {
             val currentPrefs by preferencesRepository.userPreferencesFlow.collectAsState(initial = null)
             val isDarkMode = currentPrefs?.isDarkMode ?: true
@@ -202,9 +210,9 @@ class MainActivity : AppCompatActivity() {
                 ) {
                     Surface(modifier = Modifier.fillMaxSize()) {
                         AppNavigation(
-                            deepLinkType = pendingNavType,
+                            deepLinkType = deepLink,
                             isOnboardingCompleted = isOnboardingCompleted,
-                            trustedLaunchDestination = trustedInternalDestination ?: trustedLaunchDestination,
+                            trustedLaunchDestination = trustedDest,
                             isStandaloneExit = !isNotificationReturn
                         )
                     }

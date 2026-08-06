@@ -80,8 +80,12 @@
     <string name="tools_hide_files_subtitle">Hide photos, videos and more</string>
     <string name="tools_backup">Backup</string>
     <string name="tools_backup_subtitle">Secure your data</string>
-    <string name="tools_app_blocking">App Blocking</string>
-    <string name="tools_app_blocking_subtitle">Block app usage</string>
+    <string name="tools_app_blocking">Call Blocking</string>
+    <string name="tools_app_blocking_subtitle">Block unwanted calls by number or pattern</string>
+    <string name="tools_app_lock">App Lock</string>
+    <string name="tools_app_lock_subtitle">Lock apps with password or pattern</string>
+    <string name="tools_memory_optimizer">Memory Optimizer</string>
+    <string name="tools_memory_optimizer_subtitle">Free up RAM and boost speed</string>
     <string name="tools_screen_recording">Screen Recording</string>
     <string name="tools_screen_recording_subtitle">Monitor screen activity</string>
     <string name="tools_app_manager">App Manager</string>
@@ -104,6 +108,12 @@
     <string name="hide_files_delete_message">The file will be permanently deleted from the hidden folder. This action cannot be undone.</string>
     <string name="hide_files_permission_needed">All files access is required to hide or view files</string>
     <string name="hide_files_allow_access">Allow Access</string>
+    <string name="hide_files_permission_dialog_files_title">All Files Access Needed</string>
+    <string name="hide_files_permission_dialog_files_message">ProLocker needs access to all files to move them into the secure hidden folder and to browse files on your device. No data is uploaded or shared.</string>
+    <string name="hide_files_permission_dialog_media_title">Access Your Media</string>
+    <string name="hide_files_permission_dialog_media_message">ProLocker needs to read your images, videos and audio to list them so you can choose what to hide. No data is uploaded or shared.</string>
+    <string name="hide_files_permission_denied">Permission denied. Grant access to hide files.</string>
+    <string name="hide_files_retry">Retry</string>
     <string name="hide_files_hide_count">Hide (%1$d)</string>
     <string name="hide_files_pick_hint">Select items to hide</string>
     <string name="hide_files_picker_empty_title">Nothing to hide</string>
