@@ -66,7 +66,7 @@
         <item>What city were you born in?</item>
     </string-array>
     
-    <string name="home">Home</string>
+    <string name="home">AppLocker</string>
     <string name="security">Security</string>
     <string name="account">Account</string>
     <string name="security_center">Security Center</string>

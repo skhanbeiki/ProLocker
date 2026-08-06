@@ -193,7 +193,7 @@ class MainActivity : AppCompatActivity() {
 
         setContent {
             val currentPrefs by preferencesRepository.userPreferencesFlow.collectAsState(initial = null)
-            val isDarkMode = currentPrefs?.isDarkMode ?: false
+            val isDarkMode = currentPrefs?.isDarkMode ?: true
             val language = currentPrefs?.language ?: "fa"
             val layoutDirection = if (language == "fa") LayoutDirection.Rtl else LayoutDirection.Ltr
             ProLockerTheme(useDarkTheme = isDarkMode) {

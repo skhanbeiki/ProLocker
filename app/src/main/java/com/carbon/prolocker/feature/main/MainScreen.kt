@@ -137,9 +137,9 @@ fun MainScreen(
         if (initialTab != null) {
             viewModel.setSelectedTab(
                 when (initialTab) {
-                    "security" -> MainTab.TOOLS
+                    "security" -> MainTab.HOME
                     "account" -> MainTab.ACCOUNT
-                    else -> MainTab.HOME
+                    else -> MainTab.TOOLS
                 }
             )
         }
@@ -152,8 +152,8 @@ fun MainScreen(
     }
 
     androidx.activity.compose.BackHandler(enabled = !showExitScreen) {
-        if (selectedTab != MainTab.HOME) {
-            viewModel.setSelectedTab(MainTab.HOME)
+        if (selectedTab != MainTab.TOOLS) {
+            viewModel.setSelectedTab(MainTab.TOOLS)
         } else {
             showExitScreen = true
         }
@@ -290,37 +290,6 @@ fun MainScreen(
                         tonalElevation = 0.dp
                     ) {
                         NavigationBarItem(
-                            selected = selectedTab == MainTab.HOME,
-                            onClick = { viewModel.setSelectedTab(MainTab.HOME) },
-                            icon = {
-                                Icon(
-                                    Icons.Default.Lock,
-                                    contentDescription = null,
-                                    tint = if (selectedTab == MainTab.HOME)
-                                        MaterialTheme.colorScheme.primary
-                                    else
-                                        MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            },
-                            label = {
-                                Text(
-                                    stringResource(R.string.home),
-                                    style = MaterialTheme.typography.labelSmall,
-                                    fontWeight = if (selectedTab == MainTab.HOME)
-                                        FontWeight.SemiBold
-                                    else
-                                        FontWeight.Medium
-                                )
-                            },
-                            colors = NavigationBarItemDefaults.colors(
-                                selectedIconColor = MaterialTheme.colorScheme.primary,
-                                selectedTextColor = MaterialTheme.colorScheme.primary,
-                                indicatorColor = ProLockerSecondary.copy(alpha = 0.25f),
-                                unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
-                                unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
-                            )
-                        )
-                        NavigationBarItem(
                             selected = selectedTab == MainTab.TOOLS,
                             onClick = { viewModel.setSelectedTab(MainTab.TOOLS) },
                             icon = {
@@ -338,6 +307,37 @@ fun MainScreen(
                                     stringResource(R.string.tools),
                                     style = MaterialTheme.typography.labelSmall,
                                     fontWeight = if (selectedTab == MainTab.TOOLS)
+                                        FontWeight.SemiBold
+                                    else
+                                        FontWeight.Medium
+                                )
+                            },
+                            colors = NavigationBarItemDefaults.colors(
+                                selectedIconColor = MaterialTheme.colorScheme.primary,
+                                selectedTextColor = MaterialTheme.colorScheme.primary,
+                                indicatorColor = ProLockerSecondary.copy(alpha = 0.25f),
+                                unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                                unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                            )
+                        )
+                        NavigationBarItem(
+                            selected = selectedTab == MainTab.HOME,
+                            onClick = { viewModel.setSelectedTab(MainTab.HOME) },
+                            icon = {
+                                Icon(
+                                    Icons.Default.Lock,
+                                    contentDescription = null,
+                                    tint = if (selectedTab == MainTab.HOME)
+                                        MaterialTheme.colorScheme.primary
+                                    else
+                                        MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            },
+                            label = {
+                                Text(
+                                    stringResource(R.string.home),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    fontWeight = if (selectedTab == MainTab.HOME)
                                         FontWeight.SemiBold
                                     else
                                         FontWeight.Medium
@@ -386,8 +386,16 @@ fun MainScreen(
                 }
             },
             containerColor = MaterialTheme.colorScheme.background
-        ) { _paddingValues ->
+        ) { paddingValues ->
             when (selectedTab) {
+                MainTab.TOOLS -> ToolsScreen(
+                    paddingValues = PaddingValues(0.dp),
+                    onNavigateToSecurity = onNavigateToSecurity,
+                    onNavigateToHideFiles = onNavigateToHideFiles,
+                    onNavigateToBackup = onNavigateToBackup,
+                    onNavigateToCallBlocker = onNavigateToCallBlocker
+                )
+
                 MainTab.HOME -> HomeScreen(
                     paddingValues = PaddingValues(0.dp),
                     onNavigateToLockedApps = onNavigateToLockedApps,
@@ -396,13 +404,6 @@ fun MainScreen(
                     onNavigateToPermissions = onNavigateToPermissions,
                 )
 
-                MainTab.TOOLS -> ToolsScreen(
-                    paddingValues = PaddingValues(0.dp),
-                    onNavigateToSecurity = onNavigateToSecurity,
-                    onNavigateToHideFiles = onNavigateToHideFiles,
-                    onNavigateToBackup = onNavigateToBackup,
-                    onNavigateToCallBlocker = onNavigateToCallBlocker
-                )
 
                 MainTab.ACCOUNT -> AccountScreen(
                     paddingValues = PaddingValues(0.dp),

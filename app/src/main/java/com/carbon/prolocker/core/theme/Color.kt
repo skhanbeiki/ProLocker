@@ -22,24 +22,24 @@ val ProLockerOnError = Color(0xFFFFFFFF)
 val ProLockerErrorContainer = Color(0xFF93001A)
 val ProLockerOnErrorContainer = Color(0xFFFFDAD6)
 
-val ProLockerBackground = Color(0xFF111216)
-val ProLockerOnBackground = Color(0xFFE6E1E6)
+val ProLockerBackground = Color(0xFF0F172A)
+val ProLockerOnBackground = Color(0xFFE6E9F0)
 
-val ProLockerSurface = Color(0xFF1A1C22)
-val ProLockerOnSurface = Color(0xFFE6E1E6)
+val ProLockerSurface = Color(0xFF162033)
+val ProLockerOnSurface = Color(0xFFE6E9F0)
 
-val ProLockerSurfaceVariant = Color(0xFF23262E)
-val ProLockerOnSurfaceVariant = Color(0xFFC4C6D0)
+val ProLockerSurfaceVariant = Color(0xFF1E293B)
+val ProLockerOnSurfaceVariant = Color(0xFFC4C9D6)
 
-val ProLockerOutline = Color(0xFF8E9099)
-val ProLockerOutlineVariant = Color(0xFF44474E)
+val ProLockerOutline = Color(0xFF8E95A8)
+val ProLockerOutlineVariant = Color(0xFF3B4657)
 
-val ProLockerInverseSurface = Color(0xFFE6E1E6)
-val ProLockerInverseOnSurface = Color(0xFF1A1C22)
+val ProLockerInverseSurface = Color(0xFFE6E9F0)
+val ProLockerInverseOnSurface = Color(0xFF162033)
 val ProLockerInversePrimary = Color(0xFF6C7CFF)
 
-val ProLockerCard = Color(0xFF23262E)
-val ProLockerCardBorder = Color(0xFF2E3139)
+val ProLockerCard = Color(0xFF233047)
+val ProLockerCardBorder = Color(0xFF2E3A52)
 
 val ProLockerSuccess = Color(0xFF00D1B2)
 val ProLockerWarning = Color(0xFFFFA726)

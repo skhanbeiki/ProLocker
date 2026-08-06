@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class UserPreferences(
     val onboardingCompleted: Boolean = false,
-    val isDarkMode: Boolean = false,
+    val isDarkMode: Boolean = true,
     val language: String = "fa",
     val lockType: String = "NONE",
     val hashedCredential: String = "",

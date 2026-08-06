@@ -74,7 +74,7 @@ fun ProLockerTheme(
     useDarkTheme: Boolean = true,
     content: @Composable () -> Unit
 ) {
-    val colors = DarkColors
+    val colors = if (useDarkTheme) DarkColors else LightColors
 
     val view = LocalView.current
     if (!view.isInEditMode) {
@@ -84,8 +84,8 @@ fun ProLockerTheme(
                 val window = activity.window
                 window.statusBarColor = android.graphics.Color.TRANSPARENT
                 window.navigationBarColor = android.graphics.Color.TRANSPARENT
-                WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = false
-                WindowCompat.getInsetsController(window, view).isAppearanceLightNavigationBars = false
+                WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !useDarkTheme
+                WindowCompat.getInsetsController(window, view).isAppearanceLightNavigationBars = !useDarkTheme
             } catch (_: ClassCastException) {
             }
         }

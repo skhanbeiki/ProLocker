@@ -67,7 +67,7 @@
         <item>در کدام شهر متولد شده اید؟</item>
     </string-array>
 
-    <string name="home">امنیت</string>
+    <string name="home">قفل برنامه</string>
     <string name="security">فضولگیر</string>
     <string name="account">تنظیمات</string>
     <string name="security_center">مرکز امنیت</string>
