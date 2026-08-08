@@ -3,32 +3,32 @@ package com.carbon.prolocker.ad
 object AdUnitIds {
 
     object Tapsell {
-        const val APP_ID = "8b45f58c-8c42-4007-8e33-c96a6aaa666f"
+        const val APP_ID = "8cfe437a-6b2f-4a3d-bdaa-b63d1a6d4b94"
 
-        const val HOME_TAB_APPS = "6a326bb2c401c752d197d5e8"
-        const val HOME_TAB_THEMES = "6a326be4c401c752d197d5e9"
-        const val HOME_TAB_SETTINGS = "6a326bc75762e2133d874555"
+        const val HOME_TAB_APPS = "5bc6e95b528a1a0001add28e"
+        const val HOME_TAB_THEMES = "5f142195ff28740001b4ec4c"
+        const val HOME_TAB_SETTINGS = "5f142160c785940001736067"
 
-        const val LOCKSCREEN_TOP = "5fe083871cfb5b0001826df4"
-        const val LOCKSCREEN_BOTTOM = "6a326b64356fa85c72c131ad"
+        const val LOCKSCREEN_TOP = "5f1409aeff28740001b4ec1c"
+        const val LOCKSCREEN_BOTTOM = "5bcec34d893c6200014f4321"
 
         const val RAM_CLEANER_NATIVE = "6a326c1dc401c752d197d5eb"
 
-        const val BACKGROUND_LIST_NATIVE = "6a326c1dc401c752d197d5eb"
-        const val BACKGROUND_PREVIEW_NATIVE = "6a326c36356fa85c72c131ae"
+        const val BACKGROUND_LIST_NATIVE = "5f14227dff28740001b4ec4e"
+        const val BACKGROUND_PREVIEW_NATIVE = "5f1422cfff28740001b4ec4f"
 
-        const val EXIT_NATIVE = "6a326bfac401c752d197d5ea"
+        const val EXIT_NATIVE = "5bcec4457b9869000194698f"
 
-        const val INTERSTITIAL_BACKGROUND = "6a326c7c356fa85c72c131af"
-        const val INTERSTITIAL_RAM_CLEANER = "6a326caec401c752d197d5ec"
+        const val INTERSTITIAL_BACKGROUND = "5bd0191b55f5440001d1daa7"
+        const val INTERSTITIAL_RAM_CLEANER = "5f14290dc785940001736076"
 
-        const val INTERSTITIAL_HIDDEN_ITEMS = "6a326c7c356fa85c72c131af"
-        const val INTERSTITIAL_HIDE_FILES = "6a326c7c356fa85c72c131af"
-        const val INTERSTITIAL_CALL_BLOCKER = "6a326caec401c752d197d5ec"
-        const val INTERSTITIAL_PRIVACY_AUDITOR = "6a326caec401c752d197d5ec"
-        const val INTERSTITIAL_BACKUP_HOME = "6a326c7c356fa85c72c131af"
-        const val INTERSTITIAL_BACKUP_APPS = "6a326c7c356fa85c72c131af"
-        const val INTERSTITIAL_BACKUP_CATEGORY_DETAIL = "6a326c7c356fa85c72c131af"
+        const val INTERSTITIAL_HIDDEN_ITEMS = "5f142333c78594000173606a"
+        const val INTERSTITIAL_HIDE_FILES = "5f325b08b3e30f0001e41753"
+        const val INTERSTITIAL_CALL_BLOCKER = "5f14227dff28740001b4ec4e"
+        const val INTERSTITIAL_PRIVACY_AUDITOR = "5f14227dff28740001b4ec4e"
+        const val INTERSTITIAL_BACKUP_HOME = "5f142222ff28740001b4ec4d"
+        const val INTERSTITIAL_BACKUP_APPS = "5f14236eff28740001b4ec51"
+        const val INTERSTITIAL_BACKUP_CATEGORY_DETAIL = "5f14227dff28740001b4ec4e"
     }
 
     object Adivery {

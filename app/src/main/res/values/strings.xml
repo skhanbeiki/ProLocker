@@ -83,7 +83,7 @@
     <string name="tools_app_blocking">Call Blocking</string>
     <string name="tools_app_blocking_subtitle">Block unwanted calls by number or pattern</string>
     <string name="tools_app_lock">App Lock</string>
-    <string name="tools_app_lock_subtitle">Lock apps with password or pattern</string>
+    <string name="tools_app_lock_subtitle">App Management</string>
     <string name="tools_memory_optimizer">Memory Optimizer</string>
     <string name="tools_memory_optimizer_subtitle">Free up RAM and boost speed</string>
     <string name="tools_screen_recording">Screen Recording</string>

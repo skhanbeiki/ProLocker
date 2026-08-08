@@ -84,7 +84,7 @@
     <string name="tools_app_blocking">مسدودسازی تماس</string>
     <string name="tools_app_blocking_subtitle">مسدودسازی تماس‌های ناخواسته بر اساس شماره یا الگو</string>
     <string name="tools_app_lock">قفل برنامه</string>
-    <string name="tools_app_lock_subtitle">قفل کردن برنامه‌ها با رمز یا الگو</string>
+    <string name="tools_app_lock_subtitle">مدیریت برنامه‌ها</string>
     <string name="tools_memory_optimizer">بهینه‌سازی حافظه</string>
     <string name="tools_memory_optimizer_subtitle">آزادسازی رم و افزایش سرعت</string>
     <string name="tools_screen_recording">ضبط صفحه</string>

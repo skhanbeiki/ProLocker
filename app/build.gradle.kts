@@ -22,7 +22,7 @@ android {
 
         addManifestPlaceholders(
             mapOf(
-                "TapsellMediationAppKey" to "8b45f58c-8c42-4007-8e33-c96a6aaa666f",
+                "TapsellMediationAppKey" to "8cfe437a-6b2f-4a3d-bdaa-b63d1a6d4b94",
                 "TapsellMediationAdmobAdapterSignature" to "ca-app-pub-3940256099942544~3347511713",
             )
         )

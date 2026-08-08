@@ -28,10 +28,8 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.Backup
 import androidx.compose.material.icons.outlined.ChevronLeft
-import androidx.compose.material.icons.outlined.ChevronRight
 import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.PhoneDisabled
 import androidx.compose.material.icons.outlined.PrivacyTip
@@ -115,7 +113,7 @@ fun FeatureCard(
                 scaleX = scale
                 scaleY = scale
             },
-        shape = RoundedCornerShape(20.dp),
+        shape = RoundedCornerShape(22.dp),
         color = MaterialTheme.colorScheme.surfaceVariant,
         tonalElevation = 2.dp
     ) {
@@ -129,38 +127,35 @@ fun FeatureCard(
                     enabled = true,
                     onClick = onClick
                 )
-                .padding(horizontal = 12.dp, vertical = 10.dp)
+                .padding(14.dp)
         ) {
             Column(
                 modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.Center
+                verticalArrangement = Arrangement.SpaceBetween
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth()
+                Box(
+                    modifier = Modifier
+                        .size(42.dp)
+                        .background(Color.White.copy(alpha = 0.24f), CircleShape),
+                    contentAlignment = Alignment.Center
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .size(36.dp)
-                            .background(Color.White.copy(alpha = 0.24f), CircleShape),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        if (item.lottieRes != null) {
-                            ToolbarLottieIcon(
-                                animationRes = item.lottieRes,
-                                onClick = onClick,
-                                modifier = Modifier.size(24.dp)
-                            )
-                        } else {
-                            Icon(
-                                imageVector = item.icon,
-                                contentDescription = null,
-                                tint = Color.White,
-                                modifier = Modifier.size(20.dp)
-                            )
-                        }
+                    if (item.lottieRes != null) {
+                        ToolbarLottieIcon(
+                            animationRes = item.lottieRes,
+                            onClick = onClick,
+                            modifier = Modifier.size(26.dp)
+                        )
+                    } else {
+                        Icon(
+                            imageVector = item.icon,
+                            contentDescription = null,
+                            tint = Color.White,
+                            modifier = Modifier.size(22.dp)
+                        )
                     }
-                    Spacer(modifier = Modifier.width(8.dp))
+                }
+
+                Column {
                     Text(
                         text = item.title,
                         style = MaterialTheme.typography.titleSmall,
@@ -168,20 +163,128 @@ fun FeatureCard(
                         color = Color.White,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        fontSize = 13.sp,
-                        modifier = Modifier.weight(1f)
+                        fontSize = 13.sp
+                    )
+                    Spacer(modifier = Modifier.height(3.dp))
+                    Text(
+                        text = item.subtitle,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color.White.copy(alpha = 0.85f),
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                        fontSize = 11.sp,
+                        lineHeight = 15.sp
                     )
                 }
-                Spacer(modifier = Modifier.height(6.dp))
-                Text(
-                    text = item.subtitle,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = Color.White.copy(alpha = 0.88f),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    fontSize = 11.sp,
-                    lineHeight = 14.sp
+            }
+        }
+    }
+}
+
+@Composable
+fun MemoryOptimizerCard(
+    item: ToolsFeatureItem,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+    val scale by animateFloatAsState(
+        targetValue = if (isPressed) 0.95f else 1f,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessMedium
+        ),
+        label = "memoryOptCardScale"
+    )
+
+    Surface(
+        modifier = modifier
+            .fillMaxWidth()
+            .graphicsLayer {
+                scaleX = scale
+                scaleY = scale
+            },
+        shape = RoundedCornerShape(24.dp),
+        color = MaterialTheme.colorScheme.surfaceVariant,
+        tonalElevation = 4.dp
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(86.dp)
+                .background(Brush.linearGradient(item.gradient))
+                .clickable(
+                    interactionSource = interactionSource,
+                    indication = ripple(bounded = true),
+                    onClick = onClick
                 )
+                .padding(horizontal = 20.dp, vertical = 16.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxSize(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(50.dp)
+                            .background(Color.White.copy(alpha = 0.24f), CircleShape),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        if (item.lottieRes != null) {
+                            ToolbarLottieIcon(
+                                animationRes = item.lottieRes,
+                                onClick = onClick,
+                                modifier = Modifier.size(32.dp)
+                            )
+                        } else {
+                            Icon(
+                                imageVector = item.icon,
+                                contentDescription = null,
+                                tint = Color.White,
+                                modifier = Modifier.size(26.dp)
+                            )
+                        }
+                    }
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Column(verticalArrangement = Arrangement.Center) {
+                        Text(
+                            text = item.title,
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White,
+                            fontSize = 17.sp
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = item.subtitle,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = Color.White.copy(alpha = 0.90f),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            fontSize = 12.sp
+                        )
+                    }
+                }
+
+                Surface(
+                    color = Color.White.copy(alpha = 0.22f),
+                    shape = CircleShape
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.ChevronLeft,
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .size(20.dp)
+                    )
+                }
             }
         }
     }
@@ -233,37 +336,12 @@ fun AppLockHeroCard(
         ) {
             Column {
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    Surface(
-                        color = Color.White.copy(alpha = 0.22f),
-                        shape = RoundedCornerShape(50)
-                    ) {
-                        Row(
-                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(
-                                Icons.Default.Star,
-                                contentDescription = null,
-                                tint = Color(0xFFFFD700),
-                                modifier = Modifier.size(12.dp)
-                            )
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text(
-                                "ابزار اصلی برنامه",
-                                fontSize = 10.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color.White
-                            )
-                        }
-                    }
-
                     Box(
                         modifier = Modifier
-                            .size(52.dp)
+                            .size(48.dp)
                             .background(Color.White.copy(alpha = 0.25f), CircleShape),
                         contentAlignment = Alignment.Center
                     ) {
@@ -271,36 +349,35 @@ fun AppLockHeroCard(
                             imageVector = Icons.Outlined.Lock,
                             contentDescription = null,
                             tint = Color.White,
-                            modifier = Modifier.size(30.dp)
+                            modifier = Modifier.size(26.dp)
                         )
                     }
+                    Spacer(modifier = Modifier.width(14.dp))
+                    Text(
+                        text = title,
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = Color.White,
+                        fontSize = 22.sp
+                    )
                 }
 
-                Spacer(modifier = Modifier.height(14.dp))
+//                Spacer(modifier = Modifier.height(8.dp))
 
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.ExtraBold,
-                    color = Color.White,
-                    fontSize = 22.sp
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = subtitle,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = Color.White.copy(alpha = 0.90f),
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                    fontSize = 13.sp,
-                    lineHeight = 18.sp
-                )
+//                Text(
+//                    text = subtitle,
+//                    style = MaterialTheme.typography.bodyMedium,
+//                    color = Color.White.copy(alpha = 0.90f),
+//                    maxLines = 1,
+//                    overflow = TextOverflow.Ellipsis,
+//                    fontSize = 13.sp
+//                )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Surface(
                     color = Color.White,
-                    shape = RoundedCornerShape(16.dp),
+                    shape = RoundedCornerShape(32.dp),
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Row(
@@ -309,7 +386,7 @@ fun AppLockHeroCard(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            "ورود و مدیریت برنامه‌ها",
+                            "مدیریت برنامه‌ها",
                             fontWeight = FontWeight.Bold,
                             color = Color(0xFF4F46E5),
                             fontSize = 13.sp
@@ -335,12 +412,19 @@ fun ToolsGrid(
     onFeatureClick: (ToolsFeatureItem) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val gridItems = remember(features) {
+        features.filter { it.id != FeatureId.MEMORY_OPTIMIZER }
+    }
+    val memoryItem = remember(features) {
+        features.find { it.id == FeatureId.MEMORY_OPTIMIZER }
+    }
+
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
         modifier = modifier,
         contentPadding = PaddingValues(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 24.dp),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        horizontalArrangement = Arrangement.spacedBy(14.dp),
+        verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
         item(span = { GridItemSpan(2) }) {
             AppLockHeroCard(
@@ -349,17 +433,30 @@ fun ToolsGrid(
                 onClick = onHeroClick,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 4.dp)
+                    .padding(bottom = 2.dp)
             )
         }
-        features.forEach { item ->
+
+        gridItems.forEach { item ->
             item(key = item.id.name) {
                 FeatureCard(
                     item = item,
                     onClick = { onFeatureClick(item) },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(92.dp)
+                        .height(124.dp)
+                )
+            }
+        }
+
+        if (memoryItem != null) {
+            item(span = { GridItemSpan(2) }, key = memoryItem.id.name) {
+                MemoryOptimizerCard(
+                    item = memoryItem,
+                    onClick = { onFeatureClick(memoryItem) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 2.dp)
                 )
             }
         }
@@ -430,14 +527,6 @@ fun ToolsScreen(
             gradient = listOf(Color(0xFF34D399), Color(0xFF10B981)),
             available = true,
             lottieRes = R.raw.trash_clean
-        ),
-        ToolsFeatureItem(
-            id = FeatureId.PRIVACY_AUDITOR,
-            title = stringResource(R.string.tools_privacy_auditor),
-            subtitle = stringResource(R.string.tools_privacy_auditor_subtitle),
-            icon = Icons.Outlined.PrivacyTip,
-            gradient = listOf(Color(0xFFFFC107), Color(0xFFFF9800)),
-            available = true
         )
     )
 
