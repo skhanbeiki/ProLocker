@@ -77,7 +77,7 @@
     <string name="tools_intruder_detection_subtitle">عکس برداری از فضول ها</string>
     <string name="tools_hide_apps">مخفی کردن برنامه ها</string>
     <string name="tools_hide_apps_subtitle">برنامه ها را نامرئی نگه دارید</string>
-    <string name="tools_hide_files">مخفی کردن فایل</string>
+    <string name="tools_hide_files">گالری مخفی</string>
     <string name="tools_hide_files_subtitle">عکس، ویدیو و موارد دیگر</string>
     <string name="tools_backup">پشتیبان گیری</string>
     <string name="tools_backup_subtitle">از داده های خود محافظت کنید</string>
@@ -94,7 +94,7 @@
     <string name="tools_privacy_auditor">آنالیز حریم خصوصی</string>
     <string name="tools_privacy_auditor_subtitle">تحلیل و بررسی دسترسی برنامه‌ها</string>
     <string name="coming_soon">به زودی</string>
-    <string name="hide_files_title">مخفی کردن فایل</string>
+    <string name="hide_files_title">گالری مخفی</string>
     <string name="hide_files_subtitle">فایل های خصوصی خود را ایمن نگه دارید</string>
     <string name="hide_files_images">تصاویر</string>
     <string name="hide_files_videos">ویدیوها</string>
