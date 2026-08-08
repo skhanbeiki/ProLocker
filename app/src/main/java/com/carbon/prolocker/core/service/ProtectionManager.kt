@@ -65,11 +65,15 @@ class ProtectionManager(
             if (!_protectionEnabled.value) return@launch
             val lockedApps = lockedAppsRepository.allLockedApps.first()
             if (lockedApps.any { it.lockedState }) {
-                val serviceIntent = Intent(context, AppMonitorService::class.java)
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    context.startForegroundService(serviceIntent)
-                } else {
-                    context.startService(serviceIntent)
+                try {
+                    val serviceIntent = Intent(context, AppMonitorService::class.java)
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        context.startForegroundService(serviceIntent)
+                    } else {
+                        context.startService(serviceIntent)
+                    }
+                } catch (e: Exception) {
+                    android.util.Log.e("ProtectionManager", "Failed to start AppMonitorService", e)
                 }
             } else {
                 stopMonitoring()
@@ -81,11 +85,15 @@ class ProtectionManager(
         scope.launch {
             val lockedApps = lockedAppsRepository.allLockedApps.first()
             if (lockedApps.any { it.lockedState }) {
-                val serviceIntent = Intent(context, AppMonitorService::class.java)
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    context.startForegroundService(serviceIntent)
-                } else {
-                    context.startService(serviceIntent)
+                try {
+                    val serviceIntent = Intent(context, AppMonitorService::class.java)
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        context.startForegroundService(serviceIntent)
+                    } else {
+                        context.startService(serviceIntent)
+                    }
+                } catch (e: Exception) {
+                    android.util.Log.e("ProtectionManager", "Failed to start AppMonitorService", e)
                 }
             }
         }

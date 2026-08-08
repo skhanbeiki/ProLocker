@@ -21,7 +21,7 @@ object MediaThumbnails {
                 MediaStore.Video.Thumbnails.MINI_KIND,
                 null
             )
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             null
         }
     }
@@ -42,7 +42,7 @@ object MediaThumbnails {
             )?.use { cursor ->
                 if (cursor.moveToFirst()) cursor.getString(0) else null
             }
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             null
         }
     }

@@ -115,6 +115,10 @@ class OverlayWindowManager(private val context: Context) {
                 windowManager.removeViewImmediate(root)
             } catch (e: Exception) {
                 Log.w(TAG, "Failed to remove overlay: ${e.message}")
+                try {
+                    windowManager.removeView(root)
+                } catch (_: Exception) {
+                }
             }
             for (i in 0 until root.childCount) {
                 val child = root.getChildAt(i)
