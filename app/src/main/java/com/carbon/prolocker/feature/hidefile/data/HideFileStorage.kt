@@ -147,135 +147,7 @@ class HideFileStorage(val context: Context) {
     }
 
     private fun addToMediaStore(type: String, file: File, relDir: String) {
-        val kind = mediaKind(type) ?: return
-        val collection = collectionFor(kind)
-        val resolver = context.contentResolver
-        val values = ContentValues().apply {
-            put(MediaStore.MediaColumns.DISPLAY_NAME, file.name)
-            put(MediaStore.MediaColumns.MIME_TYPE, mimeType(file.absolutePath))
-            put(MediaStore.MediaColumns.DATE_ADDED, System.currentTimeMillis() / 1000)
-            put(MediaStore.MediaColumns.SIZE, file.length())
-        }
-        fillMediaMetadata(kind, file, values)
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            // Try absolute-path insert first (works with legacy storage / all-files access);
-            // fall back to a pending-copy insert for scoped storage.
-            val inserted = try {
-                values.put(MediaStore.MediaColumns.DATA, file.absolutePath)
-                resolver.insert(collection, values) != null
-            } catch (e: Exception) {
-                insertWithPendingCopy(kind, collection, values, file, relDir)
-            }
-            if (!inserted) return
-        } else {
-            values.put(MediaStore.MediaColumns.DATA, file.absolutePath)
-            resolver.insert(collection, values)
-        }
         scanFile(file.absolutePath)
-    }
-
-    private fun insertWithPendingCopy(
-        kind: MediaKind,
-        collection: Uri,
-        values: ContentValues,
-        file: File,
-        relDir: String
-    ): Boolean {
-        val resolver = context.contentResolver
-        return try {
-            val copyValues = ContentValues(values)
-            copyValues.remove(MediaStore.MediaColumns.DATA)
-            copyValues.remove(MediaStore.MediaColumns.SIZE)
-            copyValues.put(MediaStore.MediaColumns.RELATIVE_PATH, sanitizeRelDir(kind, relDir))
-            copyValues.put(MediaStore.MediaColumns.IS_PENDING, 1)
-            val uri = resolver.insert(collection, copyValues) ?: return false
-            try {
-                val out = resolver.openOutputStream(uri) ?: return false
-                out.use { output ->
-                    FileInputStream(file).use { input ->
-                        val buf = ByteArray(64 * 1024)
-                        var len: Int
-                        while (input.read(buf).also { len = it } != -1) {
-                            output.write(buf, 0, len)
-                        }
-                    }
-                }
-                val done = ContentValues().apply { put(MediaStore.MediaColumns.IS_PENDING, 0) }
-                resolver.update(uri, done, null, null)
-                true
-            } catch (e: Exception) {
-                resolver.delete(uri, null, null)
-                false
-            }
-        } catch (e: Exception) {
-            false
-        }
-    }
-
-    private fun sanitizeRelDir(kind: MediaKind, relDir: String): String {
-        val clean = relDir.trimStart('/')
-        return when (kind) {
-            MediaKind.IMAGE ->
-                if (clean.isEmpty() || clean.startsWith("DCIM/") || clean.startsWith("Pictures/") ||
-                    clean.startsWith("Movies/")
-                ) clean.ifEmpty { "Pictures" } else "Pictures/$clean"
-
-            MediaKind.VIDEO ->
-                if (clean.isEmpty() || clean.startsWith("Movies/") || clean.startsWith("DCIM/") ||
-                    clean.startsWith("Pictures/")
-                ) clean.ifEmpty { "Movies" } else "Movies/$clean"
-
-            MediaKind.AUDIO ->
-                if (clean.isEmpty() || clean.startsWith("Music/") || clean.startsWith("Alarms/") ||
-                    clean.startsWith("Ringtones/") || clean.startsWith("Notifications/")
-                ) clean.ifEmpty { "Music" } else "Music/$clean"
-
-            MediaKind.FILE ->
-                if (clean.startsWith("Download/")) clean else "Download/${clean.ifEmpty { "Hidden" }}"
-        }
-    }
-
-    private fun fillMediaMetadata(kind: MediaKind, file: File, values: ContentValues) {
-        val retriever = MediaMetadataRetriever()
-        try {
-            retriever.setDataSource(file.absolutePath)
-            when (kind) {
-                MediaKind.IMAGE -> {
-                    values.put(MediaStore.Images.Media.TITLE, file.nameWithoutExtension)
-                    val dateTaken = retriever
-                        .extractMetadata(MediaMetadataRetriever.METADATA_KEY_DATE)
-                        ?.toLongOrNull()
-                        ?: System.currentTimeMillis()
-                    values.put(MediaStore.Images.Media.DATE_TAKEN, dateTaken)
-                }
-
-                MediaKind.VIDEO -> {
-                    values.put(
-                        MediaStore.Video.Media.DURATION,
-                        retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
-                    )
-                }
-
-                MediaKind.AUDIO -> {
-                    values.put(MediaStore.Audio.Media.ALBUM, retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM))
-                    values.put(MediaStore.Audio.Media.ARTIST, retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST))
-                    values.put(MediaStore.Audio.Media.TITLE, retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE))
-                    values.put(MediaStore.Audio.Media.IS_MUSIC, true)
-                    values.put(MediaStore.Audio.AudioColumns.DISPLAY_NAME, file.nameWithoutExtension)
-                }
-
-                MediaKind.FILE -> Unit
-            }
-        } catch (e: Exception) {
-            // metadata is best-effort
-        } finally {
-            try {
-                retriever.release()
-            } catch (e: Exception) {
-                // ignore
-            }
-        }
     }
 
     fun extractAudioArt(path: String): ByteArray? {
@@ -297,11 +169,22 @@ class HideFileStorage(val context: Context) {
     fun scanFile(path: String) {
         if (path.isEmpty()) return
         try {
-            context.sendBroadcast(
-                Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(File(path)))
+            val file = File(path)
+            val mime = mimeType(path).ifEmpty { null }
+            android.media.MediaScannerConnection.scanFile(
+                context,
+                arrayOf(file.absolutePath),
+                if (mime != null) arrayOf(mime) else null,
+                null
             )
         } catch (e: Exception) {
-            // ignore
+            try {
+                context.sendBroadcast(
+                    Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(File(path)))
+                )
+            } catch (_: Exception) {
+                // ignore
+            }
         }
     }
 
