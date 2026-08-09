@@ -122,6 +122,8 @@ class BackupAppsViewModel(
         val selected = _uiState.value.installedApps.filter { it.isSelected }
         if (selected.isEmpty()) return
 
+        val unselectedApps = _uiState.value.installedApps.map { app -> app.copy(isSelected = false) }
+
         val progressList = selected.map { app ->
             AppBackupProgressItem(
                 appName = app.appName,
@@ -132,6 +134,14 @@ class BackupAppsViewModel(
         }
 
         _uiState.value = _uiState.value.copy(
+            installedApps = unselectedApps,
+            filteredApps = unselectedApps.filter { app ->
+                if (_uiState.value.searchQuery.isBlank()) true
+                else app.appName.contains(_uiState.value.searchQuery, ignoreCase = true) ||
+                        app.packageName.contains(_uiState.value.searchQuery, ignoreCase = true)
+            },
+            selectedCount = 0,
+            isAllSelected = false,
             isProgressRunning = true,
             isBackupFinished = false,
             progressItems = progressList,

@@ -643,64 +643,106 @@ class BackupRepository(
     }
 
     fun shareBackupFile(fileInfo: BackupFileInfo) {
-        val fileUri: Uri = if (fileInfo.filePath.isNotEmpty()) {
-            val file = File(fileInfo.filePath)
-            FileProvider.getUriForFile(
-                context,
-                "${context.packageName}.fileprovider",
-                file
-            )
-        } else {
-            Uri.parse(fileInfo.uriString)
-        }
-
-        val shareIntent = Intent(Intent.ACTION_SEND).apply {
-            type = if (fileInfo.category == BackupCategory.APPLICATIONS) {
-                "application/vnd.android.package-archive"
+        try {
+            val fileUri: Uri = if (fileInfo.filePath.isNotEmpty()) {
+                val file = File(fileInfo.filePath)
+                try {
+                    FileProvider.getUriForFile(
+                        context,
+                        "${context.packageName}.fileprovider",
+                        file
+                    )
+                } catch (e: Exception) {
+                    Uri.fromFile(file)
+                }
             } else {
-                "application/json"
+                Uri.parse(fileInfo.uriString)
             }
-            putExtra(Intent.EXTRA_STREAM, fileUri)
-            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        }
 
-        val chooser = Intent.createChooser(shareIntent, context.getString(com.carbon.prolocker.R.string.backup_share_chooser_title)).apply {
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                type = if (fileInfo.category == BackupCategory.APPLICATIONS) {
+                    "application/vnd.android.package-archive"
+                } else {
+                    "application/json"
+                }
+                putExtra(Intent.EXTRA_STREAM, fileUri)
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            }
+
+            val chooser = Intent.createChooser(shareIntent, context.getString(com.carbon.prolocker.R.string.backup_share_chooser_title)).apply {
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
+            context.startActivity(chooser)
+        } catch (e: Exception) {
+            android.util.Log.e("BackupRepository", "Failed to share backup file", e)
         }
-        context.startActivity(chooser)
     }
 
     fun installApk(fileInfo: BackupFileInfo) {
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            if (!context.packageManager.canRequestPackageInstalls()) {
-                val settingsIntent = Intent(
-                    android.provider.Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,
-                    Uri.parse("package:${context.packageName}")
-                ).apply {
+        val file = if (fileInfo.filePath.isNotEmpty()) File(fileInfo.filePath) else null
+        if (file != null && !file.exists()) {
+            android.widget.Toast.makeText(
+                context,
+                context.getString(com.carbon.prolocker.R.string.backup_msg_apk_not_found),
+                android.widget.Toast.LENGTH_SHORT
+            ).show()
+            return
+        }
+
+        var opened = false
+
+        // 1. Try DocumentProvider URI for primary storage Documents/ProLockerBackup/Applications
+        try {
+            val folderUri = Uri.parse("content://com.android.externalstorage.documents/document/primary%3ADocuments%2FProLockerBackup%2FApplications")
+            val intent = Intent(Intent.ACTION_VIEW).apply {
+                setDataAndType(folderUri, "vnd.android.document/directory")
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
+            context.startActivity(intent)
+            opened = true
+        } catch (e: Exception) {
+            android.util.Log.d("BackupRepository", "DocumentProvider directory intent failed", e)
+        }
+
+        // 2. Try FileProvider directory intent
+        if (!opened && file != null) {
+            try {
+                val dir = file.parentFile ?: file
+                val dirUri = FileProvider.getUriForFile(
+                    context,
+                    "${context.packageName}.fileprovider",
+                    dir
+                )
+                val intent = Intent(Intent.ACTION_VIEW).apply {
+                    setDataAndType(dirUri, "resource/folder")
+                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                     addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 }
-                context.startActivity(settingsIntent)
-                return
+                context.startActivity(intent)
+                opened = true
+            } catch (e: Exception) {
+                android.util.Log.d("BackupRepository", "FileProvider directory intent failed", e)
             }
         }
 
-        val apkUri: Uri = if (fileInfo.filePath.isNotEmpty()) {
-            val file = File(fileInfo.filePath)
-            FileProvider.getUriForFile(
-                context,
-                "${context.packageName}.fileprovider",
-                file
-            )
-        } else {
-            Uri.parse(fileInfo.uriString)
+        // 3. Try System Downloads / File Manager Intents
+        if (!opened) {
+            try {
+                val intent = Intent(android.app.DownloadManager.ACTION_VIEW_DOWNLOADS).apply {
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                }
+                context.startActivity(intent)
+                opened = true
+            } catch (e: Exception) {
+                android.util.Log.d("BackupRepository", "DownloadManager intent failed", e)
+            }
         }
 
-        val installIntent = Intent(Intent.ACTION_VIEW).apply {
-            setDataAndType(apkUri, "application/vnd.android.package-archive")
-            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        // 4. Fallback to File Share Chooser if no file manager application opened
+        if (!opened) {
+            shareBackupFile(fileInfo)
         }
-        context.startActivity(installIntent)
     }
 
     // --- Date Formatting Helper (Jalali Persian) ---

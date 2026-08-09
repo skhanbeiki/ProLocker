@@ -369,7 +369,7 @@
     <string name="backup_date_jalali">تاریخ پشتیبان</string>
     <string name="backup_jalali_prefix">جلالی: %1$s</string>
     <string name="backup_action_restore">بازیابی پشتیبان</string>
-    <string name="backup_action_install_apk">نصب APK</string>
+    <string name="backup_action_install_apk">باز کردن در مدیریت فایل</string>
     <string name="backup_action_share">اشتراک‌گذاری</string>
     <string name="backup_action_delete">حذف</string>
     <string name="backup_delete_dialog_title">حذف فایل پشتیبان؟</string>
@@ -393,6 +393,7 @@
     <string name="backup_msg_delete_failed">حذف پشتیبان ناموفق بود</string>
     <string name="backup_msg_apk_deleted">پشتیبان APK حذف شد</string>
     <string name="backup_msg_apk_delete_failed">حذف APK ناموفق بود</string>
+    <string name="backup_msg_apk_not_found">فایل پشتیبان پیدا نشد</string>
     <string name="backup_permission_required_title">مجوز لازم است</string>
     <string name="backup_permission_required_msg">قفل حرفه‌ای برای دسترسی و بازیابی ایمن داده‌های %1$s به مجوز نیاز دارد.</string>
     <string name="backup_grant_permission">اعطای مجوز</string>

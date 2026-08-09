@@ -16,7 +16,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Android
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Description
-import androidx.compose.material.icons.outlined.Download
+import androidx.compose.material.icons.outlined.Folder
 import androidx.compose.material.icons.outlined.Restore
 import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material3.AlertDialog
@@ -217,7 +217,7 @@ fun BackupBottomSheet(
                 colors = ButtonDefaults.buttonColors(containerColor = ProLockerPrimary)
             ) {
                 Icon(
-                    imageVector = if (isApp) Icons.Outlined.Download else Icons.Outlined.Restore,
+                    imageVector = if (isApp) Icons.Outlined.Folder else Icons.Outlined.Restore,
                     contentDescription = null,
                     modifier = Modifier.size(20.dp)
                 )

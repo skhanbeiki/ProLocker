@@ -365,7 +365,7 @@
     <string name="backup_date_jalali">Backup Date (Jalali)</string>
     <string name="backup_jalali_prefix">Jalali: %1$s</string>
     <string name="backup_action_restore">Restore Backup</string>
-    <string name="backup_action_install_apk">Install APK</string>
+    <string name="backup_action_install_apk">Open in File Manager</string>
     <string name="backup_action_share">Share</string>
     <string name="backup_action_delete">Delete</string>
     <string name="backup_delete_dialog_title">Delete Backup File?</string>
@@ -389,6 +389,7 @@
     <string name="backup_msg_delete_failed">Failed to delete backup</string>
     <string name="backup_msg_apk_deleted">APK backup deleted</string>
     <string name="backup_msg_apk_delete_failed">Failed to delete APK</string>
+    <string name="backup_msg_apk_not_found">Backup file not found</string>
     <string name="backup_permission_required_title">Permission Required</string>
     <string name="backup_permission_required_msg">ProLocker needs permission to access and restore your %1$s data safely.</string>
     <string name="backup_grant_permission">Grant Permission</string>

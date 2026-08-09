@@ -3,6 +3,7 @@ package com.carbon.prolocker.core.navigation
 import android.app.Activity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -177,15 +178,22 @@ fun AppNavigation(
                 onBack = { navController.popBackStack() }
             )
         }
-        composable<BackupAppsRoute> {
+        composable<BackupAppsRoute> { backStackEntry ->
+            val viewModel: com.carbon.prolocker.feature.backup.ui.BackupAppsViewModel = org.koin.androidx.compose.koinViewModel(viewModelStoreOwner = backStackEntry)
             com.carbon.prolocker.feature.backup.ui.BackupAppsScreen(
                 onBack = { navController.popBackStack() },
-                onNavigateToProgress = { navController.navigate(BackupAppsProgressRoute) }
+                onNavigateToProgress = { navController.navigate(BackupAppsProgressRoute) },
+                viewModel = viewModel
             )
         }
-        composable<BackupAppsProgressRoute> {
+        composable<BackupAppsProgressRoute> { backStackEntry ->
+            val parentEntry = remember(backStackEntry) {
+                navController.getBackStackEntry<BackupAppsRoute>()
+            }
+            val viewModel: com.carbon.prolocker.feature.backup.ui.BackupAppsViewModel = org.koin.androidx.compose.koinViewModel(viewModelStoreOwner = parentEntry)
             com.carbon.prolocker.feature.backup.ui.BackupAppsProgressScreen(
-                onBack = { navController.popBackStack() }
+                onBack = { navController.popBackStack() },
+                viewModel = viewModel
             )
         }
         composable<HideFilesRoute> {
