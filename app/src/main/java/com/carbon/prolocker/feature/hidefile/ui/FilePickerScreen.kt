@@ -65,9 +65,9 @@ import java.util.Locale
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FilePickerScreen(
-    onBack: () -> Unit = {}
+    onBack: () -> Unit = {},
+    viewModel: HideFileViewModel = koinViewModel()
 ) {
-    val viewModel: HideFileViewModel = koinViewModel()
     val context = androidx.compose.ui.platform.LocalContext.current
     val hiddenItems by viewModel.items.collectAsState()
     val hiddenPaths = remember(hiddenItems) {

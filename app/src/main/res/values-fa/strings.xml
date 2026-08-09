@@ -122,6 +122,11 @@
     <string name="hide_files_picker_empty_title">چیزی برای مخفی کردن نیست</string>
     <string name="hide_files_picker_empty_description">در این دسته موردی یافت نشد</string>
     <string name="hide_files_go_up">رفتن به پوشه بالا</string>
+    <string name="hide_success_hide_title">مخفی‌سازی با موفقیت انجام شد</string>
+    <string name="hide_success_restore_title">بازگردانی با موفقیت انجام شد</string>
+    <string name="hide_success_hide_msg">تعداد %1$d فایل با موفقیت مخفی شد و به صندوقچه امن منتقل گردید.</string>
+    <string name="hide_success_restore_msg">تعداد %1$d فایل با موفقیت به حافظه اصلی دستگاه بازگردانی شد.</string>
+    <string name="hide_success_got_it">فهمیدم</string>
     <string name="capture_intruder_selfie">عکس از فضول</string>
     <string name="capture_intruder_selfie_desc">با دوربین جلو عکس بگیر زمانی که تلاش های ناموفق به حداکثر رسید</string>
     <string name="trigger_alarm">پخش دزدگیر</string>

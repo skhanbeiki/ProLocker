@@ -121,6 +121,11 @@
     <string name="hide_files_picker_empty_title">Nothing to hide</string>
     <string name="hide_files_picker_empty_description">No media found in this category</string>
     <string name="hide_files_go_up">Go up one folder</string>
+    <string name="hide_success_hide_title">Files Hidden Successfully</string>
+    <string name="hide_success_restore_title">Files Restored Successfully</string>
+    <string name="hide_success_hide_msg">%1$d file(s) successfully hidden and secured.</string>
+    <string name="hide_success_restore_msg">%1$d file(s) successfully restored to original storage.</string>
+    <string name="hide_success_got_it">Got it</string>
     <string name="capture_intruder_selfie">Capture Intruder Selfie</string>
     <string name="capture_intruder_selfie_desc">Take a photo using the front camera when max failed attempts are reached</string>
     <string name="trigger_alarm">Trigger Alarm</string>

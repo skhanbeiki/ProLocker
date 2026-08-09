@@ -208,6 +208,7 @@ fun AppNavigation(
         }
         composable<HiddenItemsRoute> { backStackEntry ->
             val route = backStackEntry.toRoute<HiddenItemsRoute>()
+            val viewModel: com.carbon.prolocker.feature.hidefile.HideFileViewModel = org.koin.androidx.compose.koinViewModel(viewModelStoreOwner = backStackEntry)
             com.carbon.prolocker.feature.hidefile.ui.HiddenItemsScreen(
                 type = route.category,
                 onBack = {
@@ -215,23 +216,30 @@ fun AppNavigation(
                 },
                 onOpenPicker = { category ->
                     navController.navigate(MediaPickerRoute(category))
-                }
+                },
+                viewModel = viewModel
             )
         }
         composable<MediaPickerRoute> { backStackEntry ->
             val route = backStackEntry.toRoute<MediaPickerRoute>()
+            val parentEntry = remember(backStackEntry) {
+                navController.getBackStackEntry<HiddenItemsRoute>()
+            }
+            val viewModel: com.carbon.prolocker.feature.hidefile.HideFileViewModel = org.koin.androidx.compose.koinViewModel(viewModelStoreOwner = parentEntry)
             if (route.category == com.carbon.prolocker.feature.hidefile.data.HideItem.TYPE_FILE) {
                 com.carbon.prolocker.feature.hidefile.ui.FilePickerScreen(
                     onBack = {
                         navController.popBackStack()
-                    }
+                    },
+                    viewModel = viewModel
                 )
             } else {
                 com.carbon.prolocker.feature.hidefile.ui.MediaPickerScreen(
                     type = route.category,
                     onBack = {
                         navController.popBackStack()
-                    }
+                    },
+                    viewModel = viewModel
                 )
             }
         }

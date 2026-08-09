@@ -15,8 +15,8 @@ android {
         applicationId = "com.carbon.prolocker"
         minSdk = 24
         targetSdk = 36
-        versionCode = 89
-        versionName ="5.2.2"
+        versionCode = 90
+        versionName ="5.2.3"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         addManifestPlaceholders(

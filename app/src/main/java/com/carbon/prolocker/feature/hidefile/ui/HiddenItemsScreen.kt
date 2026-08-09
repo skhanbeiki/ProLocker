@@ -98,14 +98,15 @@ import java.io.File
 fun HiddenItemsScreen(
     type: String,
     onBack: () -> Unit = {},
-    onOpenPicker: (String) -> Unit = {}
+    onOpenPicker: (String) -> Unit = {},
+    viewModel: HideFileViewModel = koinViewModel()
 ) {
-    val viewModel: HideFileViewModel = koinViewModel()
     val adManager: AdManager = koinInject()
     val preferencesRepository: PreferencesRepository = koinInject()
     val remoteConfigRepository: RemoteConfigRepository = koinInject()
 
     val allItems by viewModel.items.collectAsState()
+    val operationResult by viewModel.operationResult.collectAsState()
     val items = remember(allItems, type) { allItems.filter { it.type == type } }
 
     var selectedItem by remember { mutableStateOf<HideItem?>(null) }
@@ -326,6 +327,13 @@ fun HiddenItemsScreen(
                 requester.request(type) { onOpenPicker(type) }
             },
             onDismiss = { showPermissionDialog = false }
+        )
+    }
+
+    operationResult?.let { res ->
+        HideSuccessBottomSheet(
+            result = res,
+            onDismiss = { viewModel.clearOperationResult() }
         )
     }
 }

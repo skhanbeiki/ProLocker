@@ -77,9 +77,9 @@ import java.util.Locale
 @Composable
 fun MediaPickerScreen(
     type: String,
-    onBack: () -> Unit = {}
+    onBack: () -> Unit = {},
+    viewModel: HideFileViewModel = koinViewModel()
 ) {
-    val viewModel: HideFileViewModel = koinViewModel()
     val context = LocalContext.current
     val hiddenItems by viewModel.items.collectAsState()
     val hiddenPaths = remember(hiddenItems) {
