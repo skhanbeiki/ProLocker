@@ -90,6 +90,7 @@
     <string name="tools_screen_recording_subtitle">Monitor screen activity</string>
     <string name="tools_app_manager">App Manager</string>
     <string name="tools_app_manager_subtitle">Manage installed apps</string>
+    <string name="apps_list">Apps</string>
     <string name="tools_privacy_auditor">Privacy Auditor</string>
     <string name="tools_privacy_auditor_subtitle">Audit &amp; scan sensitive permissions</string>
     <string name="coming_soon">Coming Soon</string>
@@ -105,7 +106,7 @@
     <string name="hide_files_empty_title">Nothing hidden yet</string>
     <string name="hide_files_empty_description">Tap the button to hide new files</string>
     <string name="hide_files_open">Open</string>
-    <string name="hide_files_unhide">Unhide</string>
+    <string name="hide_files_unhide">Restore</string>
     <string name="hide_files_delete_title">Delete Item?</string>
     <string name="hide_files_delete_message">The file will be permanently deleted from the hidden folder. This action cannot be undone.</string>
     <string name="hide_files_permission_needed">All files access is required to hide or view files</string>

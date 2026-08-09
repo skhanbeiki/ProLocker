@@ -376,7 +376,7 @@ fun HomeScreen(
 
             // Apps Section Header
             Text(
-                text = "Apps",
+                text = stringResource(R.string.apps_list),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onBackground,

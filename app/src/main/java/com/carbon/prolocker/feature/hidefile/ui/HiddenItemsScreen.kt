@@ -33,6 +33,13 @@ import androidx.compose.material.icons.outlined.InsertDriveFile
 import androidx.compose.material.icons.outlined.MusicNote
 import androidx.compose.material.icons.outlined.OpenInNew
 import androidx.compose.material.icons.outlined.Share
+import android.graphics.Bitmap
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.outlined.PlayArrow
+import androidx.compose.material.icons.outlined.Restore
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
+import com.carbon.prolocker.feature.hidefile.data.MediaThumbnails
 import androidx.compose.material.icons.outlined.Visibility
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -63,16 +70,18 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.produceState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
@@ -268,17 +277,43 @@ fun HiddenItemsScreen(
                     }
                 }
                 Spacer(modifier = Modifier.height(16.dp))
-                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f))
+                // Prominent Restore Button ("بازگردانی")
+                Button(
+                    onClick = {
+                        viewModel.unhide(item)
+                        selectedItem = null
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp, vertical = 8.dp)
+                        .height(50.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = ProLockerPrimary,
+                        contentColor = Color.White
+                    )
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.Restore,
+                        contentDescription = null,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = stringResource(R.string.hide_files_unhide),
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(4.dp))
+
                 SheetActionRow(Icons.Outlined.OpenInNew, stringResource(R.string.hide_files_open)) {
                     viewModel.open(item)
                     selectedItem = null
                 }
                 SheetActionRow(Icons.Outlined.Share, stringResource(R.string.share)) {
                     viewModel.share(item)
-                    selectedItem = null
-                }
-                SheetActionRow(Icons.Outlined.Visibility, stringResource(R.string.hide_files_unhide)) {
-                    viewModel.unhide(item)
                     selectedItem = null
                 }
                 SheetActionRow(Icons.Outlined.Delete, stringResource(R.string.delete), tint = ProLockerError) {
@@ -340,6 +375,8 @@ fun HiddenItemsScreen(
 
 @Composable
 private fun HiddenMediaThumb(item: HideItem, onClick: () -> Unit) {
+    val isVideo = item.type == HideItem.TYPE_VIDEO
+
     Box(
         modifier = Modifier
             .aspectRatio(1f)
@@ -352,12 +389,55 @@ private fun HiddenMediaThumb(item: HideItem, onClick: () -> Unit) {
             "${com.carbon.prolocker.feature.hidefile.data.HideFileStorage.HIDE_FILE_DIR}/.${item.name}"
         )
         if (file.exists()) {
-            Image(
-                painter = rememberAsyncImagePainter(file),
-                contentDescription = item.name,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxSize()
-            )
+            if (isVideo) {
+                val videoThumb by produceState<Bitmap?>(initialValue = null, key1 = item.name) {
+                    value = MediaThumbnails.videoFileThumbnail(file.absolutePath)
+                }
+
+                if (videoThumb != null) {
+                    Image(
+                        bitmap = videoThumb!!.asImageBitmap(),
+                        contentDescription = item.name,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                } else {
+                    Image(
+                        painter = rememberAsyncImagePainter(file),
+                        contentDescription = item.name,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.Black.copy(alpha = 0.25f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(36.dp)
+                            .background(Color.Black.copy(alpha = 0.5f), CircleShape),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.PlayArrow,
+                            contentDescription = null,
+                            tint = Color.White,
+                            modifier = Modifier.size(22.dp)
+                        )
+                    }
+                }
+            } else {
+                Image(
+                    painter = rememberAsyncImagePainter(file),
+                    contentDescription = item.name,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
         } else {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Icon(

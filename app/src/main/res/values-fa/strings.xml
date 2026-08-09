@@ -106,7 +106,7 @@
     <string name="hide_files_empty_title">هنوز چیزی مخفی نشده</string>
     <string name="hide_files_empty_description">برای مخفی کردن فایل جدید دکمه را بزنید</string>
     <string name="hide_files_open">باز کردن</string>
-    <string name="hide_files_unhide">نمایش مجدد</string>
+    <string name="hide_files_unhide">بازگردانی</string>
     <string name="hide_files_delete_title">حذف مورد؟</string>
     <string name="hide_files_delete_message">فایل به صورت دائمی از پوشه مخفی حذف می‌شود. این عملیات قابل بازگشت نیست.</string>
     <string name="hide_files_permission_needed">برای مخفی کردن یا مشاهده فایل‌ها دسترسی به همه فایل‌ها لازم است</string>
@@ -149,6 +149,7 @@
     <string name="ok">تایید</string>
     <string name="apps_protected">برنامه محافظت شده: %1$s</string>
     <string name="search_apps">جستجوی برنامه ها...</string>
+    <string name="apps_list">برنامه ها</string>
     <string name="no_apps_found">برنامه‌ای یافت نشد</string>
     <string name="locked_apps">برنامه های قفل شده</string>
     <string name="no_apps_locked">هیچ برنامه ای قفل نیست.</string>
