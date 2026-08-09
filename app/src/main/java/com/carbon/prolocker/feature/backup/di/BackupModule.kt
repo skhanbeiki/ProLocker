@@ -14,6 +14,6 @@ val backupModule = module {
     single { BackupRepository(androidContext(), get()) }
 
     viewModel { BackupHomeViewModel(get(), get()) }
-    viewModel { BackupCategoryViewModel(androidContext(), get()) }
-    viewModel { BackupAppsViewModel(androidContext(), get()) }
+    viewModel { BackupCategoryViewModel(context = androidContext(), repository = get(), analyticsManager = get()) }
+    viewModel { BackupAppsViewModel(context = androidContext(), repository = get(), analyticsManager = get()) }
 }

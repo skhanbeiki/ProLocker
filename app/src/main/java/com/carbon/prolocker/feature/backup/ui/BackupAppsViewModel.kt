@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import com.carbon.prolocker.core.analytics.AnalyticsManager
 
 data class BackupAppsUiState(
     val selectedTab: Int = 0, // 0 = Backup, 1 = Restore
@@ -39,7 +40,8 @@ data class BackupAppsUiState(
 
 class BackupAppsViewModel(
     private val context: Context,
-    private val repository: BackupRepository
+    private val repository: BackupRepository,
+    private val analyticsManager: AnalyticsManager
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(BackupAppsUiState())
@@ -151,6 +153,7 @@ class BackupAppsViewModel(
         )
 
         viewModelScope.launch {
+            analyticsManager.trackBackupAction("applications", selected.size)
             var completed = 0
             val total = selected.size
 

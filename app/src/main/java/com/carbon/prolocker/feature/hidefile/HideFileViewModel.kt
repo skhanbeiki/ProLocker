@@ -13,13 +13,18 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
+import com.carbon.prolocker.core.analytics.AnalyticsManager
+
 data class HideOperationResult(
     val isRestore: Boolean,
     val count: Int,
     val timestamp: Long = System.currentTimeMillis()
 )
 
-class HideFileViewModel(private val repository: HideFileRepository) : ViewModel() {
+class HideFileViewModel(
+    private val repository: HideFileRepository,
+    private val analyticsManager: AnalyticsManager
+) : ViewModel() {
 
     val items: StateFlow<List<HideItem>> = repository.items
 
@@ -40,6 +45,7 @@ class HideFileViewModel(private val repository: HideFileRepository) : ViewModel(
         if (selected.isEmpty()) return
         viewModelScope.launch {
             repository.hide(selected.map { it.path to type })
+            analyticsManager.trackHideFilesAction("hide", type, selected.size)
             _operationResult.value = HideOperationResult(isRestore = false, count = selected.size)
         }
     }
@@ -48,6 +54,7 @@ class HideFileViewModel(private val repository: HideFileRepository) : ViewModel(
         if (selected.isEmpty()) return
         viewModelScope.launch {
             repository.hide(selected.map { it to type })
+            analyticsManager.trackHideFilesAction("hide", type, selected.size)
             _operationResult.value = HideOperationResult(isRestore = false, count = selected.size)
         }
     }
@@ -55,6 +62,7 @@ class HideFileViewModel(private val repository: HideFileRepository) : ViewModel(
     fun unhide(item: HideItem) {
         viewModelScope.launch {
             repository.unhide(item)
+            analyticsManager.trackHideFilesAction("unhide", item.type, 1)
             _operationResult.value = HideOperationResult(isRestore = true, count = 1)
         }
     }

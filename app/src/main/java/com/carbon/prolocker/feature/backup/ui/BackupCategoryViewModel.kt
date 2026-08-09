@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import com.carbon.prolocker.core.analytics.AnalyticsManager
 
 data class BackupCategoryUiState(
     val category: BackupCategory = BackupCategory.CONTACTS,
@@ -29,7 +30,8 @@ data class BackupCategoryUiState(
 
 class BackupCategoryViewModel(
     private val context: Context,
-    private val repository: BackupRepository
+    private val repository: BackupRepository,
+    private val analyticsManager: AnalyticsManager
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(BackupCategoryUiState())
@@ -98,6 +100,8 @@ class BackupCategoryViewModel(
                     }
                     BackupCategory.APPLICATIONS -> ""
                 }
+
+                analyticsManager.trackBackupAction(category.name.lowercase(), _uiState.value.totalAvailableItems)
 
                 _uiState.value = _uiState.value.copy(
                     isBackingUp = false,

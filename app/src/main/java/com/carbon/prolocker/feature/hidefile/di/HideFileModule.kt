@@ -12,5 +12,5 @@ val hideFileModule = module {
     single { HideFileDatabase(androidContext()) }
     single { HideFileStorage(androidContext()) }
     single { HideFileRepository(get(), get()) }
-    viewModel { HideFileViewModel(get()) }
+    viewModel { HideFileViewModel(get(), get()) }
 }

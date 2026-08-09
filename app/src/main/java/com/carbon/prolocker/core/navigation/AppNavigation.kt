@@ -18,6 +18,11 @@ import com.carbon.prolocker.feature.onboarding.PermissionsScreen
 import com.carbon.prolocker.feature.onboarding.SuccessScreen
 import com.carbon.prolocker.feature.onboarding.WelcomeScreen
 
+import androidx.compose.runtime.DisposableEffect
+import androidx.navigation.NavController
+import com.carbon.prolocker.core.analytics.AnalyticsManager
+import org.koin.compose.koinInject
+
 @Composable
 fun AppNavigation(
     deepLinkType: String? = null,
@@ -26,7 +31,22 @@ fun AppNavigation(
     isStandaloneExit: Boolean = false
 ) {
     val navController = rememberNavController()
+    val analyticsManager: AnalyticsManager = koinInject()
     val context = LocalContext.current
+
+    DisposableEffect(navController) {
+        val listener = NavController.OnDestinationChangedListener { _, destination, _ ->
+            val route = destination.route ?: return@OnDestinationChangedListener
+            val cleanScreenName = route.substringAfterLast(".").substringBefore("?")
+            if (cleanScreenName.isNotBlank()) {
+                analyticsManager.trackScreenView(cleanScreenName)
+            }
+        }
+        navController.addOnDestinationChangedListener(listener)
+        onDispose {
+            navController.removeOnDestinationChangedListener(listener)
+        }
+    }
     val startDest = if (isOnboardingCompleted) HomeRoute() else WelcomeRoute
 
     val effectiveDeepLink = trustedLaunchDestination ?: deepLinkType

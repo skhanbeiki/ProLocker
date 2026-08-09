@@ -19,6 +19,48 @@ class AnalyticsManager(context: Context) {
         firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SCREEN_VIEW, bundle)
     }
 
+    fun trackToolClick(toolName: String) {
+        val bundle = Bundle().apply {
+            putString("tool_name", toolName)
+        }
+        firebaseAnalytics.logEvent("tool_click", bundle)
+    }
+
+    fun trackHideFilesAction(action: String, category: String, count: Int) {
+        val bundle = Bundle().apply {
+            putString("action", action)
+            putString("category", category)
+            putInt("count", count)
+        }
+        firebaseAnalytics.logEvent("hide_files_action", bundle)
+    }
+
+    fun trackBackupAction(category: String, count: Int) {
+        val bundle = Bundle().apply {
+            putString("category", category)
+            putInt("count", count)
+        }
+        firebaseAnalytics.logEvent("backup_action", bundle)
+    }
+
+    fun trackMemoryOptimized(freedMb: Int) {
+        val bundle = Bundle().apply {
+            putInt("freed_mb", freedMb)
+        }
+        firebaseAnalytics.logEvent("memory_optimized", bundle)
+    }
+
+    fun trackCallBlockerAction(action: String) {
+        val bundle = Bundle().apply {
+            putString("action", action)
+        }
+        firebaseAnalytics.logEvent("call_blocker_action", bundle)
+    }
+
+    fun trackPrivacyAuditAction() {
+        firebaseAnalytics.logEvent("privacy_audit_performed", null)
+    }
+
     fun trackBackgroundSelected(backgroundId: Int) {
         val bundle = Bundle().apply {
             putInt("background_id", backgroundId)

@@ -118,6 +118,8 @@ fun MemoryOptimizerScreen(onBack: () -> Unit) {
 
 
 
+    val analyticsManager: com.carbon.prolocker.core.analytics.AnalyticsManager = org.koin.compose.koinInject()
+
     Scaffold(
         topBar = {
             AppToolbar(
@@ -172,6 +174,8 @@ fun MemoryOptimizerScreen(onBack: () -> Unit) {
                                 if (usedRamAfter >= usedRamBefore) {
                                     usedRamAfter = (usedRamBefore * 0.95).toLong()
                                 }
+                                val freedMb = ((usedRamBefore - usedRamAfter) / (1024 * 1024)).toInt().coerceAtLeast(1)
+                                analyticsManager.trackMemoryOptimized(freedMb)
                                 optimizationState = OptimizationState.COMPLETED
 
                                 preferencesRepository.updatePreferences {

@@ -483,6 +483,7 @@ fun ToolsScreen(
     onNavigateToCallBlocker: () -> Unit = {},
     onNavigateToAudit: () -> Unit = {}
 ) {
+    val analyticsManager: com.carbon.prolocker.core.analytics.AnalyticsManager = org.koin.compose.koinInject()
     val snackbarHostState = remember { SnackbarHostState() }
     val appLockTitle = stringResource(R.string.tools_app_lock)
 
@@ -549,16 +550,16 @@ fun ToolsScreen(
                                 .size(40.dp)
                                 .background(
                                     Brush.linearGradient(
-                                        colors = listOf(ProLockerPrimary, ProLockerSecondary)
+                                        listOf(ProLockerPrimary, ProLockerSecondary)
                                     ),
-                                    RoundedCornerShape(12.dp)
+                                    CircleShape
                                 ),
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
                                 Icons.Outlined.Lock,
                                 contentDescription = null,
-                                tint = MaterialTheme.colorScheme.onPrimary,
+                                tint = Color.White,
                                 modifier = Modifier.size(22.dp)
                             )
                         }
@@ -588,8 +589,12 @@ fun ToolsScreen(
             features = features,
             heroTitle = appLockTitle,
             heroSubtitle = stringResource(R.string.tools_app_lock_subtitle),
-            onHeroClick = onNavigateToAppLock,
+            onHeroClick = {
+                analyticsManager.trackToolClick("app_locker")
+                onNavigateToAppLock()
+            },
             onFeatureClick = { item ->
+                analyticsManager.trackToolClick(item.id.name.lowercase())
                 when (item.id) {
                     FeatureId.HIDE_FILES -> onNavigateToHideFiles()
                     FeatureId.INTRUDER -> onNavigateToSecurity()
