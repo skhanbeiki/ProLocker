@@ -105,11 +105,6 @@ fun MainScreen(
     var showRateDialog by remember { mutableStateOf(false) }
     val rateDialogScope = rememberCoroutineScope()
 
-    LaunchedEffect(Unit) {
-        val shouldShow = rateAppManager.shouldShowDialog()
-        if (shouldShow) showRateDialog = true
-    }
-
     LaunchedEffect(activity) {
         activity?.let {
             adManager.preloadNativeAd(
@@ -151,11 +146,17 @@ fun MainScreen(
         Log.d("MainScreen", "HOME_AD_REQUEST_START tab=$selectedTab")
     }
 
-    androidx.activity.compose.BackHandler(enabled = !showExitScreen) {
+    androidx.activity.compose.BackHandler(enabled = !showExitScreen && !showRateDialog) {
         if (selectedTab != MainTab.TOOLS) {
             viewModel.setSelectedTab(MainTab.TOOLS)
         } else {
-            showExitScreen = true
+            rateDialogScope.launch {
+                if (rateAppManager.shouldShowSurveyOnExit()) {
+                    showRateDialog = true
+                } else {
+                    showExitScreen = true
+                }
+            }
         }
     }
 
@@ -221,11 +222,20 @@ fun MainScreen(
                 MarketConfig.rateApp(context)
                 rateDialogScope.launch { rateAppManager.onRateClicked() }
             },
-            onDontShowAgainClicked = {
+            onLaterClicked = {
                 showRateDialog = false
-                rateDialogScope.launch { rateAppManager.onDontShowAgainClicked() }
+                rateDialogScope.launch {
+                    rateAppManager.onLaterClicked()
+                    (context as? android.app.Activity)?.finishAffinity()
+                }
             },
-            onDismiss = { showRateDialog = false }
+            onDismiss = {
+                showRateDialog = false
+                rateDialogScope.launch {
+                    rateAppManager.onLaterClicked()
+                    (context as? android.app.Activity)?.finishAffinity()
+                }
+            }
         )
     }
 

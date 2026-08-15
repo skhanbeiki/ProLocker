@@ -52,7 +52,7 @@ val serviceModule = module {
     single { SecurityScoreManager(androidContext(), get(), get()) }
     single { PermissionHealthMonitor(androidContext(), get()) }
     single { com.carbon.prolocker.core.language.LanguageManager(get()) }
-    single { com.carbon.prolocker.core.rate.RateAppManager(get()) }
+    single { com.carbon.prolocker.core.rate.RateAppManager(get(), get()) }
 }
 
 val databaseModule = module {

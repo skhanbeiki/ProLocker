@@ -7,7 +7,8 @@ import kotlinx.serialization.Serializable
 data class RemoteConfigResponse(
     @SerialName("interval") val interval: Long = 360,
     @SerialName("configs") val configs: RemoteConfigs = RemoteConfigs(),
-    @SerialName("defaultHomeTab") val defaultHomeTab: String = "tools"
+    @SerialName("defaultHomeTab") val defaultHomeTab: String = "tools",
+    @SerialName("surveyDisplay") val surveyDisplay: Int? = null
 ) {
     companion object {
         val DEFAULT = RemoteConfigResponse(
@@ -25,7 +26,8 @@ data class RemoteConfigResponse(
                 interstitialAdRamCleanerStep = 3,
                 nativeAdRamCleanerPage = true,
                 limitInstallDisplayAdDays = 3,
-                ramCleanerNotifyTimes = listOf(22)
+                ramCleanerNotifyTimes = listOf(22),
+                surveyDisplay = 2
             )
         )
     }
@@ -37,6 +39,8 @@ data class RemoteConfigResponse(
             configs.defaultHomeTab
         }
     }
+
+    fun getEffectiveSurveyDisplay(): Int = surveyDisplay ?: configs.surveyDisplay
 }
 
 @Serializable
@@ -53,5 +57,6 @@ data class RemoteConfigs(
     @SerialName("nativeAdRamCleanerPage") val nativeAdRamCleanerPage: Boolean = true,
     @SerialName("interstitialAdThemeStep") val interstitialAdThemeStep: Int = 3,
     @SerialName("interstitialAdRamCleanerStep") val interstitialAdRamCleanerStep: Int = 3,
-    @SerialName("limitInstallDisplayAdDays") val limitInstallDisplayAdDays: Int = 3
+    @SerialName("limitInstallDisplayAdDays") val limitInstallDisplayAdDays: Int = 3,
+    @SerialName("surveyDisplay") val surveyDisplay: Int = 2
 )

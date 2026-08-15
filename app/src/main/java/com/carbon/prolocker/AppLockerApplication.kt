@@ -67,10 +67,6 @@ class ProLockerApplication : Application(), Application.ActivityLifecycleCallbac
             lockedAppsRepository.cleanupSelfPackage()
         }
 
-        runBlocking {
-            rateAppManager.recordLaunch()
-        }
-
         detectUpdateAndRecoverService()
     }
 

@@ -44,6 +44,7 @@ class MainActivity : AppCompatActivity() {
     private val remoteConfigRepository: RemoteConfigRepository by inject()
     private val stealthModeManager: StealthModeManager by inject()
     private val adManager: AdManager by inject()
+    private val rateAppManager: com.carbon.prolocker.core.rate.RateAppManager by inject()
 
     private var pendingNavType: String? = null
     private var trustedLaunchDestination: String? = null
@@ -66,6 +67,12 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
         super.onCreate(savedInstanceState)
+
+        if (savedInstanceState == null) {
+            lifecycleScope.launch {
+                rateAppManager.recordLaunch()
+            }
+        }
 
         requestedOrientation = try {
             ActivityInfo.SCREEN_ORIENTATION_PORTRAIT

@@ -22,16 +22,23 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.carbon.prolocker.R
 
+import androidx.compose.material3.TextButton
+import com.carbon.prolocker.core.theme.ProLockerOnPrimary
+import com.carbon.prolocker.core.theme.ProLockerOnSurface
+import com.carbon.prolocker.core.theme.ProLockerOnSurfaceVariant
+import com.carbon.prolocker.core.theme.ProLockerPrimary
+import com.carbon.prolocker.core.theme.ProLockerSurfaceVariant
+
 @Composable
 fun RateAppDialog(
     onRateClicked: () -> Unit,
-    onDontShowAgainClicked: () -> Unit,
+    onLaterClicked: () -> Unit,
     onDismiss: () -> Unit
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
         shape = RoundedCornerShape(24.dp),
-        containerColor = MaterialTheme.colorScheme.surface,
+        containerColor = ProLockerSurfaceVariant,
         title = null,
         text = {
             Column(
@@ -51,7 +58,7 @@ fun RateAppDialog(
                 Text(
                     text = stringResource(R.string.rate_title),
                     style = MaterialTheme.typography.headlineSmall,
-                    color = MaterialTheme.colorScheme.onSurface,
+                    color = ProLockerOnSurface,
                     textAlign = TextAlign.Center
                 )
 
@@ -60,7 +67,7 @@ fun RateAppDialog(
                 Text(
                     text = stringResource(R.string.rate_description),
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = ProLockerOnSurfaceVariant,
                     textAlign = TextAlign.Center
                 )
             }
@@ -68,10 +75,14 @@ fun RateAppDialog(
         confirmButton = {
             Button(
                 onClick = onRateClicked,
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(48.dp),
+                shape = RoundedCornerShape(14.dp),
+                elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary
+                    containerColor = ProLockerPrimary,
+                    contentColor = ProLockerOnPrimary
                 )
             ) {
                 Text(
@@ -81,17 +92,19 @@ fun RateAppDialog(
             }
         },
         dismissButton = {
-            OutlinedButton(
-                onClick = onDontShowAgainClicked,
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.outlinedButtonColors(
-                    contentColor = MaterialTheme.colorScheme.onSurfaceVariant
+            TextButton(
+                onClick = onLaterClicked,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(40.dp),
+                shape = RoundedCornerShape(14.dp),
+                colors = ButtonDefaults.textButtonColors(
+                    contentColor = ProLockerOnSurfaceVariant.copy(alpha = 0.75f)
                 )
             ) {
                 Text(
-                    text = stringResource(R.string.rate_dont_show_again),
-                    style = MaterialTheme.typography.titleMedium
+                    text = stringResource(R.string.rate_later),
+                    style = MaterialTheme.typography.bodyMedium
                 )
             }
         }

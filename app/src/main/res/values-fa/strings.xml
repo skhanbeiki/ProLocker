@@ -325,7 +325,8 @@
     <!-- Rate App Dialog -->
     <string name="rate_title">امتیاز به برنامه</string>
     <string name="rate_description">اگر از برنامه خوشت اومد با امتیاز از ما حمایت کن</string>
-    <string name="rate_action">امتیاز میدم</string>
+    <string name="rate_action">نظر میدم</string>
+    <string name="rate_later">بعداً نظر می‌دهم</string>
     <string name="rate_dont_show_again">بعدا</string>
 
     <!-- About Us Screen -->

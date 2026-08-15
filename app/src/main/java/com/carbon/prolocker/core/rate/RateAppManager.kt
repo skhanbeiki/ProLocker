@@ -1,13 +1,16 @@
 package com.carbon.prolocker.core.rate
 
 import com.carbon.prolocker.core.datastore.PreferencesRepository
-import kotlinx.coroutines.flow.first
+import com.carbon.prolocker.network.repository.RemoteConfigRepository
 
-class RateAppManager(private val preferencesRepository: PreferencesRepository) {
+class RateAppManager(
+    private val preferencesRepository: PreferencesRepository,
+    private val remoteConfigRepository: RemoteConfigRepository
+) {
 
     enum class DialogStage(val value: Int) {
         NOT_SHOWN(0),
-        FIRST_SHOWN(1),
+        LATER_ONCE(1),
         DISMISSED_FOREVER(2),
         RATED_FOREVER(3);
 
@@ -16,52 +19,53 @@ class RateAppManager(private val preferencesRepository: PreferencesRepository) {
         }
     }
 
-    suspend fun recordLaunch(): Boolean {
+    suspend fun recordLaunch() {
         preferencesRepository.updatePreferences {
             it.copy(rateAppLaunchCount = it.rateAppLaunchCount + 1)
         }
-        return shouldShowDialog()
     }
 
-    suspend fun shouldShowDialog(): Boolean {
-        val prefs = preferencesRepository.userPreferencesFlow.first()
-        val stage = DialogStage.fromValue(prefs.rateDialogStage)
-
-        if (stage == DialogStage.RATED_FOREVER || stage == DialogStage.DISMISSED_FOREVER) {
+    suspend fun shouldShowSurveyOnExit(): Boolean {
+        val config = remoteConfigRepository.getConfig()
+        if (config.getEffectiveSurveyDisplay() != 2) {
             return false
         }
 
+        val prefs = preferencesRepository.userPreferencesFlow.value
+        if (prefs.userHasRated) {
+            return false
+        }
+
+        // On first launch, user sees regular exit dialog. On launch >= 2, user sees survey dialog.
+        if (prefs.rateAppLaunchCount < 2) {
+            return false
+        }
+
+        val stage = DialogStage.fromValue(prefs.rateDialogStage)
         return when (stage) {
-            DialogStage.NOT_SHOWN -> prefs.rateAppLaunchCount >= LAUNCHES_BEFORE_FIRST_PROMPT
-            DialogStage.FIRST_SHOWN -> prefs.rateAppLaunchCount >= LAUNCHES_BEFORE_SECOND_PROMPT
-            else -> false
+            DialogStage.NOT_SHOWN, DialogStage.LATER_ONCE -> true
+            DialogStage.DISMISSED_FOREVER, DialogStage.RATED_FOREVER -> false
         }
     }
 
     suspend fun onRateClicked() {
         preferencesRepository.updatePreferences {
-            it.copy(rateDialogStage = DialogStage.RATED_FOREVER.value, userHasRated = true)
+            it.copy(
+                rateDialogStage = DialogStage.RATED_FOREVER.value,
+                userHasRated = true
+            )
         }
     }
 
-    suspend fun onDontShowAgainClicked() {
+    suspend fun onLaterClicked() {
         preferencesRepository.updatePreferences { prefs ->
             val stage = DialogStage.fromValue(prefs.rateDialogStage)
             val nextStage = when (stage) {
-                DialogStage.NOT_SHOWN -> DialogStage.FIRST_SHOWN
-                DialogStage.FIRST_SHOWN -> DialogStage.DISMISSED_FOREVER
-                else -> stage
+                DialogStage.NOT_SHOWN -> DialogStage.LATER_ONCE
+                DialogStage.LATER_ONCE -> DialogStage.DISMISSED_FOREVER
+                else -> DialogStage.DISMISSED_FOREVER
             }
             prefs.copy(rateDialogStage = nextStage.value)
         }
-    }
-
-    suspend fun onDialogDismissed() {
-        // no-op: only explicit button presses change state
-    }
-
-    companion object {
-        private const val LAUNCHES_BEFORE_FIRST_PROMPT = 3
-        private const val LAUNCHES_BEFORE_SECOND_PROMPT = 8
     }
 }
