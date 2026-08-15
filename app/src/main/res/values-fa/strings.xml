@@ -439,4 +439,16 @@
     <string name="call_blocker_search_placeholder">جستجو...</string>
     <string name="call_blocker_stat_rules">شماره‌های مسدود</string>
     <string name="call_blocker_stat_calls">تماس‌های مسدود شده</string>
+
+    <!-- Fingerprint / Biometric -->
+    <string name="fingerprint_unlock">قفل با اثر انگشت</string>
+    <string name="fingerprint_unlock_desc">باز کردن قفل برنامه‌ها با اثر انگشت</string>
+    <string name="fingerprint_not_available">حسگر اثر انگشت در این دستگاه یافت نشد.</string>
+    <string name="fingerprint_not_enrolled">هیچ اثر انگشتی در دستگاه ثبت نشده است. لطفاً ابتدا در تنظیمات گوشی اثر انگشت تعریف کنید.</string>
+    <string name="touch_to_unlock">برای باز کردن قفل لمس کنید</string>
+    <string name="use_pattern">ورود با الگو</string>
+    <string name="use_pin">ورود با رمز عبور</string>
+    <string name="use_fingerprint">ورود با اثر انگشت</string>
+    <string name="biometric_prompt_title">تایید هویت</string>
+    <string name="biometric_prompt_subtitle">برای ادامه، اثر انگشت خود را اسکن کنید</string>
 </resources>

@@ -38,6 +38,9 @@ class EntryLockViewModel(
     private val _threshold = MutableStateFlow(3)
     val threshold: StateFlow<Int> = _threshold.asStateFlow()
 
+    private val _fingerprintUnlockEnabled = MutableStateFlow(false)
+    val fingerprintUnlockEnabled: StateFlow<Boolean> = _fingerprintUnlockEnabled.asStateFlow()
+
     init {
         viewModelScope.launch {
             preferencesRepository.userPreferencesFlow.collect { prefs ->
@@ -46,8 +49,13 @@ class EntryLockViewModel(
                 _hidePatternPath.value = prefs.hidePatternPath
                 _recoveryQuestion.value = prefs.securityQuestionHash.ifEmpty { null }
                 _threshold.value = prefs.failedAttemptsThreshold
+                _fingerprintUnlockEnabled.value = prefs.fingerprintUnlockEnabled
             }
         }
+    }
+
+    fun onBiometricSuccess() {
+        _unlocked.value = true
     }
 
     fun verifyPattern(pattern: List<Int>) {

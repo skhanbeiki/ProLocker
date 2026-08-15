@@ -435,4 +435,16 @@
     <string name="call_blocker_search_placeholder">Search blocked numbers or history...</string>
     <string name="call_blocker_stat_rules">Blocked Numbers</string>
     <string name="call_blocker_stat_calls">Blocked Calls</string>
+
+    <!-- Fingerprint / Biometric -->
+    <string name="fingerprint_unlock">Fingerprint Unlock</string>
+    <string name="fingerprint_unlock_desc">Unlock apps using your fingerprint</string>
+    <string name="fingerprint_not_available">Fingerprint sensor is not available on this device.</string>
+    <string name="fingerprint_not_enrolled">No fingerprint is registered on your device. Please set up a fingerprint in device settings first.</string>
+    <string name="touch_to_unlock">Touch sensor to unlock</string>
+    <string name="use_pattern">Use Pattern</string>
+    <string name="use_pin">Use PIN</string>
+    <string name="use_fingerprint">Use Fingerprint</string>
+    <string name="biometric_prompt_title">Authentication Required</string>
+    <string name="biometric_prompt_subtitle">Scan your fingerprint to continue</string>
 </resources>

@@ -291,6 +291,10 @@ class LockService : Service(), OnBackPressedDispatcherOwner {
                                         lockScreenAdPlace = lockScreenAdPlace,
                                         adManager = adManager,
                                         preloadedAdView = preloadedAdView,
+                                        fingerprintUnlockEnabled = lockViewModel.fingerprintUnlockEnabled.collectAsState().value,
+                                        onFingerprintClick = {
+                                             BiometricAuthActivity.start(this@LockService, stateHolder.packageName.value)
+                                        },
                                         onPatternComplete = { lockViewModel.verifyPattern(it, packageName) },
                                         onPinComplete = { lockViewModel.verifyPin(it, packageName) },
                                         onErrorReset = { lockViewModel.resetError() },

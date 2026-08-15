@@ -53,6 +53,9 @@ class LockViewModel(
     private val _selectedBackgroundUrl = MutableStateFlow<String?>(null)
     val selectedBackgroundUrl: StateFlow<String?> = _selectedBackgroundUrl.asStateFlow()
 
+    private val _fingerprintUnlockEnabled = MutableStateFlow(false)
+    val fingerprintUnlockEnabled: StateFlow<Boolean> = _fingerprintUnlockEnabled.asStateFlow()
+
     val failedAttempts = failedAttemptManager.state
 
     init {
@@ -65,6 +68,7 @@ class LockViewModel(
                 _recoveryQuestion.value = prefs.securityQuestionHash.ifEmpty { null }
                 _lockScreenRotation.value = prefs.lockScreenRotation
                 _selectedBackgroundUrl.value = prefs.selectedBackgroundUrl.ifEmpty { null }
+                _fingerprintUnlockEnabled.value = prefs.fingerprintUnlockEnabled
             }
         }
     }
@@ -136,6 +140,15 @@ class LockViewModel(
     
     fun unlockForRecovery(packageName: String) {
         sessionManager.unlockApp(packageName)
+    }
+
+    fun onBiometricSuccess(packageName: String) {
+        _isError.value = false
+        eventLogManager.logEvent("UNLOCK_SUCCESS", packageName = packageName, details = "Unlocked via Biometric")
+        failedAttemptManager.reset()
+        intruderManager.stopAlarm()
+        sessionManager.unlockApp(packageName)
+        _unlocked.value = true
     }
 
     fun resetError() {

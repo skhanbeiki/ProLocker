@@ -99,6 +99,12 @@ class AccountViewModel(
         }
     }
 
+    fun toggleFingerprintUnlock(enabled: Boolean) {
+        viewModelScope.launch {
+            preferencesRepository.updatePreferences { it.copy(fingerprintUnlockEnabled = enabled) }
+        }
+    }
+
     fun enableProtection() {
         protectionManager.enableProtection()
     }

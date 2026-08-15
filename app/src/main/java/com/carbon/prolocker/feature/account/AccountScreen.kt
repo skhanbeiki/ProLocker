@@ -73,6 +73,7 @@ fun AccountScreen(
     val protectionEnabled by viewModel?.protectionEnabled?.collectAsState()
         ?: remember { mutableStateOf(true) }
     var showRecoverySetupDialog by remember { mutableStateOf(false) }
+    var biometricErrorDialogMessage by remember { mutableStateOf<String?>(null) }
 
     val context = LocalContext.current
     val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
@@ -158,6 +159,54 @@ fun AccountScreen(
                                 imageVector = if (isRtl) Icons.Default.ChevronLeft else Icons.Default.ChevronRight,
                                 contentDescription = null,
                                 tint = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+
+                        HorizontalDivider(
+                            color = MaterialTheme.colorScheme.outlineVariant,
+                            modifier = Modifier.padding(horizontal = 16.dp)
+                        )
+
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp, vertical = 14.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    stringResource(R.string.fingerprint_unlock),
+                                    style = MaterialTheme.typography.titleMedium,
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
+                                Spacer(modifier = Modifier.height(4.dp))
+                                Text(
+                                    stringResource(R.string.fingerprint_unlock_desc),
+                                    style = AppTypography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                            Switch(
+                                checked = prefs.fingerprintUnlockEnabled,
+                                onCheckedChange = { enabled ->
+                                    if (enabled) {
+                                        val status = if (isInspection) com.carbon.prolocker.core.security.BiometricStatus.AVAILABLE else com.carbon.prolocker.core.security.BiometricHelper.getBiometricStatus(context)
+                                        when (status) {
+                                            com.carbon.prolocker.core.security.BiometricStatus.AVAILABLE -> {
+                                                viewModel?.toggleFingerprintUnlock(true)
+                                            }
+                                            com.carbon.prolocker.core.security.BiometricStatus.NONE_ENROLLED -> {
+                                                biometricErrorDialogMessage = context.getString(R.string.fingerprint_not_enrolled)
+                                            }
+                                            else -> {
+                                                biometricErrorDialogMessage = context.getString(R.string.fingerprint_not_available)
+                                            }
+                                        }
+                                    } else {
+                                        viewModel?.toggleFingerprintUnlock(false)
+                                    }
+                                }
                             )
                         }
 
@@ -381,6 +430,19 @@ fun AccountScreen(
                 showRecoverySetupDialog = false
             }
         )
+
+        if (biometricErrorDialogMessage != null) {
+            androidx.compose.material3.AlertDialog(
+                onDismissRequest = { biometricErrorDialogMessage = null },
+                title = { Text(stringResource(R.string.fingerprint_unlock), style = MaterialTheme.typography.titleLarge) },
+                text = { Text(biometricErrorDialogMessage ?: "", style = AppTypography.bodyMedium) },
+                confirmButton = {
+                    androidx.compose.material3.TextButton(onClick = { biometricErrorDialogMessage = null }) {
+                        Text(stringResource(R.string.ok))
+                    }
+                }
+            )
+        }
     }
 }
 

@@ -39,5 +39,6 @@ data class UserPreferences(
     val userHasRated: Boolean = false,
     val isProtectionEnabled: Boolean = true,
     val recoveryOnboardingDismissed: Boolean = false,
-    val lastInstalledVersionCode: Int = 0
+    val lastInstalledVersionCode: Int = 0,
+    val fingerprintUnlockEnabled: Boolean = false
 )

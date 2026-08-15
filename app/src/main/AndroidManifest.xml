@@ -31,6 +31,8 @@
         tools:ignore="ScopedStorage" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CAMERA" />
+    <uses-permission android:name="android.permission.USE_BIOMETRIC" />
+    <uses-permission android:name="android.permission.USE_FINGERPRINT" />
 
     <!-- Backup Feature Permissions -->
     <uses-permission android:name="android.permission.READ_CONTACTS" />
@@ -121,6 +123,13 @@
             android:screenOrientation="portrait"
             android:taskAffinity=""
             android:theme="@style/Theme.MyApplication" />
+
+        <activity
+            android:name="com.carbon.prolocker.feature.lock.BiometricAuthActivity"
+            android:excludeFromRecents="true"
+            android:exported="false"
+            android:launchMode="singleTop"
+            android:theme="@style/Theme.Transparent" />
 
         <receiver
             android:name="com.carbon.prolocker.core.service.BootReceiver"

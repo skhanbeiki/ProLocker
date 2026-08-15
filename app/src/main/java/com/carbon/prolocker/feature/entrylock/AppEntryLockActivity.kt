@@ -19,12 +19,21 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Fingerprint
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -40,17 +49,24 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
+import androidx.fragment.app.FragmentActivity
 import com.carbon.prolocker.R
+import com.carbon.prolocker.core.security.BiometricHelper
+import com.carbon.prolocker.core.theme.AppTypography
+import com.carbon.prolocker.core.theme.ProLockerBackground
+import com.carbon.prolocker.core.theme.ProLockerOnBackground
+import com.carbon.prolocker.core.theme.ProLockerPrimary
 import com.carbon.prolocker.core.theme.ProLockerTheme
 import com.carbon.prolocker.core.ui.components.PatternLockView
 import com.carbon.prolocker.core.ui.components.PinLockView
 import kotlinx.coroutines.delay
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class AppEntryLockActivity : ComponentActivity() {
+class AppEntryLockActivity : FragmentActivity() {
     private val viewModel: EntryLockViewModel by viewModel()
 
     companion object {
@@ -88,6 +104,7 @@ class AppEntryLockActivity : ComponentActivity() {
                 val recoveryQuestion by viewModel.recoveryQuestion.collectAsState()
                 val failedAttempts by viewModel.failedAttempts.collectAsState()
                 val threshold by viewModel.threshold.collectAsState()
+                val fingerprintUnlockEnabled by viewModel.fingerprintUnlockEnabled.collectAsState()
 
                 LaunchedEffect(unlocked) {
                     if (unlocked) {
@@ -104,6 +121,15 @@ class AppEntryLockActivity : ComponentActivity() {
                     recoveryQuestion = recoveryQuestion,
                     hidePatternPath = hidePatternPath,
                     vibrationEnabled = vibrationEnabled,
+                    fingerprintUnlockEnabled = fingerprintUnlockEnabled,
+                    onFingerprintClick = {
+                        BiometricHelper.showBiometricPrompt(
+                            activity = this@AppEntryLockActivity,
+                            title = getString(R.string.biometric_prompt_title),
+                            subtitle = getString(R.string.biometric_prompt_subtitle),
+                            onSuccess = { viewModel.onBiometricSuccess() }
+                        )
+                    },
                     onPatternComplete = { viewModel.verifyPattern(it) },
                     onPinComplete = { viewModel.verifyPin(it) },
                     onErrorReset = { viewModel.resetError() },
@@ -129,6 +155,8 @@ fun EntryLockContent(
     recoveryQuestion: String?,
     hidePatternPath: Boolean,
     vibrationEnabled: Boolean,
+    fingerprintUnlockEnabled: Boolean = false,
+    onFingerprintClick: () -> Unit = {},
     onPatternComplete: (List<Int>) -> Unit,
     onPinComplete: (String) -> Unit,
     onErrorReset: () -> Unit,
@@ -136,13 +164,14 @@ fun EntryLockContent(
     onBack: () -> Unit
 ) {
     var showForgotDialog by remember { mutableStateOf(false) }
+    var isFingerprintMode by remember(fingerprintUnlockEnabled) { mutableStateOf(fingerprintUnlockEnabled) }
     val offsetX = remember { Animatable(0f) }
     val haptic = LocalHapticFeedback.current
 
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF0f172a))
+            .background(ProLockerBackground)
     ) {
         Column(
             modifier = Modifier
@@ -161,7 +190,7 @@ fun EntryLockContent(
                 Icon(
                     Icons.Default.Lock,
                     contentDescription = null,
-                    tint = Color.White,
+                    tint = ProLockerPrimary,
                     modifier = Modifier.size(48.dp)
                 )
                 Spacer(modifier = Modifier.height(16.dp))
@@ -209,22 +238,102 @@ fun EntryLockContent(
                     .padding(horizontal = 16.dp),
                 contentAlignment = Alignment.Center
             ) {
-                when (lockType) {
-                    "PATTERN" -> {
-                        PatternLockView(
-                            onPatternDrawn = onPatternComplete,
-                            onInteractionStarted = {},
-                            isError = isError,
-                            vibrationEnabled = vibrationEnabled,
-                            hidePatternPath = hidePatternPath
+                if (isFingerprintMode) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center,
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        Surface(
+                            onClick = onFingerprintClick,
+                            shape = CircleShape,
+                            color = ProLockerPrimary.copy(alpha = 0.15f),
+                            border = BorderStroke(1.5.dp, ProLockerPrimary),
+                            modifier = Modifier.size(88.dp)
+                        ) {
+                            Box(contentAlignment = Alignment.Center) {
+                                Icon(
+                                    imageVector = Icons.Default.Fingerprint,
+                                    contentDescription = stringResource(R.string.fingerprint_unlock),
+                                    tint = ProLockerPrimary,
+                                    modifier = Modifier.size(48.dp)
+                                )
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(14.dp))
+
+                        Text(
+                            text = stringResource(R.string.touch_to_unlock),
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontWeight = FontWeight.Medium,
+                            color = ProLockerOnBackground.copy(alpha = 0.9f),
+                            textAlign = TextAlign.Center
                         )
+
+                        Spacer(modifier = Modifier.height(24.dp))
+
+                        OutlinedButton(
+                            onClick = { isFingerprintMode = false },
+                            shape = RoundedCornerShape(50),
+                            border = BorderStroke(1.5.dp, ProLockerPrimary.copy(alpha = 0.7f)),
+                            colors = ButtonDefaults.outlinedButtonColors(
+                                containerColor = Color.Transparent,
+                                contentColor = ProLockerPrimary
+                            ),
+                            modifier = Modifier.height(44.dp).padding(horizontal = 24.dp)
+                        ) {
+                            val switchText = if (lockType == "PIN") stringResource(R.string.use_pin) else stringResource(R.string.use_pattern)
+                            Text(
+                                text = switchText,
+                                style = AppTypography.labelLarge,
+                                color = ProLockerPrimary
+                            )
+                        }
                     }
-                    "PIN" -> {
-                        PinLockView(
-                            isError = isError,
-                            onPinComplete = onPinComplete,
-                            vibrationEnabled = vibrationEnabled
-                        )
+                } else {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        when (lockType) {
+                            "PATTERN" -> {
+                                PatternLockView(
+                                    onPatternDrawn = onPatternComplete,
+                                    onInteractionStarted = {},
+                                    isError = isError,
+                                    vibrationEnabled = vibrationEnabled,
+                                    hidePatternPath = hidePatternPath
+                                )
+                            }
+                            "PIN" -> {
+                                PinLockView(
+                                    isError = isError,
+                                    onPinComplete = onPinComplete,
+                                    vibrationEnabled = vibrationEnabled
+                                )
+                            }
+                        }
+
+                        if (fingerprintUnlockEnabled) {
+                            Spacer(modifier = Modifier.height(12.dp))
+                            OutlinedButton(
+                                onClick = { isFingerprintMode = true },
+                                shape = RoundedCornerShape(50),
+                                border = BorderStroke(1.5.dp, ProLockerPrimary.copy(alpha = 0.7f)),
+                                colors = ButtonDefaults.outlinedButtonColors(
+                                    containerColor = Color.Transparent,
+                                    contentColor = ProLockerPrimary
+                                ),
+                                modifier = Modifier.height(36.dp)
+                            ) {
+                                Text(
+                                    text = stringResource(R.string.use_fingerprint),
+                                    style = AppTypography.labelMedium,
+                                    color = ProLockerPrimary
+                                )
+                            }
+                        }
                     }
                 }
             }
