@@ -462,7 +462,7 @@ fun CategoryRestoreTabContent(
             verticalArrangement = Arrangement.spacedBy(12.dp),
             modifier = Modifier.fillMaxSize()
         ) {
-            items(uiState.backupFiles, key = { it.fileName }) { fileInfo ->
+            items(uiState.backupFiles, key = { "${it.fileName}_${it.filePath}" }) { fileInfo ->
                 Surface(
                     color = MaterialTheme.colorScheme.surfaceVariant,
                     shape = RoundedCornerShape(20.dp),

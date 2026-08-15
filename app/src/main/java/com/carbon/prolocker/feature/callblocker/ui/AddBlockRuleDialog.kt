@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -234,7 +235,7 @@ fun ContactsPickerTabContent(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier.fillMaxSize()
             ) {
-                items(filtered, key = { it.number + it.name }) { item ->
+                itemsIndexed(filtered, key = { index, item -> "${item.number}_${item.name}_$index" }) { _, item ->
                     PickerRowItem(
                         icon = Icons.Outlined.Contacts,
                         title = item.name.ifBlank { item.number },
@@ -286,7 +287,7 @@ fun CallLogsPickerTabContent(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier.fillMaxSize()
             ) {
-                items(filtered, key = { it.number + it.timestampMs }) { item ->
+                itemsIndexed(filtered, key = { index, item -> "${item.number}_${item.timestampMs}_$index" }) { _, item ->
                     PickerRowItem(
                         icon = Icons.Outlined.Call,
                         title = item.name ?: item.number,

@@ -478,7 +478,7 @@ fun AppsRestoreTabContent(
             verticalArrangement = Arrangement.spacedBy(12.dp),
             modifier = Modifier.fillMaxSize()
         ) {
-            items(uiState.backupApkFiles, key = { it.fileName }) { fileInfo ->
+            items(uiState.backupApkFiles, key = { "${it.fileName}_${it.filePath}" }) { fileInfo ->
                 Surface(
                     color = MaterialTheme.colorScheme.surfaceVariant,
                     shape = RoundedCornerShape(20.dp),

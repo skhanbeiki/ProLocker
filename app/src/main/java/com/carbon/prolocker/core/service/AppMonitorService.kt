@@ -131,32 +131,30 @@ class AppMonitorService : Service() {
             val manager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
             manager.createNotificationChannel(channel)
         }
+        val notification = createNotification()
         try {
-            val hasCameraPermission = androidx.core.content.ContextCompat.checkSelfPermission(
-                this, android.Manifest.permission.CAMERA
-            ) == android.content.pm.PackageManager.PERMISSION_GRANTED
-            val fgServiceType = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                if (hasCameraPermission && Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-                    android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE or android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_CAMERA
-                } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-                    android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
-                } else {
-                    0
-                }
+            val fgServiceType = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
             } else {
                 0
             }
             androidx.core.app.ServiceCompat.startForeground(
                 this,
                 1001,
-                createNotification(),
+                notification,
                 fgServiceType
             )
         } catch (e: Exception) {
-            Log.e(TAG, "Failed to startForeground in AppMonitorService", e)
+            Log.e(TAG, "Failed to startForeground with type in AppMonitorService, fallback to basic startForeground", e)
+            try {
+                startForeground(1001, notification)
+            } catch (e2: Exception) {
+                Log.e(TAG, "Critical: Failed to startForeground in AppMonitorService", e2)
+            }
         }
-        val prefs = runBlocking { preferencesRepository.userPreferencesFlow.first() }
+        val prefs = preferencesRepository.currentPreferences
         if (!prefs.isProtectionEnabled) {
+            stopForeground(STOP_FOREGROUND_REMOVE)
             stopSelf()
             return
         }

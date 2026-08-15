@@ -223,7 +223,7 @@ fun HiddenItemsScreen(
                     verticalArrangement = Arrangement.spacedBy(10.dp),
                     modifier = Modifier.weight(1f)
                 ) {
-                    items(items, key = { it.name }) { item ->
+                    items(items, key = { "${it.id}_${it.path}_${it.name}" }) { item ->
                         HiddenMediaThumb(item, onClick = { selectedItem = item })
                     }
                 }
@@ -233,7 +233,7 @@ fun HiddenItemsScreen(
                     contentPadding = PaddingValues(20.dp, 4.dp, 20.dp, 120.dp),
                     verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    items(items, key = { it.name }) { item ->
+                    items(items, key = { "${it.id}_${it.path}_${it.name}" }) { item ->
                         HiddenFileRow(item, onClick = { selectedItem = item })
                     }
                 }
