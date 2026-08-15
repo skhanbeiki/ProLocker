@@ -87,6 +87,22 @@ android {
         buildConfig = true
     }
     testOptions { unitTests { isIncludeAndroidResources = true } }
+
+}
+
+val androidComponents = extensions.getByType<com.android.build.api.variant.ApplicationAndroidComponentsExtension>()
+androidComponents.onVariants { variant ->
+    val flavor = variant.flavorName ?: ""
+    val bType = variant.buildType ?: ""
+    val vCode = android.defaultConfig.versionCode ?: 90
+    variant.outputs.forEach { output ->
+        val impl = output as? com.android.build.api.variant.impl.VariantOutputImpl
+        if (bType == "release") {
+            impl?.outputFileName?.set("ProLocker-$flavor-$vCode.apk")
+        } else {
+            impl?.outputFileName?.set("ProLocker-$flavor-$vCode-$bType.apk")
+        }
+    }
 }
 
 secrets {
