@@ -19,6 +19,9 @@ import androidx.lifecycle.setViewTreeLifecycleOwner
 import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 
+import androidx.lifecycle.ViewModelStoreOwner
+import androidx.lifecycle.setViewTreeViewModelStoreOwner
+
 class OverlayWindowManager(private val context: Context) {
 
     companion object {
@@ -72,6 +75,7 @@ class OverlayWindowManager(private val context: Context) {
         composeView: ComposeView,
         lifecycleOwner: LifecycleOwner,
         savedStateRegistryOwner: SavedStateRegistryOwner,
+        viewModelStoreOwner: ViewModelStoreOwner,
         onBackPressedDispatcher: OnBackPressedDispatcher? = null
     ) {
         dismiss()
@@ -88,6 +92,7 @@ class OverlayWindowManager(private val context: Context) {
             setBackgroundColor(Color.BLACK)
             setViewTreeLifecycleOwner(lifecycleOwner)
             setViewTreeSavedStateRegistryOwner(savedStateRegistryOwner)
+            setViewTreeViewModelStoreOwner(viewModelStoreOwner)
             addView(
                 composeView,
                 FrameLayout.LayoutParams(

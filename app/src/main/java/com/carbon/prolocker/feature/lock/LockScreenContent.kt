@@ -428,7 +428,7 @@ fun LockScreenContent(
                                         }
                                     }
 
-                                    "PIN" -> {
+                                    else -> {
                                         PinLockView(
                                             isError = isError,
                                             onPinComplete = onPinComplete,
@@ -628,11 +628,9 @@ fun LockScreenContent(
                             Column(
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
-                                val currentLockTypeRaw = lockType?.lowercase() ?: "credential"
+                                val currentLockTypeRaw = lockType?.lowercase() ?: "pin"
                                 val credentialStr =
-                                    if (currentLockTypeRaw == "pattern") stringResource(R.string.pattern_text) else if (currentLockTypeRaw == "pin") stringResource(
-                                        R.string.pin_text
-                                    ) else stringResource(R.string.credential_text)
+                                    if (currentLockTypeRaw == "pattern") stringResource(R.string.pattern_text) else stringResource(R.string.pin_text)
                                 Text(
                                     text = if (isError) stringResource(
                                         R.string.incorrect_credential_prefix,
@@ -687,7 +685,7 @@ fun LockScreenContent(
                                         )
                                     }
 
-                                    "PIN" -> {
+                                    else -> {
                                         PinLockView(
                                             isError = isError,
                                             onPinComplete = onPinComplete,

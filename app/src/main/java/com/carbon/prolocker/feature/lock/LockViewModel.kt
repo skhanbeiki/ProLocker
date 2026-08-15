@@ -26,34 +26,36 @@ class LockViewModel(
     private val vibrationManager: VibrationManager
 ) : ViewModel() {
 
+    private val currentPrefs = preferencesRepository.currentPreferences
+
     private val _isError = MutableStateFlow(false)
     val isError: StateFlow<Boolean> = _isError.asStateFlow()
     
     private val _unlocked = MutableStateFlow(false)
     val unlocked: StateFlow<Boolean> = _unlocked.asStateFlow()
     
-    private val _lockType = MutableStateFlow<String?>(null)
+    private val _lockType = MutableStateFlow<String?>(currentPrefs.lockType)
     val lockType: StateFlow<String?> = _lockType.asStateFlow()
 
-    private val _threshold = MutableStateFlow(3)
+    private val _threshold = MutableStateFlow(currentPrefs.failedAttemptsThreshold)
     val threshold: StateFlow<Int> = _threshold.asStateFlow()
 
-    private val _vibrationEnabled = MutableStateFlow(true)
+    private val _vibrationEnabled = MutableStateFlow(currentPrefs.vibrationEnabled)
     val vibrationEnabled: StateFlow<Boolean> = _vibrationEnabled.asStateFlow()
 
-    private val _hidePatternPath = MutableStateFlow(false)
+    private val _hidePatternPath = MutableStateFlow(currentPrefs.hidePatternPath)
     val hidePatternPath: StateFlow<Boolean> = _hidePatternPath.asStateFlow()
 
-    private val _recoveryQuestion = MutableStateFlow<String?>(null)
+    private val _recoveryQuestion = MutableStateFlow<String?>(currentPrefs.securityQuestionHash.ifEmpty { null })
     val recoveryQuestion: StateFlow<String?> = _recoveryQuestion.asStateFlow()
 
-    private val _lockScreenRotation = MutableStateFlow("SYSTEM")
+    private val _lockScreenRotation = MutableStateFlow(currentPrefs.lockScreenRotation)
     val lockScreenRotation: StateFlow<String> = _lockScreenRotation.asStateFlow()
 
-    private val _selectedBackgroundUrl = MutableStateFlow<String?>(null)
+    private val _selectedBackgroundUrl = MutableStateFlow<String?>(currentPrefs.selectedBackgroundUrl.ifEmpty { null })
     val selectedBackgroundUrl: StateFlow<String?> = _selectedBackgroundUrl.asStateFlow()
 
-    private val _fingerprintUnlockEnabled = MutableStateFlow(false)
+    private val _fingerprintUnlockEnabled = MutableStateFlow(currentPrefs.fingerprintUnlockEnabled)
     val fingerprintUnlockEnabled: StateFlow<Boolean> = _fingerprintUnlockEnabled.asStateFlow()
 
     val failedAttempts = failedAttemptManager.state

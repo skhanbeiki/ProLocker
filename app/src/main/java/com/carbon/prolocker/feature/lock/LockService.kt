@@ -28,6 +28,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.setViewTreeLifecycleOwner
+import androidx.lifecycle.setViewTreeViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import com.carbon.prolocker.ad.AdManager
@@ -208,7 +209,13 @@ class LockService : Service(), OnBackPressedDispatcherOwner {
         )
 
         try {
-            overlayManager.show(composeView, serviceLifecycleOwner, serviceLifecycleOwner, onBackPressedDispatcher)
+            overlayManager.show(
+                composeView,
+                serviceLifecycleOwner,
+                serviceLifecycleOwner,
+                serviceLifecycleOwner,
+                onBackPressedDispatcher
+            )
             isShowing = true
             eventLogManager.logEvent("LOCK_OVERLAY_SHOWN", packageName = packageName)
         } catch (e: Exception) {
@@ -238,16 +245,12 @@ class LockService : Service(), OnBackPressedDispatcherOwner {
     ): ComposeView {
         val localizedContext = createLocalizedContext()
         val layoutDirection = resolveLayoutDirection(localizedContext)
-        val isDarkMode = try {
-            runBlocking {
-                preferencesRepository.userPreferencesFlow.first().isDarkMode
-            }
-        } catch (_: Exception) {
-            false
-        }
+        val isDarkMode = preferencesRepository.currentPreferences.isDarkMode
         return ComposeView(localizedContext).apply {
+            setViewCompositionStrategy(androidx.compose.ui.platform.ViewCompositionStrategy.DisposeOnLifecycleDestroyed(serviceLifecycleOwner))
             setViewTreeLifecycleOwner(serviceLifecycleOwner)
             setViewTreeSavedStateRegistryOwner(serviceLifecycleOwner)
+            setViewTreeViewModelStoreOwner(serviceLifecycleOwner)
             setContent {
                 CompositionLocalProvider(
                     LocalContext provides localizedContext,

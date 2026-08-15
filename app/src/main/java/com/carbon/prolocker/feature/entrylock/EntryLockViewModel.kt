@@ -14,7 +14,9 @@ class EntryLockViewModel(
     private val preferencesRepository: PreferencesRepository
 ) : ViewModel() {
 
-    private val _lockType = MutableStateFlow<String?>(null)
+    private val currentPrefs = preferencesRepository.currentPreferences
+
+    private val _lockType = MutableStateFlow<String?>(currentPrefs.lockType)
     val lockType: StateFlow<String?> = _lockType.asStateFlow()
 
     private val _isError = MutableStateFlow(false)
@@ -23,22 +25,22 @@ class EntryLockViewModel(
     private val _unlocked = MutableStateFlow(false)
     val unlocked: StateFlow<Boolean> = _unlocked.asStateFlow()
 
-    private val _vibrationEnabled = MutableStateFlow(true)
+    private val _vibrationEnabled = MutableStateFlow(currentPrefs.vibrationEnabled)
     val vibrationEnabled: StateFlow<Boolean> = _vibrationEnabled.asStateFlow()
 
-    private val _hidePatternPath = MutableStateFlow(false)
+    private val _hidePatternPath = MutableStateFlow(currentPrefs.hidePatternPath)
     val hidePatternPath: StateFlow<Boolean> = _hidePatternPath.asStateFlow()
 
-    private val _recoveryQuestion = MutableStateFlow<String?>(null)
+    private val _recoveryQuestion = MutableStateFlow<String?>(currentPrefs.securityQuestionHash.ifEmpty { null })
     val recoveryQuestion: StateFlow<String?> = _recoveryQuestion.asStateFlow()
 
     private val _failedAttempts = MutableStateFlow(0)
     val failedAttempts: StateFlow<Int> = _failedAttempts.asStateFlow()
 
-    private val _threshold = MutableStateFlow(3)
+    private val _threshold = MutableStateFlow(currentPrefs.failedAttemptsThreshold)
     val threshold: StateFlow<Int> = _threshold.asStateFlow()
 
-    private val _fingerprintUnlockEnabled = MutableStateFlow(false)
+    private val _fingerprintUnlockEnabled = MutableStateFlow(currentPrefs.fingerprintUnlockEnabled)
     val fingerprintUnlockEnabled: StateFlow<Boolean> = _fingerprintUnlockEnabled.asStateFlow()
 
     init {
