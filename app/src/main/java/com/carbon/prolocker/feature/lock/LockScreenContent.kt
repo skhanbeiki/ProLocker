@@ -152,7 +152,7 @@ fun LockScreenContent(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.background)
+                    .background(Color(0xFF0f172a))
             )
         }
         Scaffold(
