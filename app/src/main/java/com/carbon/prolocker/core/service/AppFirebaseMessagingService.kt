@@ -94,7 +94,7 @@ class AppFirebaseMessagingService : FirebaseMessagingService() {
         val localizedContext = getLocalizedContext()
         val channelId = "general"
         val notificationBuilder = NotificationCompat.Builder(this, channelId)
-            .setSmallIcon(R.mipmap.ic_launcher)
+            .setSmallIcon(R.drawable.ic_notifi)
             .setContentTitle(title)
             .setContentText(body)
             .setAutoCancel(true)

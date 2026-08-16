@@ -258,7 +258,7 @@ fun EntryLockContent(
                                     imageVector = Icons.Default.Fingerprint,
                                     contentDescription = stringResource(R.string.fingerprint_unlock),
                                     tint = ProLockerPrimary,
-                                    modifier = Modifier.size(48.dp)
+                                    modifier = Modifier.size(52.dp)
                                 )
                             }
                         }
@@ -273,7 +273,7 @@ fun EntryLockContent(
                             textAlign = TextAlign.Center
                         )
 
-                        Spacer(modifier = Modifier.height(24.dp))
+                        Spacer(modifier = Modifier.height(40.dp))
 
                         OutlinedButton(
                             onClick = { isFingerprintMode = false },
@@ -283,12 +283,12 @@ fun EntryLockContent(
                                 containerColor = Color.Transparent,
                                 contentColor = ProLockerPrimary
                             ),
-                            modifier = Modifier.height(44.dp).padding(horizontal = 24.dp)
+                            modifier = Modifier.height(36.dp).padding(horizontal = 24.dp)
                         ) {
                             val switchText = if (lockType == "PIN") stringResource(R.string.use_pin) else stringResource(R.string.use_pattern)
                             Text(
                                 text = switchText,
-                                style = AppTypography.labelLarge,
+                                style = AppTypography.labelMedium,
                                 color = ProLockerPrimary
                             )
                         }
@@ -327,7 +327,7 @@ fun EntryLockContent(
                                     containerColor = Color.Transparent,
                                     contentColor = ProLockerPrimary
                                 ),
-                                modifier = Modifier.height(36.dp)
+                                modifier = Modifier.height(36.dp).padding(horizontal = 24.dp)
                             ) {
                                 Text(
                                     text = stringResource(R.string.use_fingerprint),

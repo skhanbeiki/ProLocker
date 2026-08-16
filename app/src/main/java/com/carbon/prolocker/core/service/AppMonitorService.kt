@@ -352,7 +352,7 @@ class AppMonitorService : Service() {
         return NotificationCompat.Builder(this, channelId)
             .setContentTitle(localizedContext.getString(R.string.prolocker_is_active))
             .setContentText(localizedContext.getString(R.string.protecting_your_apps))
-            .setSmallIcon(android.R.drawable.ic_secure)
+            .setSmallIcon(R.drawable.ic_notifi)
             .setContentIntent(openAppIntent)
             .setOngoing(true)
             .setPriority(NotificationCompat.PRIORITY_LOW)
