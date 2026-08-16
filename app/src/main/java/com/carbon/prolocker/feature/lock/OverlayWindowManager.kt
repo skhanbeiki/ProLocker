@@ -57,7 +57,7 @@ class OverlayWindowManager(private val context: Context) {
                         WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED or
                         WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON or
                         WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON or
-                        WindowManager.LayoutParams.FLAG_SECURE
+                        (if (!com.carbon.prolocker.BuildConfig.DEBUG) WindowManager.LayoutParams.FLAG_SECURE else 0)
             width = w
             height = h
             gravity = Gravity.TOP or Gravity.START

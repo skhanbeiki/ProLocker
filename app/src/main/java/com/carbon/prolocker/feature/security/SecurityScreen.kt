@@ -114,9 +114,13 @@ fun SecurityScreen(
 
     if (!isInspection) {
         androidx.compose.runtime.DisposableEffect(Unit) {
-            activity?.window?.addFlags(android.view.WindowManager.LayoutParams.FLAG_SECURE)
+            if (!com.carbon.prolocker.BuildConfig.DEBUG) {
+                activity?.window?.addFlags(android.view.WindowManager.LayoutParams.FLAG_SECURE)
+            }
             onDispose {
-                activity?.window?.clearFlags(android.view.WindowManager.LayoutParams.FLAG_SECURE)
+                if (!com.carbon.prolocker.BuildConfig.DEBUG) {
+                    activity?.window?.clearFlags(android.view.WindowManager.LayoutParams.FLAG_SECURE)
+                }
             }
         }
     }

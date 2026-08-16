@@ -68,7 +68,9 @@ fun PatternSetupScreen(
                 val oldLightStatusBars = insetsController.isAppearanceLightStatusBars
                 val oldLightNavigationBars = insetsController.isAppearanceLightNavigationBars
 
-                window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
+                if (!com.carbon.prolocker.BuildConfig.DEBUG) {
+                    window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
+                }
 
                 window.statusBarColor = bgColor.toArgb()
                 window.navigationBarColor = bgColor.toArgb()
@@ -77,7 +79,9 @@ fun PatternSetupScreen(
                 insetsController.isAppearanceLightNavigationBars = false
 
                 onDispose {
-                    window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
+                    if (!com.carbon.prolocker.BuildConfig.DEBUG) {
+                        window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
+                    }
 
                     window.statusBarColor = oldStatusBarColor
                     window.navigationBarColor = oldNavigationBarColor
