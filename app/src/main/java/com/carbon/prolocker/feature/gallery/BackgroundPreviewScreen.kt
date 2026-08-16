@@ -7,15 +7,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -35,12 +31,14 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.carbon.prolocker.R
 import com.carbon.prolocker.ad.AdManager
 import com.carbon.prolocker.ad.AdPlacement
 import com.carbon.prolocker.ad.NativeAdContainer
 import com.carbon.prolocker.ad.NativeAdType
+import com.carbon.prolocker.core.theme.AppTypography
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 
@@ -69,7 +67,8 @@ fun BackgroundPreviewScreen(
                 title = {
                     Text(
                         stringResource(R.string.preview),
-                        style = MaterialTheme.typography.titleLarge,
+                        style = AppTypography.titleLarge,
+                        fontSize = 20.sp,
                         fontWeight = FontWeight.Bold
                     )
                 },
@@ -85,14 +84,13 @@ fun BackgroundPreviewScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
-                .verticalScroll(rememberScrollState()),
+                .padding(paddingValues),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(20.dp),
+                    .padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 AsyncImage(
@@ -103,7 +101,7 @@ fun BackgroundPreviewScreen(
                         .wrapContentWidth()
                         .padding(horizontal = 40.dp)
                         .weight(1f)
-                        .clip(RoundedCornerShape(20.dp))
+                        .clip(RoundedCornerShape(16.dp))
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 NativeAdContainer(
@@ -117,44 +115,30 @@ fun BackgroundPreviewScreen(
                 )
 
                 if (background != null) {
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(20.dp),
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceVariant
-                        ),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-                    ) {
-                        Column(modifier = Modifier.padding(16.dp)) {
-                            Text(
-                                text = background.name,
-                                style = MaterialTheme.typography.titleLarge,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Text(
-                                text = "${stringResource(R.string.downloads)}: ${background.downloadCount}",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                            if (!background.category.isNullOrEmpty()) {
-                                Spacer(modifier = Modifier.height(4.dp))
-                                Text(
-                                    text = "${stringResource(R.string.category)}: ${background.category}",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            }
-                        }
+                    Text(
+                        text = background.name,
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.onBackground,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = "${stringResource(R.string.downloads)}: ${background.downloadCount}",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    if (!background.category.isNullOrEmpty()) {
+                        Spacer(modifier = Modifier.height(2.dp))
+                        Text(
+                            text = "${stringResource(R.string.category)}: ${background.category}",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
                     }
-                    Spacer(modifier = Modifier.height(24.dp))
-                } else {
-                    Spacer(modifier = Modifier.height(24.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
                 }
-
                 if (isSelected) {
+                    Spacer(modifier = Modifier.height(12.dp))
                     Button(
                         onClick = {
                             viewModel.removeBackground()
@@ -169,10 +153,7 @@ fun BackgroundPreviewScreen(
                             contentColor = MaterialTheme.colorScheme.error
                         )
                     ) {
-                        Text(
-                            stringResource(R.string.remove_background),
-                            fontWeight = FontWeight.Bold
-                        )
+                        Text(stringResource(R.string.remove_background), fontWeight = FontWeight.Bold)
                     }
                 } else {
                     Button(
@@ -190,14 +171,9 @@ fun BackgroundPreviewScreen(
                             contentColor = Color.White
                         )
                     ) {
-                        Text(
-                            stringResource(R.string.set_as_lock_background),
-                            fontWeight = FontWeight.Bold
-                        )
+                        Text(stringResource(R.string.set_as_lock_background), fontWeight = FontWeight.Bold)
                     }
                 }
-
-                Spacer(modifier = Modifier.height(24.dp))
             }
         }
     }
