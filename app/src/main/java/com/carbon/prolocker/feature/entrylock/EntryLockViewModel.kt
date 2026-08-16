@@ -1,8 +1,10 @@
 package com.carbon.prolocker.feature.entrylock
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.carbon.prolocker.core.datastore.PreferencesRepository
+import com.carbon.prolocker.core.security.IntruderManager
 import com.carbon.prolocker.core.utils.SecurityUtils
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -11,7 +13,9 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class EntryLockViewModel(
-    private val preferencesRepository: PreferencesRepository
+    private val preferencesRepository: PreferencesRepository,
+    private val intruderManager: IntruderManager,
+    private val context: Context
 ) : ViewModel() {
 
     private val currentPrefs = preferencesRepository.currentPreferences
@@ -58,6 +62,8 @@ class EntryLockViewModel(
 
     fun onBiometricSuccess() {
         _unlocked.value = true
+        _failedAttempts.value = 0
+        intruderManager.stopAlarm()
     }
 
     fun verifyPattern(pattern: List<Int>) {
@@ -69,9 +75,12 @@ class EntryLockViewModel(
             if (hashedInput == prefs.hashedCredential) {
                 _isError.value = false
                 _unlocked.value = true
+                _failedAttempts.value = 0
+                intruderManager.stopAlarm()
             } else {
                 _isError.value = true
                 _failedAttempts.value++
+                intruderManager.handleFailedAttempt(context.packageName, "PATTERN", _failedAttempts.value)
             }
         }
     }
@@ -84,9 +93,12 @@ class EntryLockViewModel(
             if (hashedInput == prefs.hashedCredential) {
                 _isError.value = false
                 _unlocked.value = true
+                _failedAttempts.value = 0
+                intruderManager.stopAlarm()
             } else {
                 _isError.value = true
                 _failedAttempts.value++
+                intruderManager.handleFailedAttempt(context.packageName, "PIN", _failedAttempts.value)
             }
         }
     }
@@ -98,6 +110,8 @@ class EntryLockViewModel(
 
             if (hashedAnswer == prefs.securityAnswerHash) {
                 _unlocked.value = true
+                _failedAttempts.value = 0
+                intruderManager.stopAlarm()
                 onResult(true)
             } else {
                 onResult(false)

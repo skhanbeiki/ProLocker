@@ -9,11 +9,13 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.os.Build
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
 import androidx.core.os.LocaleListCompat
 import com.carbon.prolocker.R
 import com.carbon.prolocker.core.database.LockedAppsRepository
@@ -47,14 +49,17 @@ class AppMonitorService : Service() {
             lockType: String,
             photoPath: String
         ) {
-            Log.d(TAG, "INTRUDER_CAPTURE_SENT_TO_SERVICE pkg=$packageName lockType=$lockType path=$photoPath")
-            val intent = Intent(context, AppMonitorService::class.java).apply {
-                action = ACTION_CAPTURE_INTRUDER
-                putExtra(EXTRA_INTRUDER_PACKAGE, packageName)
-                putExtra(EXTRA_INTRUDER_LOCK_TYPE, lockType)
-                putExtra(EXTRA_INTRUDER_PHOTO_PATH, photoPath)
+            try {
+                val intent = Intent(context, AppMonitorService::class.java).apply {
+                    action = ACTION_CAPTURE_INTRUDER
+                    putExtra(EXTRA_INTRUDER_PACKAGE, packageName)
+                    putExtra(EXTRA_INTRUDER_LOCK_TYPE, lockType)
+                    putExtra(EXTRA_INTRUDER_PHOTO_PATH, photoPath)
+                }
+                context.startService(intent)
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to startService with capture intent", e)
             }
-            context.startService(intent)
         }
     }
 
@@ -105,9 +110,17 @@ class AppMonitorService : Service() {
             ""
         }
         val appLocales = LocaleListCompat.forLanguageTags(languageTag)
-        val locale = if (!appLocales.isEmpty) appLocales[0] else Locale.getDefault()
-        val config = Configuration(resources.configuration)
-        config.setLocales(android.os.LocaleList(locale))
+        val locale = if (!appLocales.isEmpty) {
+            appLocales[0] ?: Locale.getDefault()
+        } else {
+            Locale.getDefault()
+        }
+
+        val config = Configuration(resources.configuration).apply {
+            setLocale(locale)
+            setLayoutDirection(locale)
+        }
+
         val localizedContext = createConfigurationContext(config)
 
         Log.d(TAG, "NOTIFICATION_LANGUAGE AppMonitorService: languageTag=$languageTag, locale=$locale")
@@ -132,12 +145,22 @@ class AppMonitorService : Service() {
             manager.createNotificationChannel(channel)
         }
         val notification = createNotification()
-        try {
-            val fgServiceType = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-                android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
-            } else {
-                0
+        val hasCameraPermission = ContextCompat.checkSelfPermission(
+            this,
+            android.Manifest.permission.CAMERA
+        ) == PackageManager.PERMISSION_GRANTED
+
+        val fgServiceType = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            var type = android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
+            if (hasCameraPermission) {
+                type = type or android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_CAMERA
             }
+            type
+        } else {
+            0
+        }
+
+        try {
             androidx.core.app.ServiceCompat.startForeground(
                 this,
                 1001,
@@ -145,9 +168,18 @@ class AppMonitorService : Service() {
                 fgServiceType
             )
         } catch (e: Exception) {
-            Log.e(TAG, "Failed to startForeground with type in AppMonitorService, fallback to basic startForeground", e)
+            Log.e(TAG, "Failed to startForeground with type in AppMonitorService, fallback to SPECIAL_USE", e)
             try {
-                startForeground(1001, notification)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                    androidx.core.app.ServiceCompat.startForeground(
+                        this,
+                        1001,
+                        notification,
+                        android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
+                    )
+                } else {
+                    startForeground(1001, notification)
+                }
             } catch (e2: Exception) {
                 Log.e(TAG, "Critical: Failed to startForeground in AppMonitorService", e2)
             }
@@ -167,9 +199,8 @@ class AppMonitorService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (intent?.action == ACTION_CAPTURE_INTRUDER) {
             val packageName = intent.getStringExtra(EXTRA_INTRUDER_PACKAGE) ?: return START_NOT_STICKY
-            val lockType = intent.getStringExtra(EXTRA_INTRUDER_LOCK_TYPE) ?: return START_NOT_STICKY
+            val lockType = intent.getStringExtra(EXTRA_INTRUDER_LOCK_TYPE) ?: "UNKNOWN"
             val photoPath = intent.getStringExtra(EXTRA_INTRUDER_PHOTO_PATH) ?: return START_NOT_STICKY
-            Log.d(TAG, "INTRUDER_CAPTURE_RECEIVED_IN_SERVICE pkg=$packageName lockType=$lockType path=$photoPath")
             handleIntruderCapture(packageName, lockType, photoPath)
             return START_NOT_STICKY
         }
@@ -233,12 +264,34 @@ class AppMonitorService : Service() {
     private fun handleIntruderCapture(packageName: String, lockType: String, photoPath: String) {
         serviceScope.launch {
             try {
+                val hasCameraPermission = ContextCompat.checkSelfPermission(
+                    this@AppMonitorService,
+                    android.Manifest.permission.CAMERA
+                ) == PackageManager.PERMISSION_GRANTED
+
+                if (!hasCameraPermission) {
+                    Log.w(TAG, "Cannot capture intruder: CAMERA permission not granted")
+                    return@launch
+                }
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                    try {
+                        androidx.core.app.ServiceCompat.startForeground(
+                            this@AppMonitorService,
+                            1001,
+                            createNotification(),
+                            android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE or
+                                    android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_CAMERA
+                        )
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Failed to elevate foreground service type for camera", e)
+                    }
+                }
+
                 val photoFile = java.io.File(photoPath)
-                Log.d(TAG, "INTRUDER_CAPTURE_START pkg=$packageName file=${photoFile.name}")
+                photoFile.parentFile?.mkdirs()
 
                 val success = cameraCaptureManager.captureSelfie(photoFile)
-                Log.d(TAG, "INTRUDER_CAPTURE_RESULT success=$success file.exists()=${photoFile.exists()} file.length()=${photoFile.length()}")
-
                 if (success && photoFile.exists() && photoFile.length() > 0) {
                     val entity = com.carbon.prolocker.core.database.IntruderEventEntity(
                         photoPath = photoFile.absolutePath,
@@ -247,12 +300,9 @@ class AppMonitorService : Service() {
                         lockType = lockType
                     )
                     intruderEventDao.insertEvent(entity)
-                    Log.d(TAG, "INTRUDER_DB_RECORD_CREATED id=${entity.id} pkg=$packageName")
-                } else {
-                    Log.e(TAG, "INTRUDER_CAPTURE_FAILED or file empty — no DB record created")
                 }
             } catch (e: Exception) {
-                Log.e(TAG, "INTRUDER_CAPTURE_EXCEPTION pkg=$packageName", e)
+                Log.e(TAG, "Exception during intruder capture", e)
             }
         }
     }
@@ -299,16 +349,6 @@ class AppMonitorService : Service() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        val appLanguageTag = try {
-            runBlocking {
-                preferencesRepository.userPreferencesFlow.first().language
-            }
-        } catch (_: Exception) {
-            Locale.getDefault().language
-        }
-
-        Log.d(TAG, "NOTIFICATION_LANGUAGE AppMonitorService.createNotification: appLanguage=$appLanguageTag, currentLocale=${Locale.getDefault()}, contextLocale=${localizedContext.resources.configuration.locales[0]}")
-
         return NotificationCompat.Builder(this, channelId)
             .setContentTitle(localizedContext.getString(R.string.prolocker_is_active))
             .setContentText(localizedContext.getString(R.string.protecting_your_apps))
@@ -324,8 +364,11 @@ class AppMonitorService : Service() {
     override fun onDestroy() {
         super.onDestroy()
         isMonitoring = false
+        try {
+            unregisterReceiver(screenReceiver)
+        } catch (_: Exception) {
+        }
         serviceScope.cancel()
-        unregisterReceiver(screenReceiver)
         permissionHealthMonitor.stopMonitoring()
     }
 }

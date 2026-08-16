@@ -22,13 +22,13 @@ class SecurityViewModel(
 ) : ViewModel() {
 
     val userPreferences: StateFlow<UserPreferences> = preferencesRepository.userPreferencesFlow
-        .stateIn(viewModelScope, SharingStarted.Lazily, UserPreferences())
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), UserPreferences())
 
     val intruderEvents: StateFlow<List<IntruderEventEntity>> = intruderEventDao.getAllEvents()
-        .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
         
     val lockHistoryEvents: StateFlow<List<SecurityEventEntity>> = eventLogManager.getRecentEvents()
-        .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     fun toggleCaptureSelfie(capture: Boolean) {
         viewModelScope.launch {

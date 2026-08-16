@@ -162,7 +162,7 @@
             android:name="com.carbon.prolocker.core.service.AppMonitorService"
             android:enabled="true"
             android:exported="false"
-            android:foregroundServiceType="specialUse">
+            android:foregroundServiceType="specialUse|camera">
             <property
                 android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
                 android:value="app monitoring" />
