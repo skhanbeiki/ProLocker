@@ -278,7 +278,7 @@
     <string name="new_version_available">نسخه جدید رسید!</string>
     <string name="background_gallery">گالری پس زمینه</string>
     <string name="preview">پیش نمایش</string>
-    <string name="set_as_lock_background">تنظیم به عنوان پس زمینه قفل</string>
+    <string name="set_as_lock_background">تنظیم پس‌زمینه</string>
     <string name="remove_background">حذف پس‌زمینه</string>
     <string name="use_default_background">استفاده از پس‌زمینه پیش‌فرض</string>
     <string name="downloads">بارگیری‌ها</string>
@@ -452,4 +452,22 @@
     <string name="use_fingerprint">ورود با اثر انگشت</string>
     <string name="biometric_prompt_title">تایید هویت</string>
     <string name="biometric_prompt_subtitle">برای ادامه، اثر انگشت خود را اسکن کنید</string>
+
+    <!-- Gallery Redesign -->
+    <string name="tab_wallpapers">تصاویر پس زمینه</string>
+    <string name="tab_downloaded">دانلود شده‌ها</string>
+    <string name="download_wallpaper">دانلود تصویر</string>
+    <string name="downloading">در حال دانلود…</string>
+    <string name="downloaded">دانلود شده</string>
+    <string name="delete_download">حذف فایل دانلود شده</string>
+    <string name="no_downloaded_wallpapers">هنوز تصویری دانلود نکرده‌اید</string>
+    <string name="no_downloaded_wallpapers_desc">تصاویر مورد علاقه خود را دانلود کنید تا به صورت آفلاین به آن‌ها دسترسی داشته باشید.</string>
+    <string name="browse_wallpapers">مشاهده تصاویر پس‌زمینه</string>
+    <string name="active_status">فعال</string>
+    <string name="active_background">پس‌زمینه فعال</string>
+    <string name="tags">برچسب‌ها</string>
+    <string name="created_date">تاریخ انتشار</string>
+    <string name="dimensions">ابعاد</string>
+    <string name="delete_wallpaper_confirm">آیا از حذف این تصویر دانلود شده مطمئن هستید؟</string>
+    <string name="wallpaper_download_success">تصویر پس‌زمینه با موفقیت دانلود شد</string>
 </resources>

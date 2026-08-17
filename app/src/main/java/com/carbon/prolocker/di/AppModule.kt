@@ -68,6 +68,7 @@ val databaseModule = module {
     single { get<AppDatabase>().securityEventDao() }
     single { get<AppDatabase>().crashDao() }
     single { get<AppDatabase>().callBlockerDao() }
+    single { get<AppDatabase>().downloadedBackgroundDao() }
     single { LockedAppsRepository(get()) }
 }
 
@@ -94,6 +95,7 @@ val repositoryModule = module {
     single { com.carbon.prolocker.core.database.CrashRepository(get(), get(), get(), androidContext()) }
     single { com.carbon.prolocker.core.repository.UpdateRepository(get()) }
     single { com.carbon.prolocker.core.repository.BackgroundRepository(get()) }
+    single { com.carbon.prolocker.core.repository.BackgroundDownloadManager(androidContext(), get(), get(), get(), get()) }
     single { com.carbon.prolocker.core.analytics.AnalyticsManager(androidContext()) }
     single { com.carbon.prolocker.feature.privacyauditor.PrivacyAuditorRepository(androidContext()) }
 }
@@ -107,7 +109,7 @@ val viewModelModule = module {
     viewModel { com.carbon.prolocker.feature.account.AccountViewModel(get(), get(), get(), get(), get()) }
     viewModel { com.carbon.prolocker.feature.security.SecurityViewModel(get(), get(), get(), get()) }
     viewModel { com.carbon.prolocker.feature.main.MainViewModel(get(), get(), get()) }
-    viewModel { com.carbon.prolocker.feature.gallery.BackgroundGalleryViewModel(get(), get(), get(), get()) }
+    viewModel { com.carbon.prolocker.feature.gallery.BackgroundGalleryViewModel(get(), get(), get(), get(), get(), get()) }
     viewModel { com.carbon.prolocker.feature.entrylock.EntryLockViewModel(get(), get(), androidContext()) }
     viewModel { com.carbon.prolocker.feature.privacyauditor.PrivacyAuditorViewModel(get()) }
 }

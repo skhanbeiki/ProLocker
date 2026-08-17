@@ -10,17 +10,35 @@ data class BackgroundItem(
     val category: String? = null,
     val color: String? = null,
     val image: BackgroundImage? = null,
-    @SerialName("download_count") val downloadCount: Int = 0
+    @SerialName("download_count") val downloadCount: Int = 0,
+    val tags: List<String> = emptyList(),
+    val created: String? = null
 ) {
     val photoThumb: String
         get() = image?.file?.photoThumb ?: ""
+
     val photoGallery: String
         get() = image?.file?.photoGallery ?: ""
+
+    val photoThumb2x: String
+        get() = image?.file?.photoThumb2x ?: image?.file?.photoGallery ?: image?.file?.photoThumb ?: ""
+
+    val width: Int?
+        get() = image?.width
+
+    val height: Int?
+        get() = image?.height
+
+    val size: Int?
+        get() = image?.size
 }
 
 @Serializable
 data class BackgroundImage(
-    val file: BackgroundFile? = null
+    val file: BackgroundFile? = null,
+    val height: Int? = null,
+    val width: Int? = null,
+    val size: Int? = null
 )
 
 @Serializable

@@ -2,6 +2,7 @@ package com.carbon.prolocker.core.repository
 
 import android.util.Log
 import com.carbon.prolocker.network.api.BackgroundApi
+import com.carbon.prolocker.network.model.BackgroundItem
 import com.carbon.prolocker.network.model.BackgroundResponse
 import io.ktor.client.plugins.ResponseException
 import io.ktor.client.statement.bodyAsText
@@ -9,6 +10,7 @@ import kotlinx.serialization.json.Json
 import java.io.IOException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
+import java.util.concurrent.ConcurrentHashMap
 
 sealed class GalleryException(message: String, cause: Throwable? = null) : Exception(message, cause) {
     class NoNetwork(cause: Throwable? = null) : GalleryException("No network connection", cause)
@@ -20,12 +22,22 @@ sealed class GalleryException(message: String, cause: Throwable? = null) : Excep
 
 class BackgroundRepository(private val backgroundApi: BackgroundApi) {
     private val json = Json { ignoreUnknownKeys = true }
+    private val memoryCache = ConcurrentHashMap<Int, BackgroundItem>()
+
+    fun getCachedBackground(id: Int): BackgroundItem? = memoryCache[id]
+
+    fun getAllCachedBackgrounds(): List<BackgroundItem> = memoryCache.values.toList()
+
+    fun cacheBackgrounds(items: List<BackgroundItem>) {
+        items.forEach { memoryCache[it.id] = it }
+    }
 
     suspend fun getBackgrounds(cursor: String): BackgroundResponse {
         try {
             val response = backgroundApi.getBackgrounds(cursor, 20)
             if (response.status.value in 200..299) {
                 val parsed = json.decodeFromString<BackgroundResponse>(response.bodyAsText())
+                cacheBackgrounds(parsed.results)
                 Log.d("BackgroundGallery", "Repository count: ${parsed.results.size}")
                 return parsed
             }

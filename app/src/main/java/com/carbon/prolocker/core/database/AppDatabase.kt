@@ -13,9 +13,10 @@ import com.carbon.prolocker.feature.callblocker.data.CallBlockerDao
         SecurityEventEntity::class,
         CrashEntity::class,
         BlockedNumberEntity::class,
-        BlockedCallLogEntity::class
+        BlockedCallLogEntity::class,
+        DownloadedBackgroundEntity::class
     ],
-    version = 5,
+    version = 6,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -24,4 +25,5 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun securityEventDao(): SecurityEventDao
     abstract fun crashDao(): CrashDao
     abstract fun callBlockerDao(): CallBlockerDao
+    abstract fun downloadedBackgroundDao(): DownloadedBackgroundDao
 }

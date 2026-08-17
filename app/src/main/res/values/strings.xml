@@ -278,7 +278,7 @@
     <string name="new_version_available">New version available!</string>
     <string name="background_gallery">Background Gallery</string>
     <string name="preview">Preview</string>
-    <string name="set_as_lock_background">Set As Lock Background</string>
+    <string name="set_as_lock_background">Set Wallpaper</string>
     <string name="remove_background">Remove Background</string>
     <string name="use_default_background">Use Default Background</string>
     <string name="downloads">Downloads</string>
@@ -448,4 +448,22 @@
     <string name="use_fingerprint">Use Fingerprint</string>
     <string name="biometric_prompt_title">Authentication Required</string>
     <string name="biometric_prompt_subtitle">Scan your fingerprint to continue</string>
+
+    <!-- Gallery Redesign -->
+    <string name="tab_wallpapers">Wallpapers</string>
+    <string name="tab_downloaded">Downloaded</string>
+    <string name="download_wallpaper">Download Wallpaper</string>
+    <string name="downloading">Downloading…</string>
+    <string name="downloaded">Downloaded</string>
+    <string name="delete_download">Delete Download</string>
+    <string name="no_downloaded_wallpapers">No downloaded wallpapers yet</string>
+    <string name="no_downloaded_wallpapers_desc">Download your favorite wallpapers to use them offline anytime.</string>
+    <string name="browse_wallpapers">Explore Wallpapers</string>
+    <string name="active_status">Active</string>
+    <string name="active_background">Active Background</string>
+    <string name="tags">Tags</string>
+    <string name="created_date">Release Date</string>
+    <string name="dimensions">Dimensions</string>
+    <string name="delete_wallpaper_confirm">Are you sure you want to delete this downloaded wallpaper?</string>
+    <string name="wallpaper_download_success">Wallpaper downloaded successfully</string>
 </resources>

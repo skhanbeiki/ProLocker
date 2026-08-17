@@ -105,7 +105,7 @@ class RamCleanerNotificationManager(private val context: Context) {
         )
 
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
-            .setSmallIcon(android.R.drawable.ic_menu_delete)
+            .setSmallIcon(R.drawable.ic_recycle)
             .setContentTitle(title)
             .setContentText(body)
             .setStyle(NotificationCompat.BigTextStyle().bigText(body))
