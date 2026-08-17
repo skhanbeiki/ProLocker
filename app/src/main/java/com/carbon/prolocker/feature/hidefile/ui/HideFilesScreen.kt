@@ -111,8 +111,13 @@ fun HideFilesScreen(
     var pendingCategoryType by remember { mutableStateOf<String?>(null) }
     var showPermissionDialog by remember { mutableStateOf(false) }
 
+    LaunchedEffect(Unit) {
+        viewModel.refresh()
+    }
+
     val requester = rememberStoragePermissionRequester(
         onGranted = { category ->
+            viewModel.refresh()
             val cat = category ?: pendingCategoryType
             if (cat != null) onOpenCategory(cat)
         },

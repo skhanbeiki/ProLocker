@@ -13,6 +13,7 @@ import android.provider.MediaStore
 import android.text.format.Formatter
 import android.webkit.MimeTypeMap
 import androidx.core.content.FileProvider
+import kotlinx.serialization.json.Json
 import java.io.File
 import java.io.FileInputStream
 import java.util.Date
@@ -24,6 +25,11 @@ class HideFileStorage(val context: Context) {
         private const val FILE_PROVIDER_SUFFIX = ".fileprovider"
     }
 
+    private val json = Json {
+        ignoreUnknownKeys = true
+        coerceInputValues = true
+    }
+
     val storageRoot: File
         get() = Environment.getExternalStorageDirectory()
 
@@ -31,6 +37,41 @@ class HideFileStorage(val context: Context) {
         get() = File(storageRoot, HIDE_FILE_DIR)
 
     fun hiddenFile(item: HideItem): File = File(hiddenDir, ".${item.name}")
+
+    // ---------------------------------------------------------------- sidecar metadata helpers
+
+    fun writeSidecarMeta(item: HideItem) {
+        try {
+            val dir = hiddenDir
+            if (!dir.exists()) dir.mkdirs()
+            val metaFile = File(dir, ".${item.name}.meta")
+            val jsonStr = json.encodeToString(HideItem.serializer(), item)
+            metaFile.writeText(jsonStr)
+        } catch (_: Exception) {
+            // best-effort sidecar write
+        }
+    }
+
+    fun readSidecarMeta(hiddenFile: File): HideItem? {
+        return try {
+            val metaFile = File(hiddenFile.parentFile, "${hiddenFile.name}.meta")
+            if (!metaFile.exists()) return null
+            val text = metaFile.readText()
+            if (text.isBlank()) return null
+            json.decodeFromString<HideItem>(text)
+        } catch (_: Exception) {
+            null
+        }
+    }
+
+    fun deleteSidecarMeta(item: HideItem) {
+        try {
+            val metaFile = File(hiddenDir, ".${item.name}.meta")
+            if (metaFile.exists()) metaFile.delete()
+        } catch (_: Exception) {
+            // best-effort cleanup
+        }
+    }
 
     // ---------------------------------------------------------------- permissions
 
@@ -69,7 +110,7 @@ class HideFileStorage(val context: Context) {
         val target = File(dir, ".$name")
         if (!from.renameTo(target)) return null
 
-        return HideItem(
+        val item = HideItem(
             name = name,
             path = computeRelDir(path),
             type = type,
@@ -82,6 +123,8 @@ class HideFileStorage(val context: Context) {
             imagePath = if (type == HideItem.TYPE_AUDIO) "" else "",
             image = if (type == HideItem.TYPE_AUDIO) artBytes else null
         )
+        writeSidecarMeta(item)
+        return item
     }
 
     private fun computeRelDir(path: String): String {
@@ -100,11 +143,16 @@ class HideFileStorage(val context: Context) {
         if (!dir.exists()) dir.mkdirs()
         val to = File(dir, item.name)
         if (!from.renameTo(to)) return false
+        deleteSidecarMeta(item)
         addToMediaStore(item.type, to, item.path)
         return true
     }
 
-    fun deleteHiddenFile(item: HideItem): Boolean = hiddenFile(item).delete()
+    fun deleteHiddenFile(item: HideItem): Boolean {
+        val deleted = hiddenFile(item).delete()
+        deleteSidecarMeta(item)
+        return deleted
+    }
 
     // ---------------------------------------------------------------- media store helpers
 

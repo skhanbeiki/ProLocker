@@ -1,19 +1,25 @@
 package com.carbon.prolocker.feature.hidefile.data
 
 import android.os.Environment
+import android.text.format.Formatter
+import java.io.File
+import java.util.Date
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
-import java.io.File
 
 class HideFileRepository(
     private val database: HideFileDatabase,
     private val storage: HideFileStorage
 ) {
+
+    private val repositoryScope = CoroutineScope(Dispatchers.IO)
 
     private val _items = MutableStateFlow<List<HideItem>>(emptyList())
     val items: StateFlow<List<HideItem>> = _items.asStateFlow()
@@ -34,12 +40,74 @@ class HideFileRepository(
     fun needsAllFilesAccess(): Boolean = storage.needsAllFilesAccess()
 
     fun refresh() {
-        var loaded = database.getAllItems()
-        if (loaded.isEmpty()) {
-            restoreFromJsonBackup()
-            loaded = database.getAllItems()
+        repositoryScope.launch {
+            try {
+                var loaded = database.getAllItems()
+                scanAndRecoverOrphans(loaded)
+                loaded = database.getAllItems()
+
+                if (loaded.isEmpty()) {
+                    restoreFromJsonBackup()
+                    loaded = database.getAllItems()
+                }
+                _items.value = loaded
+            } catch (_: Exception) {
+                // Defensive
+            }
         }
-        _items.value = loaded
+    }
+
+    private fun scanAndRecoverOrphans(existingDbItems: List<HideItem>) {
+        try {
+            val dir = storage.hiddenDir
+            if (!dir.exists() || !dir.isDirectory) return
+
+            val existingNames = existingDbItems.map { it.name }.toSet()
+            val filesOnDisk = dir.listFiles() ?: return
+
+            for (file in filesOnDisk) {
+                if (file.isDirectory || file.name.endsWith(".meta")) continue
+
+                val rawName = file.name
+                val originalName = if (rawName.startsWith(".")) rawName.substring(1) else rawName
+                if (originalName.isEmpty() || existingNames.contains(originalName)) continue
+
+                var recoveredItem = storage.readSidecarMeta(file)
+                if (recoveredItem == null) {
+                    val detectedType = inferFileType(originalName)
+                    val size = file.length()
+                    val lastMod = file.lastModified()
+                    val defaultRelPath = when (detectedType) {
+                        HideItem.TYPE_IMAGE -> "/Pictures/Restored"
+                        HideItem.TYPE_VIDEO -> "/Movies/Restored"
+                        HideItem.TYPE_AUDIO -> "/Music/Restored"
+                        else -> "/Download/Restored"
+                    }
+                    recoveredItem = HideItem(
+                        name = originalName,
+                        path = defaultRelPath,
+                        type = detectedType,
+                        date = try { Date(lastMod).toString() } catch (_: Exception) { "" },
+                        size = try { Formatter.formatShortFileSize(storage.context, size) } catch (_: Exception) { "${size}B" }
+                    )
+                }
+
+                database.addItem(recoveredItem)
+                storage.writeSidecarMeta(recoveredItem)
+            }
+        } catch (_: Exception) {
+            // Defensive: ensure orphan recovery never crashes the application
+        }
+    }
+
+    private fun inferFileType(filename: String): String {
+        val ext = filename.substringAfterLast('.', "").lowercase()
+        return when (ext) {
+            "jpg", "jpeg", "png", "webp", "gif", "bmp", "heic", "heif" -> HideItem.TYPE_IMAGE
+            "mp4", "mkv", "avi", "3gp", "webm", "mov", "flv", "wmv" -> HideItem.TYPE_VIDEO
+            "mp3", "m4a", "aac", "flac", "wav", "ogg", "wma", "opus" -> HideItem.TYPE_AUDIO
+            else -> HideItem.TYPE_FILE
+        }
     }
 
     /**

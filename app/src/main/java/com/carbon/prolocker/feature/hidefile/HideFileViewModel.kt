@@ -35,6 +35,8 @@ class HideFileViewModel(
     private val _operationResult = MutableStateFlow<HideOperationResult?>(null)
     val operationResult: StateFlow<HideOperationResult?> = _operationResult.asStateFlow()
 
+    fun refresh() = repository.refresh()
+
     fun itemsFor(type: String): List<HideItem> = repository.itemsFor(type)
 
     fun hasStorageAccess(): Boolean = repository.hasStorageAccess()

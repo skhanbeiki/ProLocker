@@ -141,8 +141,13 @@ fun HiddenItemsScreen(
 
     BackHandler { handleExit() }
 
+    LaunchedEffect(type) {
+        viewModel.refresh()
+    }
+
     val requester = rememberStoragePermissionRequester(
         onGranted = { category ->
+            viewModel.refresh()
             if (category == null || category == type) onOpenPicker(type)
         },
         onDenied = {
