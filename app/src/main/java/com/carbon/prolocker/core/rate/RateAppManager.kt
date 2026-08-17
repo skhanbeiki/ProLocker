@@ -27,7 +27,7 @@ class RateAppManager(
 
     suspend fun shouldShowSurveyOnExit(): Boolean {
         val config = remoteConfigRepository.getConfig()
-        if (config.getEffectiveSurveyDisplay() != 2) {
+        if (config.getEffectiveSurveyDisplay() != 1) {
             return false
         }
 
@@ -36,8 +36,8 @@ class RateAppManager(
             return false
         }
 
-        // On first launch, user sees regular exit dialog. On launch >= 2, user sees survey dialog.
-        if (prefs.rateAppLaunchCount < 2) {
+        // On launch >= 1, user sees survey dialog on exit.
+        if (prefs.rateAppLaunchCount < 1) {
             return false
         }
 

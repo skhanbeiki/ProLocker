@@ -27,7 +27,7 @@ data class RemoteConfigResponse(
                 nativeAdRamCleanerPage = true,
                 limitInstallDisplayAdDays = 3,
                 ramCleanerNotifyTimes = listOf(22),
-                surveyDisplay = 2
+                surveyDisplay = 1
             )
         )
     }
@@ -58,5 +58,5 @@ data class RemoteConfigs(
     @SerialName("interstitialAdThemeStep") val interstitialAdThemeStep: Int = 3,
     @SerialName("interstitialAdRamCleanerStep") val interstitialAdRamCleanerStep: Int = 3,
     @SerialName("limitInstallDisplayAdDays") val limitInstallDisplayAdDays: Int = 3,
-    @SerialName("surveyDisplay") val surveyDisplay: Int = 2
+    @SerialName("surveyDisplay") val surveyDisplay: Int = 1
 )
