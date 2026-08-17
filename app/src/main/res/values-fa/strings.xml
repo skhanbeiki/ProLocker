@@ -178,7 +178,7 @@
     <string name="protecting_your_apps">در حال محافظت از برنامه‌های شما</string>
     <string name="usage_access_revoked">مجوز دسترسی به استفاده لغو شد</string>
     <string name="usage_access_revoked_desc">قفل حرفه ای ممکن است به درستی کار نکند.</string>
-    <string name="overlay_revoked">مجوز نمایش روی سایر برنامه‌ها لغو شد</string>
+    <string name="overlay_revoked">مجوز نمایش روی سایر برنامه ها لغو شد</string>
     <string name="overlay_revoked_desc">صفحات قفل نمایش داده نخواهند شد.</string>
     <string name="camera_revoked">مجوز دوربین لغو شد</string>
     <string name="camera_revoked_desc">ثبت عکس از فضول غیرفعال شد.</string>
@@ -470,4 +470,7 @@
     <string name="dimensions">ابعاد</string>
     <string name="delete_wallpaper_confirm">آیا از حذف این تصویر دانلود شده مطمئن هستید؟</string>
     <string name="wallpaper_download_success">تصویر پس‌زمینه با موفقیت دانلود شد</string>
+    <string name="default_background">پس‌زمینه پیش‌فرض</string>
+    <string name="default_background_desc">رنگ اصلی برنامه</string>
+    <string name="default_background_active">پس‌زمینه پیش‌فرض فعال است</string>
 </resources>

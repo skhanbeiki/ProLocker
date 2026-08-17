@@ -1,6 +1,7 @@
 package com.carbon.prolocker.feature.gallery
 
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -29,9 +30,9 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.CloudOff
 import androidx.compose.material.icons.filled.DownloadDone
 import androidx.compose.material.icons.filled.FileDownload
-import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material.icons.outlined.DownloadDone
 import androidx.compose.material.icons.outlined.Palette
+import androidx.compose.material.icons.outlined.Wallpaper
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -48,6 +49,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -69,6 +71,7 @@ import com.carbon.prolocker.ad.AdManager
 import com.carbon.prolocker.ad.AdPlacement
 import com.carbon.prolocker.ad.NativeAdContainer
 import com.carbon.prolocker.ad.NativeAdType
+import com.carbon.prolocker.core.database.DownloadedBackgroundEntity
 import com.carbon.prolocker.core.datastore.PreferencesRepository
 import com.carbon.prolocker.core.theme.AppTypography
 import com.carbon.prolocker.core.ui.components.EmptyState
@@ -78,6 +81,11 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 import java.io.File
+
+sealed interface DownloadedGridItem {
+    data object DefaultItem : DownloadedGridItem
+    data class CustomItem(val entity: DownloadedBackgroundEntity) : DownloadedGridItem
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -115,6 +123,26 @@ fun BackgroundGalleryScreen(
     val onlineBackgrounds = when (val state = uiState) {
         is GalleryUiState.Success -> state.backgrounds
         else -> emptyList()
+    }
+
+    // Dynamic grid items for Tab 2 (Permanent Default Background + Downloaded items)
+    val tab2Items = remember(downloadedBackgrounds, selectedBackgroundUrl) {
+        val isDefaultActive = selectedBackgroundUrl.isNullOrEmpty()
+        val list = mutableListOf<DownloadedGridItem>()
+        if (isDefaultActive) {
+            list.add(DownloadedGridItem.DefaultItem)
+            downloadedBackgrounds.forEach { list.add(DownloadedGridItem.CustomItem(it)) }
+        } else {
+            if (downloadedBackgrounds.isNotEmpty()) {
+                val first = downloadedBackgrounds.first()
+                list.add(DownloadedGridItem.CustomItem(first))
+                list.add(DownloadedGridItem.DefaultItem)
+                downloadedBackgrounds.drop(1).forEach { list.add(DownloadedGridItem.CustomItem(it)) }
+            } else {
+                list.add(DownloadedGridItem.DefaultItem)
+            }
+        }
+        list
     }
 
     LaunchedEffect(onlineGridState) {
@@ -261,60 +289,70 @@ fun BackgroundGalleryScreen(
                         }
                     }
                 } else {
-                    // Downloaded Wallpapers Tab
-                    if (downloadedBackgrounds.isEmpty()) {
-                        EmptyState(
-                            title = stringResource(R.string.no_downloaded_wallpapers),
-                            description = stringResource(R.string.no_downloaded_wallpapers_desc),
-                            icon = Icons.Outlined.Download,
-                            actionText = stringResource(R.string.browse_wallpapers),
-                            onAction = { viewModel.setSelectedTab(0) }
-                        )
-                    } else {
-                        LazyVerticalGrid(
-                            state = downloadedGridState,
-                            columns = GridCells.Fixed(2),
-                            contentPadding = PaddingValues(16.dp),
-                            horizontalArrangement = Arrangement.spacedBy(14.dp),
-                            verticalArrangement = Arrangement.spacedBy(14.dp),
-                            modifier = Modifier.fillMaxSize()
-                        ) {
-                            itemsIndexed(
-                                items = downloadedBackgrounds,
-                                key = { _, downloaded -> downloaded.id }
-                            ) { _, downloaded ->
-                                val cachedItem = viewModel.findBackgroundItem(downloaded.id)
-                                val bgItem = cachedItem ?: downloaded.toBackgroundItem()
-                                val isActive = viewModel.isBackgroundActive(bgItem)
-                                val imageModel = if (File(downloaded.localPath).exists()) {
-                                    downloaded.localPath
-                                } else {
-                                    downloaded.photoThumb
+                    // Downloaded Wallpapers Tab (includes permanent Default Background card)
+                    LazyVerticalGrid(
+                        state = downloadedGridState,
+                        columns = GridCells.Fixed(2),
+                        contentPadding = PaddingValues(16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(14.dp),
+                        verticalArrangement = Arrangement.spacedBy(14.dp),
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        itemsIndexed(
+                            items = tab2Items,
+                            key = { _, item ->
+                                when (item) {
+                                    is DownloadedGridItem.DefaultItem -> "default_bg"
+                                    is DownloadedGridItem.CustomItem -> item.entity.id
                                 }
-                                val effectiveDownloadCount = if (downloaded.downloadCount > 0) {
-                                    downloaded.downloadCount
-                                } else {
-                                    cachedItem?.downloadCount ?: 0
-                                }
-                                val effectiveTitle = downloaded.name.ifEmpty { cachedItem?.name ?: "" }
-                                val effectiveCategory = downloaded.category ?: cachedItem?.category
-
-                                WallpaperGridCard(
-                                    imageUrl = imageModel,
-                                    title = effectiveTitle,
-                                    category = effectiveCategory,
-                                    downloadCount = effectiveDownloadCount,
-                                    isActive = isActive,
-                                    isDownloaded = true,
-                                    onClick = {
-                                        val targetUrl = if (File(downloaded.localPath).exists()) {
-                                            downloaded.localPath
-                                        } else {
-                                            downloaded.photoGallery.ifEmpty { downloaded.photoThumb }
+                            }
+                        ) { _, item ->
+                            when (item) {
+                                is DownloadedGridItem.DefaultItem -> {
+                                    val isDefaultActive = selectedBackgroundUrl.isNullOrEmpty()
+                                    DefaultBackgroundCard(
+                                        isActive = isDefaultActive,
+                                        onClick = {
+                                            onBackgroundClick("default", 0)
                                         }
-                                        onBackgroundClick(targetUrl, downloaded.id)
+                                    )
+                                }
+
+                                is DownloadedGridItem.CustomItem -> {
+                                    val downloaded = item.entity
+                                    val cachedItem = viewModel.findBackgroundItem(downloaded.id)
+                                    val bgItem = cachedItem ?: downloaded.toBackgroundItem()
+                                    val isActive = viewModel.isBackgroundActive(bgItem)
+                                    val imageModel = if (File(downloaded.localPath).exists()) {
+                                        downloaded.localPath
+                                    } else {
+                                        downloaded.photoThumb
                                     }
-                                )
+                                    val effectiveDownloadCount = if (downloaded.downloadCount > 0) {
+                                        downloaded.downloadCount
+                                    } else {
+                                        cachedItem?.downloadCount ?: 0
+                                    }
+                                    val effectiveTitle = downloaded.name.ifEmpty { cachedItem?.name ?: "" }
+                                    val effectiveCategory = downloaded.category ?: cachedItem?.category
+
+                                    WallpaperGridCard(
+                                        imageUrl = imageModel,
+                                        title = effectiveTitle,
+                                        category = effectiveCategory,
+                                        downloadCount = effectiveDownloadCount,
+                                        isActive = isActive,
+                                        isDownloaded = true,
+                                        onClick = {
+                                            val targetUrl = if (File(downloaded.localPath).exists()) {
+                                                downloaded.localPath
+                                            } else {
+                                                downloaded.photoGallery.ifEmpty { downloaded.photoThumb }
+                                            }
+                                            onBackgroundClick(targetUrl, downloaded.id)
+                                        }
+                                    )
+                                }
                             }
                         }
                     }
@@ -336,6 +374,135 @@ fun BackgroundGalleryScreen(
 }
 
 @Composable
+fun DefaultBackgroundCard(
+    isActive: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .aspectRatio(0.72f)
+            .clickable(onClick = onClick)
+            .shadow(4.dp, RoundedCornerShape(18.dp)),
+        shape = RoundedCornerShape(18.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            // Theme Default Dark Gradient Canvas for ProLocker
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        Brush.verticalGradient(
+                            colors = listOf(
+                                Color(0xFF0F172A),
+                                Color(0xFF1E293B),
+                                Color(0xFF334155)
+                            )
+                        )
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Surface(
+                    shape = CircleShape,
+                    color = Color.White.copy(alpha = 0.12f),
+                    border = BorderStroke(1.dp, Color.White.copy(alpha = 0.25f)),
+                    modifier = Modifier.size(56.dp)
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Icon(
+                            imageVector = Icons.Outlined.Wallpaper,
+                            contentDescription = null,
+                            tint = Color.White,
+                            modifier = Modifier.size(30.dp)
+                        )
+                    }
+                }
+            }
+
+            // Dark Scrim Gradient at the Bottom
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(90.dp)
+                    .align(Alignment.BottomCenter)
+                    .background(
+                        Brush.verticalGradient(
+                            colors = listOf(
+                                Color.Transparent,
+                                Color.Black.copy(alpha = 0.75f),
+                                Color.Black.copy(alpha = 0.92f)
+                            )
+                        )
+                    )
+            )
+
+            // Active Background Badge
+            if (isActive) {
+                Surface(
+                    shape = RoundedCornerShape(12.dp),
+                    color = Color(0xFF2E7D32),
+                    shadowElevation = 4.dp,
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(8.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Check,
+                            contentDescription = null,
+                            tint = Color.White,
+                            modifier = Modifier.size(13.dp)
+                        )
+                        Spacer(modifier = Modifier.width(3.dp))
+                        Text(
+                            text = stringResource(R.string.active_status),
+                            style = AppTypography.labelSmall,
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White
+                        )
+                    }
+                }
+            }
+
+            // Bottom Information Overlay
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.BottomCenter)
+                    .padding(horizontal = 10.dp, vertical = 8.dp)
+            ) {
+                Text(
+                    text = stringResource(R.string.default_background),
+                    color = Color.White,
+                    style = AppTypography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 13.sp,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+
+                Spacer(modifier = Modifier.height(3.dp))
+
+                Text(
+                    text = stringResource(R.string.default_background_desc),
+                    color = Color.White.copy(alpha = 0.75f),
+                    style = AppTypography.labelSmall,
+                    fontSize = 10.sp,
+                    maxLines = 1
+                )
+            }
+        }
+    }
+}
+
+@Composable
 fun GallerySegmentedTabs(
     selectedTab: Int,
     downloadedCount: Int,
@@ -345,7 +512,7 @@ fun GallerySegmentedTabs(
     Surface(
         shape = RoundedCornerShape(18.dp),
         color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
-        border = androidx.compose.foundation.BorderStroke(
+        border = BorderStroke(
             1.dp,
             MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f)
         ),
@@ -513,7 +680,7 @@ fun WallpaperGridCard(
                     Surface(
                         shape = CircleShape,
                         color = Color.Black.copy(alpha = 0.55f),
-                        border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = 0.3f)),
+                        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.3f)),
                         modifier = Modifier.size(26.dp)
                     ) {
                         Box(contentAlignment = Alignment.Center) {
