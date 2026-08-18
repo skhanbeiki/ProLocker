@@ -469,4 +469,7 @@
     <string name="default_background">Default Background</string>
     <string name="default_background_desc">App Theme Color</string>
     <string name="default_background_active">Default background is active</string>
+    <string name="select_language">Select Language</string>
+    <string name="lang_english">English</string>
+    <string name="lang_persian">فارسی (Persian)</string>
 </resources>

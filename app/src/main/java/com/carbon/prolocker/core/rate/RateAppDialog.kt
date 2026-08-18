@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import com.carbon.prolocker.R
 
 import androidx.compose.material3.TextButton
+import androidx.compose.ui.tooling.preview.Preview
 import com.carbon.prolocker.core.theme.ProLockerOnPrimary
 import com.carbon.prolocker.core.theme.ProLockerOnSurface
 import com.carbon.prolocker.core.theme.ProLockerOnSurfaceVariant
@@ -48,9 +49,11 @@ fun RateAppDialog(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Image(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(120.dp),
                     painter = painterResource(id = R.drawable.img_5stat),
                     contentDescription = null,
-                    modifier = Modifier.size(120.dp)
                 )
 
                 Spacer(modifier = Modifier.height(20.dp))
@@ -108,5 +111,14 @@ fun RateAppDialog(
                 )
             }
         }
+    )
+}
+@Preview
+@Composable
+fun RateAppDialogPreview(){
+    RateAppDialog(
+        {},
+        {},
+        {},
     )
 }

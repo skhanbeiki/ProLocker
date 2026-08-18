@@ -195,9 +195,6 @@ class MainActivity : AppCompatActivity() {
         val prefs = runBlocking { preferencesRepository.userPreferencesFlow.first() }
         val isOnboardingCompleted = prefs.onboardingCompleted && prefs.lockType != "NONE"
 
-        // Apply locale BEFORE setContent so string resources resolve in the correct language
-        languageManager.applyLanguage(prefs.language)
-
         // Snapshot deep-link state, then clear it so a re-inflated navigation (e.g. after the
         // activity is recreated) does not re-apply a stale destination.
         val deepLink = pendingNavType
@@ -209,10 +206,19 @@ class MainActivity : AppCompatActivity() {
         setContent {
             val currentPrefs by preferencesRepository.userPreferencesFlow.collectAsState(initial = null)
             val isDarkMode = currentPrefs?.isDarkMode ?: true
-            val language = currentPrefs?.language ?: "fa"
+            val rawLang = currentPrefs?.language
+            val language = languageManager.getEffectiveLanguageTag(rawLang)
             val layoutDirection = if (language == "fa") LayoutDirection.Rtl else LayoutDirection.Ltr
+
+            val baseContext = androidx.compose.ui.platform.LocalContext.current
+            val localizedContext = androidx.compose.runtime.remember(baseContext, language) {
+                languageManager.createLocalizedContext(baseContext, language)
+            }
+
             ProLockerTheme(useDarkTheme = isDarkMode) {
                 CompositionLocalProvider(
+                    androidx.compose.ui.platform.LocalContext provides localizedContext,
+                    androidx.activity.compose.LocalActivityResultRegistryOwner provides this@MainActivity,
                     LocalLayoutDirection provides layoutDirection
                 ) {
                     Surface(modifier = Modifier.fillMaxSize()) {

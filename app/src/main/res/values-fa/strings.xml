@@ -473,4 +473,7 @@
     <string name="default_background">پس‌زمینه پیش‌فرض</string>
     <string name="default_background_desc">رنگ اصلی برنامه</string>
     <string name="default_background_active">پس‌زمینه پیش‌فرض فعال است</string>
+    <string name="select_language">انتخاب زبان</string>
+    <string name="lang_english">English (انگلیسی)</string>
+    <string name="lang_persian">فارسی</string>
 </resources>

@@ -7,7 +7,7 @@ data class UserPreferences(
     val onboardingCompleted: Boolean = false,
     val isDarkMode: Boolean = true,
     val selectedTab: String = "tools",
-    val language: String = "fa",
+    val language: String = "",
     val lockType: String = "NONE",
     val hashedCredential: String = "",
     val securitySalt: String = "",
