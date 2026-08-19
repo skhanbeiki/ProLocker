@@ -56,7 +56,7 @@ android {
 
     signingConfigs {
         create("release") {
-            storeFile = rootProject.file("keystore.jks")
+            storeFile = if (rootProject.file("keystore.jks").exists()) rootProject.file("keystore.jks") else rootProject.file("keystore")
             storePassword = "-Prolocker$^carbon>siamak<reza>mahmoud<mehdi!"
             keyAlias = "prolocker"
             keyPassword = "-Prolocker$^carbon>siamak<reza>mahmoud<mehdi!"
@@ -94,14 +94,43 @@ val androidComponents = extensions.getByType<com.android.build.api.variant.Appli
 androidComponents.onVariants { variant ->
     val flavor = variant.flavorName ?: ""
     val bType = variant.buildType ?: ""
-    val vCode = android.defaultConfig.versionCode ?: 90
+    val vCode = android.defaultConfig.versionCode ?: 97
+    val appName = "ProLocker"
+
     variant.outputs.forEach { output ->
         val impl = output as? com.android.build.api.variant.impl.VariantOutputImpl
         if (bType == "release") {
-            impl?.outputFileName?.set("ProLocker-$flavor-$vCode.apk")
+            impl?.outputFileName?.set("$appName-$flavor-$vCode.apk")
         } else {
-            impl?.outputFileName?.set("ProLocker-$flavor-$vCode-$bType.apk")
+            impl?.outputFileName?.set("$appName-$flavor-$vCode-$bType.apk")
         }
+    }
+}
+
+val appVersionCode = android.defaultConfig.versionCode ?: 98
+val appName = "ProLocker"
+
+android.productFlavors.all {
+    val flavorName = name
+    val capitalFlavor = flavorName.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
+    val copyTaskName = "copy${capitalFlavor}ReleaseAab"
+
+    tasks.register<Copy>(copyTaskName) {
+        dependsOn("sign${capitalFlavor}ReleaseBundle")
+        val bundleDir = layout.buildDirectory.dir("outputs/bundle/${flavorName}Release")
+        from(bundleDir)
+        include("app-$flavorName-release.aab")
+        into(bundleDir)
+        rename("app-$flavorName-release.aab", "$appName-$flavorName-$appVersionCode.aab")
+        duplicatesStrategy = DuplicatesStrategy.INCLUDE
+    }
+
+    tasks.matching { it.name == "produce${capitalFlavor}ReleaseBundleIdeListingFile" }.configureEach {
+        mustRunAfter(copyTaskName)
+    }
+
+    tasks.matching { it.name == "bundle${capitalFlavor}Release" }.configureEach {
+        finalizedBy(copyTaskName)
     }
 }
 
