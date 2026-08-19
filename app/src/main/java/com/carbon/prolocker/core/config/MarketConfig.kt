@@ -1,10 +1,11 @@
 package com.carbon.prolocker.core.config
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import com.carbon.prolocker.BuildConfig
-
+import com.google.android.play.core.review.ReviewManagerFactory
 
 object MarketConfig {
     val marketName: String
@@ -13,7 +14,6 @@ object MarketConfig {
     val marketType: String
         get() = BuildConfig.MARKET_TYPE
 
-    // Example use cases derived from flavors
     val isGooglePlay: Boolean
         get() = marketType == "googleplay"
 
@@ -23,9 +23,9 @@ object MarketConfig {
     val isMyket: Boolean
         get() = marketType == "myket"
 
-    val contactUsUrl: String = "mailto:carbon.apps@gmail.com"
-
-    val aboutUsUrl: String = "https://example.com/about"
+    val contactUsUrl: String = "mailto:carbon.prolocker@gmail.com"
+    val aboutUsUrl: String = "https://carbonprolocker.com/about"
+    val privacyPolicyUrl: String = "https://carbonprolocker.com/privacy-policy"
 
     fun shareUrl(context: Context): String {
         val packageName = context.packageName
@@ -37,8 +37,29 @@ object MarketConfig {
     }
 
     fun rateApp(context: Context) {
-        val packageName = context.packageName
+        if (isGooglePlay && context is Activity) {
+            try {
+                val manager = ReviewManagerFactory.create(context)
+                val request = manager.requestReviewFlow()
+                request.addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        val reviewInfo = task.result
+                        manager.launchReviewFlow(context, reviewInfo)
+                    } else {
+                        fallbackRateApp(context)
+                    }
+                }
+                return
+            } catch (_: Exception) {
+                fallbackRateApp(context)
+                return
+            }
+        }
+        fallbackRateApp(context)
+    }
 
+    private fun fallbackRateApp(context: Context) {
+        val packageName = context.packageName
         val rateIntent = when {
             isBazaar -> {
                 Intent(Intent.ACTION_EDIT).apply {
@@ -46,13 +67,11 @@ object MarketConfig {
                     setPackage("com.farsitel.bazaar")
                 }
             }
-
             isMyket -> {
                 Intent(Intent.ACTION_VIEW).apply {
                     data = Uri.parse("myket://comment?id=$packageName")
                 }
             }
-
             else -> {
                 Intent(Intent.ACTION_VIEW).apply {
                     data = Uri.parse(shareUrl(context))
@@ -65,10 +84,7 @@ object MarketConfig {
         } catch (e: Exception) {
             try {
                 context.startActivity(
-                    Intent(
-                        Intent.ACTION_VIEW,
-                        Uri.parse(shareUrl(context))
-                    )
+                    Intent(Intent.ACTION_VIEW, Uri.parse(shareUrl(context)))
                 )
             } catch (_: Exception) {
             }

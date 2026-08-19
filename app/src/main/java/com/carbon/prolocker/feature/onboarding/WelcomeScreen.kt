@@ -32,6 +32,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -45,10 +46,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.carbon.prolocker.R
@@ -70,7 +73,8 @@ fun WelcomeScreen(
     val currentPrefs by preferencesRepository?.userPreferencesFlow?.collectAsState(initial = null)
         ?: remember { mutableStateOf(null) }
 
-    val currentLanguage = languageManager?.getEffectiveLanguageTag(currentPrefs?.language) ?: (if (MarketConfig.isGooglePlay) "en" else "fa")
+    val currentLanguage = languageManager?.getEffectiveLanguageTag(currentPrefs?.language)
+        ?: (if (MarketConfig.isGooglePlay) "en" else "fa")
     val scope = rememberCoroutineScope()
 
     var animated by remember { mutableStateOf(false) }
@@ -145,7 +149,11 @@ fun WelcomeScreen(
 
             // Language Selection - Only active on Google Play flavor
             if (MarketConfig.isGooglePlay) {
-                Spacer(modifier = Modifier.height(28.dp))
+                Spacer(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                )
 
                 Text(
                     text = stringResource(id = R.string.select_language),
@@ -156,41 +164,46 @@ fun WelcomeScreen(
 
                 Spacer(modifier = Modifier.height(14.dp))
 
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                CompositionLocalProvider(
+                    LocalLayoutDirection provides LayoutDirection.Ltr
                 ) {
-                    LanguageOptionCard(
-                        title = "English",
-                        subtitle = "English",
-                        isSelected = currentLanguage == "en",
-                        onClick = {
-                            if (currentLanguage != "en") {
-                                scope.launch(kotlinx.coroutines.Dispatchers.IO) {
-                                    preferencesRepository?.updatePreferences { it.copy(language = "en") }
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        LanguageOptionCard(
+                            title = "English",
+                            subtitle = "English",
+                            isSelected = currentLanguage == "en",
+                            onClick = {
+                                if (currentLanguage != "en") {
+                                    scope.launch(kotlinx.coroutines.Dispatchers.IO) {
+                                        preferencesRepository?.updatePreferences { it.copy(language = "en") }
+                                    }
                                 }
-                            }
-                        },
-                        modifier = Modifier.weight(1f)
-                    )
+                            },
+                            modifier = Modifier.weight(1f)
+                        )
 
-                    LanguageOptionCard(
-                        title = "فارسی",
-                        subtitle = "Persian",
-                        isSelected = currentLanguage == "fa",
-                        onClick = {
-                            if (currentLanguage != "fa") {
-                                scope.launch(kotlinx.coroutines.Dispatchers.IO) {
-                                    preferencesRepository?.updatePreferences { it.copy(language = "fa") }
+                        LanguageOptionCard(
+                            title = "فارسی",
+                            subtitle = "Persian",
+                            isSelected = currentLanguage == "fa",
+                            onClick = {
+                                if (currentLanguage != "fa") {
+                                    scope.launch(kotlinx.coroutines.Dispatchers.IO) {
+                                        preferencesRepository?.updatePreferences { it.copy(language = "fa") }
+                                    }
                                 }
-                            }
-                        },
-                        modifier = Modifier.weight(1f)
-                    )
+                            },
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
                 }
+                Spacer(modifier = Modifier.height(24.dp))
+            } else {
+                Spacer(modifier = Modifier.weight(1f))
             }
-
-            Spacer(modifier = Modifier.weight(1f))
 
             PrimaryButton(
                 text = stringResource(id = R.string.continue_action),
@@ -270,7 +283,9 @@ private fun LanguageOptionCard(
                     )
                     .border(
                         1.5.dp,
-                        if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
+                        if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant.copy(
+                            alpha = 0.4f
+                        ),
                         CircleShape
                     ),
                 contentAlignment = Alignment.Center

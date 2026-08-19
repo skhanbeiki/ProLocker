@@ -93,6 +93,35 @@ class AdManager(
         interstitialProviders.values.forEach { it.initSdk(context) }
     }
 
+    fun requestConsentAndInit(activity: android.app.Activity) {
+        if (!MarketConfig.isGooglePlay) {
+            initSdk()
+            return
+        }
+        try {
+            val params = com.google.android.ump.ConsentRequestParameters.Builder()
+                .setTagForUnderAgeOfConsent(false)
+                .build()
+            val consentInformation = com.google.android.ump.UserMessagingPlatform.getConsentInformation(activity)
+            consentInformation.requestConsentInfoUpdate(
+                activity,
+                params,
+                {
+                    com.google.android.ump.UserMessagingPlatform.loadAndShowConsentFormIfRequired(activity) { formError ->
+                        if (consentInformation.canRequestAds()) {
+                            initSdk()
+                        }
+                    }
+                },
+                { _ ->
+                    initSdk()
+                }
+            )
+        } catch (_: Exception) {
+            initSdk()
+        }
+    }
+
     fun areAdsEnabled(): Boolean = runBlocking {
         try {
             val prefs = preferencesRepository.userPreferencesFlow.first()

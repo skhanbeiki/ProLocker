@@ -472,4 +472,8 @@
     <string name="select_language">Select Language</string>
     <string name="lang_english">English</string>
     <string name="lang_persian">فارسی (Persian)</string>
+    <string name="accessibility_disclosure_title">Accessibility Service Permission</string>
+    <string name="accessibility_disclosure_message">To detect when locked applications are opened and display the lock screen, ProLocker requires the Accessibility Service permission.\n\nPrivacy Commitment: No personal data, typed text, or screen content is ever collected, stored, or transmitted.</string>
+    <string name="accessibility_disclosure_accept">Accept &amp; Continue</string>
+    <string name="privacy_policy">Privacy Policy</string>
 </resources>

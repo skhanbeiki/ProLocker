@@ -79,6 +79,7 @@ fun AppSettingsScreen(
     var showLanguageDialog by remember { mutableStateOf(false) }
     var showStealthWarningDialog by remember { mutableStateOf(false) }
     var showStealthRequiresLockDialog by remember { mutableStateOf(false) }
+    var showAccessibilityDisclosure by remember { mutableStateOf(false) }
     var isAdminActive by remember {
         mutableStateOf(
             if (isInspection) false else com.carbon.prolocker.core.security.DeviceAdminManager(context).isAdminActive()
@@ -198,6 +199,26 @@ fun AppSettingsScreen(
                                 Text(stringResource(R.string.language), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
                                 Spacer(modifier = Modifier.height(2.dp))
                                 Text(if (currentLanguage == "fa") stringResource(R.string.persian) else stringResource(R.string.english), style = AppTypography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            }
+                        }
+
+                        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant, modifier = Modifier.padding(horizontal = 16.dp))
+
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    try {
+                                        val intent = Intent(Intent.ACTION_VIEW, android.net.Uri.parse(com.carbon.prolocker.core.config.MarketConfig.privacyPolicyUrl))
+                                        context.startActivity(intent)
+                                    } catch (_: Exception) {}
+                                }
+                                .padding(horizontal = 16.dp, vertical = 14.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(stringResource(R.string.privacy_policy), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
                             }
                         }
                     }
@@ -515,8 +536,12 @@ fun AppSettingsScreen(
                                 checked = isAccessibilityActive,
                                 onCheckedChange = {
                                     if (!isInspection) {
-                                        val intent = Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS)
-                                        context.startActivity(intent)
+                                        if (isAccessibilityActive) {
+                                            val intent = Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS)
+                                            context.startActivity(intent)
+                                        } else {
+                                            showAccessibilityDisclosure = true
+                                        }
                                     }
                                 }
                             )
@@ -704,6 +729,19 @@ fun AppSettingsScreen(
                     TextButton(onClick = { showStealthRequiresLockDialog = false }) {
                         Text(stringResource(R.string.ok))
                     }
+                }
+            )
+        }
+
+        if (showAccessibilityDisclosure) {
+            com.carbon.prolocker.core.ui.components.AccessibilityDisclosureDialog(
+                onAccept = {
+                    showAccessibilityDisclosure = false
+                    val intent = Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS)
+                    context.startActivity(intent)
+                },
+                onDecline = {
+                    showAccessibilityDisclosure = false
                 }
             )
         }

@@ -476,4 +476,8 @@
     <string name="select_language">انتخاب زبان</string>
     <string name="lang_english">English (انگلیسی)</string>
     <string name="lang_persian">فارسی</string>
+    <string name="accessibility_disclosure_title">دسترسی سرویس دسترسی‌پذیری</string>
+    <string name="accessibility_disclosure_message">برای عملکرد صحیح قفل هوشمند برنامه‌ها، ProLocker به مجوز Accessibility Service نیاز دارد تا هنگام باز شدن برنامه‌های انتخابی، صفحه قفل را نمایش دهد.\n\nتعهد حریم خصوصی: هیچ‌گونه اطلاعات شخصی، داده‌های تایپ‌شده یا محتوای صفحه جمع‌آوری، ذخیره یا ارسال نمی‌شود.</string>
+    <string name="accessibility_disclosure_accept">موافقم و ادامه</string>
+    <string name="privacy_policy">سیاست حریم خصوصی</string>
 </resources>

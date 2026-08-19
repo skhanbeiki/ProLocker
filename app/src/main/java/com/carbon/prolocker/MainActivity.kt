@@ -260,6 +260,7 @@ class MainActivity : AppCompatActivity() {
             val currentPrefs = preferencesRepository.userPreferencesFlow.first()
             RemoteConfigWorker.schedule(applicationContext, currentPrefs.remoteConfigInterval)
             stealthModeManager.repairLauncherState(this@MainActivity)
+            adManager.requestConsentAndInit(this@MainActivity)
 
             // Preload lock screen ads so they're ready when LockService needs them
             try {

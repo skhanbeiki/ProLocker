@@ -178,6 +178,10 @@ dependencies {
     ksp(libs.moshi.kotlin.codegen)
     implementation(libs.persiandate)
     implementation(libs.lottie.compose)
+
+    // Google Play specific libraries
+    implementation("com.google.android.play:review-ktx:2.0.2")
+    implementation("com.google.android.ump:user-messaging-platform:3.1.0")
 }
 
 

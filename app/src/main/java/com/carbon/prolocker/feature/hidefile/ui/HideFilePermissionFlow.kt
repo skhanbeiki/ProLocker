@@ -33,6 +33,12 @@ fun StorageAccessDialog(
     onConfirm: () -> Unit,
     onDismiss: () -> Unit
 ) {
+    val context = LocalContext.current
+    val titleText = context.getString(R.string.hide_files_permission_dialog_media_title)
+    val messageText = context.getString(R.string.hide_files_permission_dialog_media_message)
+    val allowText = context.getString(R.string.hide_files_allow_access)
+    val cancelText = context.getString(R.string.cancel)
+
     AlertDialog(
         onDismissRequest = onDismiss,
         shape = RoundedCornerShape(24.dp),
@@ -46,13 +52,13 @@ fun StorageAccessDialog(
         },
         title = {
             Text(
-                stringResource(R.string.hide_files_permission_dialog_media_title),
+                titleText,
                 fontWeight = FontWeight.Bold
             )
         },
         text = {
             Text(
-                stringResource(R.string.hide_files_permission_dialog_media_message),
+                messageText,
                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.85f)
             )
         },
@@ -61,12 +67,12 @@ fun StorageAccessDialog(
                 onClick = onConfirm,
                 shape = RoundedCornerShape(16.dp)
             ) {
-                Text(stringResource(R.string.hide_files_allow_access))
+                Text(allowText)
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text(stringResource(R.string.cancel), color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(cancelText, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
     )
