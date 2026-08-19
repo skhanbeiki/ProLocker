@@ -15,8 +15,8 @@ android {
         applicationId = "com.carbon.prolocker"
         minSdk = 24
         targetSdk = 36
-        versionCode = 91
-        versionName ="5.2.4"
+        versionCode = 92
+        versionName ="5.2.5"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         addManifestPlaceholders(
@@ -137,7 +137,7 @@ dependencies {
     implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.room.runtime)
     implementation(libs.coil.compose)
-    implementation("io.coil-kt:coil-gif:2.7.0")
+    implementation(libs.coil.gif)
     implementation(libs.converter.moshi)
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.kotlinx.coroutines.core)
@@ -180,8 +180,8 @@ dependencies {
     implementation(libs.lottie.compose)
 
     // Google Play specific libraries
-    implementation("com.google.android.play:review-ktx:2.0.2")
-    implementation("com.google.android.ump:user-messaging-platform:3.1.0")
+    implementation(libs.review.ktx)
+    implementation(libs.user.messaging.platform)
 }
 
 
