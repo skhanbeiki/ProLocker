@@ -262,6 +262,7 @@ class LockService : Service(), OnBackPressedDispatcherOwner {
 
                 CompositionLocalProvider(
                     LocalContext provides localizedContext,
+                    androidx.compose.ui.platform.LocalConfiguration provides localizedContext.resources.configuration,
                     LocalLayoutDirection provides layoutDirection,
                     LocalViewModelStoreOwner provides serviceLifecycleOwner,
                     LocalOnBackPressedDispatcherOwner provides this@LockService

@@ -12,10 +12,12 @@ import android.os.Environment
 import android.provider.MediaStore
 import android.text.format.Formatter
 import android.webkit.MimeTypeMap
+import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import kotlinx.serialization.json.Json
 import java.io.File
 import java.io.FileInputStream
+import java.io.FileOutputStream
 import java.util.Date
 
 class HideFileStorage(val context: Context) {
@@ -34,9 +36,34 @@ class HideFileStorage(val context: Context) {
         get() = Environment.getExternalStorageDirectory()
 
     val hiddenDir: File
-        get() = File(storageRoot, HIDE_FILE_DIR)
+        get() {
+            val appExt = context.getExternalFilesDir(null)
+            if (appExt != null) {
+                val extDir = File(appExt, HIDE_FILE_DIR)
+                if (extDir.exists() || extDir.mkdirs()) {
+                    return extDir
+                }
+            }
+            val internal = File(context.filesDir, HIDE_FILE_DIR)
+            if (!internal.exists()) internal.mkdirs()
+            return internal
+        }
 
-    fun hiddenFile(item: HideItem): File = File(hiddenDir, ".${item.name}")
+    fun hiddenFile(item: HideItem): File {
+        val primary = File(hiddenDir, ".${item.name}")
+        if (primary.exists()) return primary
+        val legacy = File(File(storageRoot, HIDE_FILE_DIR), ".${item.name}")
+        if (legacy.exists()) return legacy
+        val appExtDir = context.getExternalFilesDir(null)?.let { File(it, HIDE_FILE_DIR) }
+        if (appExtDir != null) {
+            val appExtFile = File(appExtDir, ".${item.name}")
+            if (appExtFile.exists()) return appExtFile
+        }
+        val internalDir = File(context.filesDir, HIDE_FILE_DIR)
+        val internalFile = File(internalDir, ".${item.name}")
+        if (internalFile.exists()) return internalFile
+        return primary
+    }
 
     // ---------------------------------------------------------------- sidecar metadata helpers
 
@@ -68,6 +95,8 @@ class HideFileStorage(val context: Context) {
         try {
             val metaFile = File(hiddenDir, ".${item.name}.meta")
             if (metaFile.exists()) metaFile.delete()
+            val legacyMeta = File(File(storageRoot, HIDE_FILE_DIR), ".${item.name}.meta")
+            if (legacyMeta.exists()) legacyMeta.delete()
         } catch (_: Exception) {
             // best-effort cleanup
         }
@@ -75,25 +104,27 @@ class HideFileStorage(val context: Context) {
 
     // ---------------------------------------------------------------- permissions
 
-    fun hasAllFilesAccess(): Boolean =
-        Build.VERSION.SDK_INT < Build.VERSION_CODES.R || Environment.isExternalStorageManager()
+    fun hasAllFilesAccess(): Boolean = false
 
-    fun needsAllFilesAccess(): Boolean =
-        Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && !Environment.isExternalStorageManager()
+    fun needsAllFilesAccess(): Boolean = false
 
     fun hasStorageAccess(): Boolean {
-        return when {
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.R -> Environment.isExternalStorageManager()
-            else -> context.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) ==
-                PackageManager.PERMISSION_GRANTED
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            ContextCompat.checkSelfPermission(context, Manifest.permission.READ_MEDIA_IMAGES) == PackageManager.PERMISSION_GRANTED &&
+            ContextCompat.checkSelfPermission(context, Manifest.permission.READ_MEDIA_VIDEO) == PackageManager.PERMISSION_GRANTED &&
+            ContextCompat.checkSelfPermission(context, Manifest.permission.READ_MEDIA_AUDIO) == PackageManager.PERMISSION_GRANTED
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+        } else {
+            true
         }
     }
 
     // ---------------------------------------------------------------- hide
 
     /**
-     * Moves [path] into the hidden folder as `.<name>` (exact legacy format) and returns
-     * the metadata to persist. Returns null when the rename fails.
+     * Moves [path] into the hidden folder as `.<name>` and returns
+     * the metadata to persist. Falls back to stream copy + delete for Scoped Storage compatibility.
      */
     fun hideFile(path: String, type: String, artBytes: ByteArray? = null): HideItem? {
         val from = File(path)
@@ -108,7 +139,22 @@ class HideFileStorage(val context: Context) {
         if (!dir.exists() && !dir.mkdirs()) return null
 
         val target = File(dir, ".$name")
-        if (!from.renameTo(target)) return null
+        var moved = from.renameTo(target)
+        if (!moved) {
+            moved = try {
+                FileInputStream(from).use { input ->
+                    FileOutputStream(target).use { output ->
+                        input.copyTo(output)
+                    }
+                }
+                from.delete()
+                true
+            } catch (_: Exception) {
+                if (target.exists()) target.delete()
+                false
+            }
+        }
+        if (!moved) return null
 
         val item = HideItem(
             name = name,
@@ -127,6 +173,61 @@ class HideFileStorage(val context: Context) {
         return item
     }
 
+    fun hideUri(uri: Uri, type: String): HideItem? {
+        val resolver = context.contentResolver
+        var fileName = "file_${System.currentTimeMillis()}"
+        var size = 0L
+        try {
+            resolver.query(uri, arrayOf(MediaStore.MediaColumns.DISPLAY_NAME, MediaStore.MediaColumns.SIZE), null, null, null)?.use { cursor ->
+                if (cursor.moveToFirst()) {
+                    val nameIndex = cursor.getColumnIndex(MediaStore.MediaColumns.DISPLAY_NAME)
+                    val sizeIndex = cursor.getColumnIndex(MediaStore.MediaColumns.SIZE)
+                    if (nameIndex >= 0) {
+                        cursor.getString(nameIndex)?.let { fileName = it }
+                    }
+                    if (sizeIndex >= 0) {
+                        size = cursor.getLong(sizeIndex)
+                    }
+                }
+            }
+        } catch (_: Exception) {}
+
+        val dir = hiddenDir
+        if (!dir.exists() && !dir.mkdirs()) return null
+        val target = File(dir, ".$fileName")
+
+        try {
+            resolver.openInputStream(uri)?.use { input ->
+                FileOutputStream(target).use { output ->
+                    input.copyTo(output)
+                }
+            } ?: return null
+        } catch (_: Exception) {
+            if (target.exists()) target.delete()
+            return null
+        }
+
+        if (size == 0L && target.exists()) {
+            size = target.length()
+        }
+
+        val item = HideItem(
+            name = fileName,
+            path = defaultRelPath(type),
+            type = type,
+            date = Date().toString(),
+            size = try {
+                Formatter.formatShortFileSize(context, size)
+            } catch (e: Exception) {
+                "${size}B"
+            },
+            imagePath = "",
+            image = null
+        )
+        writeSidecarMeta(item)
+        return item
+    }
+
     private fun computeRelDir(path: String): String {
         val storage = storageRoot.path
         val rel = path.removePrefix(storage)
@@ -139,17 +240,79 @@ class HideFileStorage(val context: Context) {
     fun restore(item: HideItem): Boolean {
         val from = hiddenFile(item)
         if (!from.exists()) return false
-        val dir = File(storageRoot, item.path)
-        if (!dir.exists()) dir.mkdirs()
-        val to = File(dir, item.name)
-        if (!from.renameTo(to)) return false
-        deleteSidecarMeta(item)
-        addToMediaStore(item.type, to, item.path)
-        return true
+
+        // Attempt 1: Direct filesystem restoration
+        try {
+            val targetDir = File(storageRoot, item.path.ifEmpty { defaultRelPath(item.type) })
+            if (!targetDir.exists()) targetDir.mkdirs()
+            val to = File(targetDir, item.name)
+            if (from.renameTo(to)) {
+                deleteSidecarMeta(item)
+                addToMediaStore(item.type, to)
+                return true
+            }
+            // Stream copy fallback
+            FileInputStream(from).use { input ->
+                FileOutputStream(to).use { output ->
+                    input.copyTo(output)
+                }
+            }
+            from.delete()
+            deleteSidecarMeta(item)
+            addToMediaStore(item.type, to)
+            return true
+        } catch (_: Exception) {
+            // Fall through to MediaStore insert for Scoped Storage
+        }
+
+        // Attempt 2: MediaStore insertion for Android 10+ (API 29+)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            try {
+                val collection = mediaCollection(item.type)
+                val relPath = when (item.type) {
+                    HideItem.TYPE_IMAGE -> Environment.DIRECTORY_PICTURES + "/Restored"
+                    HideItem.TYPE_VIDEO -> Environment.DIRECTORY_MOVIES + "/Restored"
+                    HideItem.TYPE_AUDIO -> Environment.DIRECTORY_MUSIC + "/Restored"
+                    else -> Environment.DIRECTORY_DOWNLOADS + "/Restored"
+                }
+                val values = ContentValues().apply {
+                    put(MediaStore.MediaColumns.DISPLAY_NAME, item.name)
+                    put(MediaStore.MediaColumns.MIME_TYPE, mimeForItem(item))
+                    put(MediaStore.MediaColumns.RELATIVE_PATH, relPath)
+                    put(MediaStore.MediaColumns.IS_PENDING, 1)
+                }
+                val uri = context.contentResolver.insert(collection, values)
+                if (uri != null) {
+                    context.contentResolver.openOutputStream(uri)?.use { out ->
+                        FileInputStream(from).use { inp ->
+                            inp.copyTo(out)
+                        }
+                    }
+                    values.clear()
+                    values.put(MediaStore.MediaColumns.IS_PENDING, 0)
+                    context.contentResolver.update(uri, values, null, null)
+                    from.delete()
+                    deleteSidecarMeta(item)
+                    return true
+                }
+            } catch (_: Exception) {
+                // Ignore and return false
+            }
+        }
+
+        return false
+    }
+
+    private fun defaultRelPath(type: String): String = when (type) {
+        HideItem.TYPE_IMAGE -> "Pictures/Restored"
+        HideItem.TYPE_VIDEO -> "Movies/Restored"
+        HideItem.TYPE_AUDIO -> "Music/Restored"
+        else -> "Download/Restored"
     }
 
     fun deleteHiddenFile(item: HideItem): Boolean {
-        val deleted = hiddenFile(item).delete()
+        val file = hiddenFile(item)
+        val deleted = file.delete()
         deleteSidecarMeta(item)
         return deleted
     }
@@ -194,7 +357,7 @@ class HideFileStorage(val context: Context) {
         scanFile(originalPath)
     }
 
-    private fun addToMediaStore(type: String, file: File, relDir: String) {
+    private fun addToMediaStore(type: String, file: File) {
         scanFile(file.absolutePath)
     }
 
@@ -310,7 +473,11 @@ class HideFileStorage(val context: Context) {
         MediaKind.IMAGE -> MediaStore.Images.Media.EXTERNAL_CONTENT_URI
         MediaKind.VIDEO -> MediaStore.Video.Media.EXTERNAL_CONTENT_URI
         MediaKind.AUDIO -> MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
-        MediaKind.FILE -> MediaStore.Files.getContentUri("external")
+        MediaKind.FILE -> if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            MediaStore.Downloads.EXTERNAL_CONTENT_URI
+        } else {
+            MediaStore.Files.getContentUri("external")
+        }
     }
 
     private enum class MediaKind {

@@ -133,6 +133,18 @@ class HideFileRepository(
         writeJsonBackup()
     }
 
+    /**
+     * Hides files directly picked as Content URIs (e.g. from SAF / Document Picker).
+     */
+    suspend fun hideUris(uris: List<android.net.Uri>, type: String) = withContext(Dispatchers.IO) {
+        for (uri in uris) {
+            val item = storage.hideUri(uri, type) ?: continue
+            database.addItem(item)
+        }
+        refresh()
+        writeJsonBackup()
+    }
+
     suspend fun unhide(item: HideItem): Boolean = withContext(Dispatchers.IO) {
         val restored = storage.restore(item)
         if (restored) {

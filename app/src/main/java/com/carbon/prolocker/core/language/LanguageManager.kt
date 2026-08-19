@@ -22,8 +22,20 @@ class LocalizedContextWrapper(
 
 class LanguageManager(private val preferencesRepository: PreferencesRepository) {
 
-    private companion object {
-        const val TAG = "Moslemprolocker"
+    companion object {
+        const val TAG = "MoslemProLocker"
+
+        fun createLocalizedContextStatic(baseContext: Context, languageTag: String): Context {
+            val locale = Locale(languageTag)
+            Locale.setDefault(locale)
+
+            val config = Configuration(baseContext.resources.configuration)
+            config.setLocales(android.os.LocaleList(locale))
+            config.setLayoutDirection(locale)
+
+            val configContext = baseContext.createConfigurationContext(config)
+            return LocalizedContextWrapper(baseContext, configContext)
+        }
     }
 
     fun getEffectiveLanguageTag(rawLanguage: String? = null): String {
@@ -62,15 +74,7 @@ class LanguageManager(private val preferencesRepository: PreferencesRepository) 
      */
     fun createLocalizedContext(baseContext: Context, overrideLanguage: String? = null): Context {
         val languageTag = getEffectiveLanguageTag(overrideLanguage)
-        val locale = Locale(languageTag)
-        Locale.setDefault(locale)
-
-        val config = Configuration(baseContext.resources.configuration)
-        config.setLocales(android.os.LocaleList(locale))
-        config.setLayoutDirection(locale)
-
-        val configContext = baseContext.createConfigurationContext(config)
-        return LocalizedContextWrapper(baseContext, configContext)
+        return createLocalizedContextStatic(baseContext, languageTag)
     }
 
     /**

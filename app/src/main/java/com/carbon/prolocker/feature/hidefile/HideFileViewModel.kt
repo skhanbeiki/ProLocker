@@ -61,6 +61,15 @@ class HideFileViewModel(
         }
     }
 
+    fun hideUris(uris: List<android.net.Uri>, type: String) {
+        if (uris.isEmpty()) return
+        viewModelScope.launch {
+            repository.hideUris(uris, type)
+            analyticsManager.trackHideFilesAction("hide", type, uris.size)
+            _operationResult.value = HideOperationResult(isRestore = false, count = uris.size)
+        }
+    }
+
     fun unhide(item: HideItem) {
         viewModelScope.launch {
             repository.unhide(item)

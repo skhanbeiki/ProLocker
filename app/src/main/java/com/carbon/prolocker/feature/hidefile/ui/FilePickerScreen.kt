@@ -20,9 +20,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.automirrored.outlined.ArrowForward
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.outlined.Folder
 import androidx.compose.material.icons.outlined.InsertDriveFile
@@ -95,6 +98,15 @@ fun FilePickerScreen(
         loading = false
     }
 
+    val documentPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenMultipleDocuments()
+    ) { uris ->
+        if (uris.isNotEmpty()) {
+            viewModel.hideUris(uris, HideItem.TYPE_FILE)
+            onBack()
+        }
+    }
+
     val hideLabel = stringResource(R.string.hide_files_hide_count, selectedPaths.size)
 
     Scaffold(
@@ -122,6 +134,15 @@ fun FilePickerScreen(
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                },
+                actions = {
+                    IconButton(onClick = { documentPickerLauncher.launch(arrayOf("*/*")) }) {
+                        Icon(
+                            Icons.Default.Add,
+                            contentDescription = null,
+                            tint = ProLockerPrimary
                         )
                     }
                 },
@@ -158,11 +179,24 @@ fun FilePickerScreen(
         Box(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
             when {
                 loading -> LoadingView()
-                entries.isEmpty() -> EmptyState(
-                    title = stringResource(R.string.hide_files_picker_empty_title),
-                    description = stringResource(R.string.hide_files_picker_empty_description),
-                    modifier = Modifier.fillMaxSize()
-                )
+                entries.isEmpty() -> Column(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = androidx.compose.foundation.layout.Arrangement.Center
+                ) {
+                    EmptyState(
+                        title = stringResource(R.string.hide_files_picker_empty_title),
+                        description = stringResource(R.string.hide_files_picker_empty_description),
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
+                    Button(
+                        onClick = { documentPickerLauncher.launch(arrayOf("*/*")) },
+                        shape = RoundedCornerShape(16.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = ProLockerPrimary)
+                    ) {
+                        Text(stringResource(R.string.hide_files_files))
+                    }
+                }
                 else -> LazyColumn(
                     contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
                     verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(6.dp)

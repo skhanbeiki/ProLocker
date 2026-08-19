@@ -64,6 +64,22 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    override fun attachBaseContext(newBase: android.content.Context) {
+        val repo = try {
+            org.koin.java.KoinJavaComponent.get<PreferencesRepository>(PreferencesRepository::class.java)
+        } catch (_: Exception) {
+            null
+        }
+        val lang = try {
+            repo?.currentPreferences?.language
+        } catch (_: Exception) {
+            null
+        }
+        val effective = if (!lang.isNullOrEmpty()) lang else if (com.carbon.prolocker.core.config.MarketConfig.isGooglePlay) "en" else "fa"
+        val localizedContext = LanguageManager.createLocalizedContextStatic(newBase, effective)
+        super.attachBaseContext(localizedContext)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
         super.onCreate(savedInstanceState)
@@ -218,6 +234,7 @@ class MainActivity : AppCompatActivity() {
             ProLockerTheme(useDarkTheme = isDarkMode) {
                 CompositionLocalProvider(
                     androidx.compose.ui.platform.LocalContext provides localizedContext,
+                    androidx.compose.ui.platform.LocalConfiguration provides localizedContext.resources.configuration,
                     androidx.activity.compose.LocalActivityResultRegistryOwner provides this@MainActivity,
                     LocalLayoutDirection provides layoutDirection
                 ) {

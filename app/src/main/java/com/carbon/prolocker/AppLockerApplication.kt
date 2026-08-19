@@ -43,6 +43,7 @@ class ProLockerApplication : Application(), Application.ActivityLifecycleCallbac
     private val lockedAppsRepository: LockedAppsRepository by inject()
     private val rateAppManager: RateAppManager by inject()
     private val preferencesRepository: PreferencesRepository by inject()
+    private val languageManager: com.carbon.prolocker.core.language.LanguageManager by inject()
 
     private var startedActivityCount = 0
 
@@ -54,6 +55,9 @@ class ProLockerApplication : Application(), Application.ActivityLifecycleCallbac
             androidContext(this@ProLockerApplication)
             modules(appModule, com.carbon.prolocker.network.networkModule)
         }
+
+        val currentLang = languageManager.getCurrentLanguageTag()
+        languageManager.applyLanguage(currentLang)
 
         setupCrashHandler()
         uploadPendingCrashes()
