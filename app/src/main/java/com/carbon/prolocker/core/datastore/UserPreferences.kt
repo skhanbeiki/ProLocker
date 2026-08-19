@@ -7,7 +7,7 @@ data class UserPreferences(
     val onboardingCompleted: Boolean = false,
     val isDarkMode: Boolean = true,
     val selectedTab: String = "tools",
-    val language: String = "",
+    val language: String = if (com.carbon.prolocker.core.config.MarketConfig.isGooglePlay) "en" else "fa",
     val lockType: String = "NONE",
     val hashedCredential: String = "",
     val securitySalt: String = "",

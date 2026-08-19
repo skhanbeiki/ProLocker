@@ -8,6 +8,8 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
@@ -32,16 +34,22 @@ class RestrictedActivity : ComponentActivity() {
         val destination = intent.getStringExtra(EXTRA_DESTINATION) ?: "backgrounds"
         RestrictedModeManager.enterRestrictedMode(destination)
 
-        val prefs = runBlocking { preferencesRepository.userPreferencesFlow.first() }
-        val isDarkMode = prefs.isDarkMode
-        val language = prefs.language
-        val layoutDirection = if (language == "fa") LayoutDirection.Rtl else LayoutDirection.Ltr
-
         enableEdgeToEdge()
 
         setContent {
+            val currentPrefs by preferencesRepository.userPreferencesFlow.collectAsState(initial = null)
+            val isDarkMode = currentPrefs?.isDarkMode ?: true
+            val language = languageManager.getEffectiveLanguageTag(currentPrefs?.language)
+            val layoutDirection = languageManager.getLayoutDirection(language)
+            val baseContext = androidx.compose.ui.platform.LocalContext.current
+            val localizedContext = androidx.compose.runtime.remember(baseContext, language) {
+                languageManager.createLocalizedContext(baseContext, language)
+            }
+
             ProLockerTheme(useDarkTheme = isDarkMode) {
                 CompositionLocalProvider(
+                    androidx.compose.ui.platform.LocalContext provides localizedContext,
+                    androidx.activity.compose.LocalActivityResultRegistryOwner provides this@RestrictedActivity,
                     LocalLayoutDirection provides layoutDirection
                 ) {
                     Surface(modifier = Modifier.fillMaxSize()) {
@@ -50,8 +58,6 @@ class RestrictedActivity : ComponentActivity() {
                 }
             }
         }
-
-        languageManager.applyLanguage(language)
     }
 
     override fun onDestroy() {

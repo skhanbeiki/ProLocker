@@ -16,10 +16,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Security
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -182,6 +184,8 @@ fun AppSettingsScreen(
 
                         HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant, modifier = Modifier.padding(horizontal = 16.dp))
 
+                        val currentLanguage = if (prefs.language.isNotEmpty()) prefs.language else (if (com.carbon.prolocker.core.config.MarketConfig.isGooglePlay) "en" else "fa")
+
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -193,7 +197,7 @@ fun AppSettingsScreen(
                             Column(modifier = Modifier.weight(1f)) {
                                 Text(stringResource(R.string.language), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
                                 Spacer(modifier = Modifier.height(2.dp))
-                                Text(if (prefs.language == "fa") stringResource(R.string.persian) else stringResource(R.string.english), style = AppTypography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                Text(if (currentLanguage == "fa") stringResource(R.string.persian) else stringResource(R.string.english), style = AppTypography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                             }
                         }
                     }
@@ -608,17 +612,56 @@ fun AppSettingsScreen(
         }
 
         if (showLanguageDialog) {
+            val currentLanguage = if (prefs.language.isNotEmpty()) prefs.language else (if (com.carbon.prolocker.core.config.MarketConfig.isGooglePlay) "en" else "fa")
             AlertDialog(
                 onDismissRequest = { showLanguageDialog = false },
                 shape = RoundedCornerShape(20.dp),
                 title = { Text(stringResource(R.string.language), style = MaterialTheme.typography.titleLarge) },
                 text = {
                     Column {
-                        Row(modifier = Modifier.fillMaxWidth().clickable { viewModel?.changeLanguage("en"); showLanguageDialog = false }.padding(16.dp)) {
-                            Text(stringResource(R.string.english), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { viewModel?.changeLanguage("en"); showLanguageDialog = false }
+                                .padding(16.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                stringResource(R.string.english),
+                                style = MaterialTheme.typography.titleMedium,
+                                color = if (currentLanguage == "en") MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
+                                fontWeight = if (currentLanguage == "en") FontWeight.Bold else FontWeight.Normal
+                            )
+                            if (currentLanguage == "en") {
+                                Icon(
+                                    imageVector = Icons.Default.Check,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                            }
                         }
-                        Row(modifier = Modifier.fillMaxWidth().clickable { viewModel?.changeLanguage("fa"); showLanguageDialog = false }.padding(16.dp)) {
-                            Text(stringResource(R.string.persian), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { viewModel?.changeLanguage("fa"); showLanguageDialog = false }
+                                .padding(16.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                stringResource(R.string.persian),
+                                style = MaterialTheme.typography.titleMedium,
+                                color = if (currentLanguage == "fa") MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
+                                fontWeight = if (currentLanguage == "fa") FontWeight.Bold else FontWeight.Normal
+                            )
+                            if (currentLanguage == "fa") {
+                                Icon(
+                                    imageVector = Icons.Default.Check,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                            }
                         }
                     }
                 },

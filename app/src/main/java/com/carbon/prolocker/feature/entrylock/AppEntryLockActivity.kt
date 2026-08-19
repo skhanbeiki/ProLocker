@@ -64,10 +64,13 @@ import com.carbon.prolocker.core.theme.ProLockerTheme
 import com.carbon.prolocker.core.ui.components.PatternLockView
 import com.carbon.prolocker.core.ui.components.PinLockView
 import kotlinx.coroutines.delay
+import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class AppEntryLockActivity : FragmentActivity() {
     private val viewModel: EntryLockViewModel by viewModel()
+    private val preferencesRepository: com.carbon.prolocker.core.datastore.PreferencesRepository by inject()
+    private val languageManager: com.carbon.prolocker.core.language.LanguageManager by inject()
 
     companion object {
         @Volatile
@@ -97,52 +100,67 @@ class AppEntryLockActivity : FragmentActivity() {
         window.navigationBarColor = android.graphics.Color.TRANSPARENT
 
         setContent {
-            ProLockerTheme {
-                val lockType by viewModel.lockType.collectAsState()
-                val isError by viewModel.isError.collectAsState()
-                val unlocked by viewModel.unlocked.collectAsState()
-                val vibrationEnabled by viewModel.vibrationEnabled.collectAsState()
-                val hidePatternPath by viewModel.hidePatternPath.collectAsState()
-                val recoveryQuestion by viewModel.recoveryQuestion.collectAsState()
-                val failedAttempts by viewModel.failedAttempts.collectAsState()
-                val threshold by viewModel.threshold.collectAsState()
-                val fingerprintUnlockEnabled by viewModel.fingerprintUnlockEnabled.collectAsState()
+            val currentPrefs by preferencesRepository.userPreferencesFlow.collectAsState(initial = null)
+            val isDarkMode = currentPrefs?.isDarkMode ?: true
+            val language = languageManager.getEffectiveLanguageTag(currentPrefs?.language)
+            val layoutDirection = languageManager.getLayoutDirection(language)
+            val baseContext = androidx.compose.ui.platform.LocalContext.current
+            val localizedContext = androidx.compose.runtime.remember(baseContext, language) {
+                languageManager.createLocalizedContext(baseContext, language)
+            }
 
-                LaunchedEffect(unlocked) {
-                    if (unlocked) {
-                        setResult(RESULT_OK)
-                        finish()
+            ProLockerTheme(useDarkTheme = isDarkMode) {
+                androidx.compose.runtime.CompositionLocalProvider(
+                    androidx.compose.ui.platform.LocalContext provides localizedContext,
+                    androidx.activity.compose.LocalActivityResultRegistryOwner provides this@AppEntryLockActivity,
+                    androidx.compose.ui.platform.LocalLayoutDirection provides layoutDirection
+                ) {
+                    val lockType by viewModel.lockType.collectAsState()
+                    val isError by viewModel.isError.collectAsState()
+                    val unlocked by viewModel.unlocked.collectAsState()
+                    val vibrationEnabled by viewModel.vibrationEnabled.collectAsState()
+                    val hidePatternPath by viewModel.hidePatternPath.collectAsState()
+                    val recoveryQuestion by viewModel.recoveryQuestion.collectAsState()
+                    val failedAttempts by viewModel.failedAttempts.collectAsState()
+                    val threshold by viewModel.threshold.collectAsState()
+                    val fingerprintUnlockEnabled by viewModel.fingerprintUnlockEnabled.collectAsState()
+
+                    LaunchedEffect(unlocked) {
+                        if (unlocked) {
+                            setResult(RESULT_OK)
+                            finish()
+                        }
                     }
+
+                    EntryLockContent(
+                        lockType = lockType,
+                        isError = isError,
+                        failedAttempts = failedAttempts,
+                        threshold = threshold,
+                        recoveryQuestion = recoveryQuestion,
+                        hidePatternPath = hidePatternPath,
+                        vibrationEnabled = vibrationEnabled,
+                        fingerprintUnlockEnabled = fingerprintUnlockEnabled,
+                        onFingerprintClick = {
+                            BiometricHelper.showBiometricPrompt(
+                                activity = this@AppEntryLockActivity,
+                                title = getString(R.string.biometric_prompt_title),
+                                subtitle = getString(R.string.biometric_prompt_subtitle),
+                                onSuccess = { viewModel.onBiometricSuccess() }
+                            )
+                        },
+                        onPatternComplete = { viewModel.verifyPattern(it) },
+                        onPinComplete = { viewModel.verifyPin(it) },
+                        onErrorReset = { viewModel.resetError() },
+                        onVerifyRecoveryAnswer = { answer, onResult ->
+                            viewModel.verifyRecoveryAnswer(answer, onResult)
+                        },
+                        onBack = {
+                            setResult(RESULT_CANCELED)
+                            finish()
+                        }
+                    )
                 }
-
-                EntryLockContent(
-                    lockType = lockType,
-                    isError = isError,
-                    failedAttempts = failedAttempts,
-                    threshold = threshold,
-                    recoveryQuestion = recoveryQuestion,
-                    hidePatternPath = hidePatternPath,
-                    vibrationEnabled = vibrationEnabled,
-                    fingerprintUnlockEnabled = fingerprintUnlockEnabled,
-                    onFingerprintClick = {
-                        BiometricHelper.showBiometricPrompt(
-                            activity = this@AppEntryLockActivity,
-                            title = getString(R.string.biometric_prompt_title),
-                            subtitle = getString(R.string.biometric_prompt_subtitle),
-                            onSuccess = { viewModel.onBiometricSuccess() }
-                        )
-                    },
-                    onPatternComplete = { viewModel.verifyPattern(it) },
-                    onPinComplete = { viewModel.verifyPin(it) },
-                    onErrorReset = { viewModel.resetError() },
-                    onVerifyRecoveryAnswer = { answer, onResult ->
-                        viewModel.verifyRecoveryAnswer(answer, onResult)
-                    },
-                    onBack = {
-                        setResult(RESULT_CANCELED)
-                        finish()
-                    }
-                )
             }
         }
     }

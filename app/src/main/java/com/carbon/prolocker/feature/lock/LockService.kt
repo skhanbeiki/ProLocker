@@ -243,15 +243,23 @@ class LockService : Service(), OnBackPressedDispatcherOwner {
         lockScreenAdPlace: String,
         preloadedAdView: android.view.View?
     ): ComposeView {
-        val localizedContext = createLocalizedContext()
-        val layoutDirection = resolveLayoutDirection(localizedContext)
-        val isDarkMode = preferencesRepository.currentPreferences.isDarkMode
-        return ComposeView(localizedContext).apply {
+        val initialLang = languageManager.getEffectiveLanguageTag()
+        val initialContext = languageManager.createLocalizedContext(this, initialLang)
+        return ComposeView(initialContext).apply {
             setViewCompositionStrategy(androidx.compose.ui.platform.ViewCompositionStrategy.DisposeOnLifecycleDestroyed(serviceLifecycleOwner))
             setViewTreeLifecycleOwner(serviceLifecycleOwner)
             setViewTreeSavedStateRegistryOwner(serviceLifecycleOwner)
             setViewTreeViewModelStoreOwner(serviceLifecycleOwner)
             setContent {
+                val currentPrefs by preferencesRepository.userPreferencesFlow.collectAsState(initial = null)
+                val isDarkMode = currentPrefs?.isDarkMode ?: true
+                val language = languageManager.getEffectiveLanguageTag(currentPrefs?.language)
+                val layoutDirection = languageManager.getLayoutDirection(language)
+                val baseContext = LocalContext.current
+                val localizedContext = androidx.compose.runtime.remember(baseContext, language) {
+                    languageManager.createLocalizedContext(baseContext, language)
+                }
+
                 CompositionLocalProvider(
                     LocalContext provides localizedContext,
                     LocalLayoutDirection provides layoutDirection,
@@ -353,32 +361,6 @@ class LockService : Service(), OnBackPressedDispatcherOwner {
                     }
                 }
             }
-        }
-    }
-
-    private fun createLocalizedContext(): Context {
-        val languageTag = try {
-            runBlocking {
-                preferencesRepository.userPreferencesFlow.first().language
-            }
-        } catch (_: Exception) {
-            ""
-        }
-        val appLocales = LocaleListCompat.forLanguageTags(languageTag)
-        val locale = if (!appLocales.isEmpty) appLocales[0] else Locale.getDefault()
-
-        val config = Configuration(resources.configuration)
-        config.setLocales(android.os.LocaleList(locale))
-
-        return createConfigurationContext(config)
-    }
-
-    private fun resolveLayoutDirection(context: Context): LayoutDirection {
-        val locale = context.resources.configuration.locales[0]
-        return if (locale.script == "Arab" || locale.script == "Hebr" || locale.language == "fa" || locale.language == "ar" || locale.language == "he" || locale.language == "ur") {
-            LayoutDirection.Rtl
-        } else {
-            LayoutDirection.Ltr
         }
     }
 

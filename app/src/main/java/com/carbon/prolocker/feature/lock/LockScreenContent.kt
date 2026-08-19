@@ -111,15 +111,6 @@ fun LockScreenContent(
     onNavigateToBackgrounds: () -> Unit = {},
     onNavigateToMemory: () -> Unit = {}
 ) {
-    val languageManager: LanguageManager = koinInject()
-    val preferencesRepository: PreferencesRepository = koinInject()
-    val language by preferencesRepository.userPreferencesFlow
-        .map { it.language }
-        .collectAsState(initial = "en")
-    LaunchedEffect(language) {
-        languageManager.applyLanguage(language)
-    }
-
     val pm = LocalContext.current.packageManager
     var appName by remember { mutableStateOf("") }
     var appIcon by remember { mutableStateOf<Drawable?>(null) }

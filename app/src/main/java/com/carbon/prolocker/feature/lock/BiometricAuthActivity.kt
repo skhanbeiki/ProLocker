@@ -32,6 +32,17 @@ class BiometricAuthActivity : AppCompatActivity() {
     private val eventLogManager: EventLogManager by inject()
     private val failedAttemptManager: FailedAttemptManager by inject()
     private val intruderManager: IntruderManager by inject()
+    private val languageManager: com.carbon.prolocker.core.language.LanguageManager by inject()
+
+    override fun attachBaseContext(newBase: Context) {
+        val localizedContext = try {
+            val lm: com.carbon.prolocker.core.language.LanguageManager = org.koin.java.KoinJavaComponent.get(com.carbon.prolocker.core.language.LanguageManager::class.java)
+            lm.createLocalizedContext(newBase)
+        } catch (_: Exception) {
+            newBase
+        }
+        super.attachBaseContext(localizedContext)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

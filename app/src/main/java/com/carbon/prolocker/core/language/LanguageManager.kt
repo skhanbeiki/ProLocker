@@ -6,11 +6,10 @@ import android.content.res.AssetManager
 import android.content.res.Configuration
 import android.content.res.Resources
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.core.os.LocaleListCompat
 import com.carbon.prolocker.core.config.MarketConfig
 import com.carbon.prolocker.core.datastore.PreferencesRepository
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.runBlocking
 import java.util.Locale
 
 class LocalizedContextWrapper(
@@ -28,10 +27,11 @@ class LanguageManager(private val preferencesRepository: PreferencesRepository) 
     }
 
     fun getEffectiveLanguageTag(rawLanguage: String? = null): String {
-        val lang = rawLanguage?.takeIf { it.isNotEmpty() } ?: try {
-            runBlocking {
-                preferencesRepository.userPreferencesFlow.first().language
-            }
+        if (!rawLanguage.isNullOrEmpty()) {
+            return rawLanguage
+        }
+        val lang = try {
+            preferencesRepository.currentPreferences.language
         } catch (_: Exception) {
             null
         }
@@ -40,6 +40,10 @@ class LanguageManager(private val preferencesRepository: PreferencesRepository) 
         } else {
             if (MarketConfig.isGooglePlay) "en" else "fa"
         }
+    }
+
+    fun getLayoutDirection(languageTag: String): LayoutDirection {
+        return if (languageTag == "fa") LayoutDirection.Rtl else LayoutDirection.Ltr
     }
 
     fun setLanguage(languageTag: String) {
@@ -54,7 +58,7 @@ class LanguageManager(private val preferencesRepository: PreferencesRepository) 
     }
 
     /**
-     * Creates a ContextWrapper preserving the base Activity context while resolving resources in the selected language.
+     * Creates a ContextWrapper preserving the base Activity/Service context while resolving resources in the selected language.
      */
     fun createLocalizedContext(baseContext: Context, overrideLanguage: String? = null): Context {
         val languageTag = getEffectiveLanguageTag(overrideLanguage)
