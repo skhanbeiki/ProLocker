@@ -20,6 +20,8 @@ import com.carbon.prolocker.feature.onboarding.WelcomeScreen
 
 import androidx.compose.runtime.DisposableEffect
 import androidx.navigation.NavController
+import com.carbon.prolocker.core.language.findActivity
+import com.carbon.prolocker.core.security.AppDeviceAdminReceiver
 import com.carbon.prolocker.core.analytics.AnalyticsManager
 import org.koin.compose.koinInject
 
@@ -295,7 +297,7 @@ fun AppNavigation(
             MemoryOptimizerScreen(
                 onBack = {
                     if (shouldFinishAffinity) {
-                        (context as? Activity)?.finishAffinity()
+                        context.findActivity()?.finishAffinity()
                     } else {
                         navController.popBackStack()
                     }
@@ -307,7 +309,7 @@ fun AppNavigation(
             com.carbon.prolocker.feature.gallery.BackgroundGalleryScreen(
                 onBack = {
                     if (isStandalone) {
-                        (context as? Activity)?.finishAffinity()
+                        context.findActivity()?.finishAffinity()
                     } else {
                         navController.popBackStack()
                     }

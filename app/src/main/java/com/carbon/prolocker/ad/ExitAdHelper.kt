@@ -8,6 +8,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
+import com.carbon.prolocker.core.language.findActivity
+
 fun triggerExitInterstitialAd(
     context: Context,
     coroutineScope: CoroutineScope,
@@ -17,7 +19,7 @@ fun triggerExitInterstitialAd(
     placement: String,
     onBack: () -> Unit
 ) {
-    val activity = context as? Activity ?: run {
+    val activity = context.findActivity() ?: run {
         onBack()
         return
     }

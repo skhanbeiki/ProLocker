@@ -84,3 +84,11 @@ class LanguageManager(private val preferencesRepository: PreferencesRepository) 
         return getEffectiveLanguageTag()
     }
 }
+
+tailrec fun Context.findActivity(): android.app.Activity? =
+    when (this) {
+        is android.app.Activity -> this
+        is ContextWrapper -> baseContext.findActivity()
+        else -> null
+    }
+

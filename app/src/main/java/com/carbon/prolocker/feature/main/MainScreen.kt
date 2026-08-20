@@ -5,6 +5,8 @@ import android.content.res.Configuration
 import android.net.Uri
 import android.util.Log
 import androidx.compose.foundation.background
+import com.carbon.prolocker.core.language.findActivity
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -65,7 +67,6 @@ import com.carbon.prolocker.ad.AdManager
 import com.carbon.prolocker.ad.AdPlacement
 import com.carbon.prolocker.ad.NativeAdContainer
 import com.carbon.prolocker.ad.NativeAdType
-import com.carbon.prolocker.ad.findActivity
 import com.carbon.prolocker.core.config.MarketConfig
 import com.carbon.prolocker.core.rate.RateAppDialog
 import com.carbon.prolocker.core.rate.RateAppManager
@@ -226,14 +227,14 @@ fun MainScreen(
                 showRateDialog = false
                 rateDialogScope.launch {
                     rateAppManager.onLaterClicked()
-                    (context as? android.app.Activity)?.finishAffinity()
+                    context.findActivity()?.finishAffinity()
                 }
             },
             onDismiss = {
                 showRateDialog = false
                 rateDialogScope.launch {
                     rateAppManager.onLaterClicked()
-                    (context as? android.app.Activity)?.finishAffinity()
+                    context.findActivity()?.finishAffinity()
                 }
             }
         )
@@ -504,7 +505,7 @@ fun ExitBottomSheet(
                     .padding(bottom = 32.dp)
                     .clickable(
                         onClick = {
-                            (context as? android.app.Activity)?.finishAffinity()
+                            context.findActivity()?.finishAffinity()
                         }
                     )
                     .height(56.dp)

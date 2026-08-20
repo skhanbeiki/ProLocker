@@ -1,5 +1,6 @@
 package com.carbon.prolocker.feature.home
 
+import com.carbon.prolocker.core.language.findActivity
 import android.app.ActivityManager
 import android.content.Context
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -232,7 +233,7 @@ private fun handleThemeInterstitial(
     context: Context,
     onBack: () -> Unit
 ) {
-    val activity = context as? android.app.Activity ?: run {
+    val activity = context.findActivity() ?: run {
         onBack()
         return
     }

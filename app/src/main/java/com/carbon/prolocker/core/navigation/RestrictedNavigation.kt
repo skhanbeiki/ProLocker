@@ -12,6 +12,8 @@ import com.carbon.prolocker.feature.home.MemoryOptimizerScreen
 import java.net.URLDecoder
 import java.net.URLEncoder
 
+import com.carbon.prolocker.core.language.findActivity
+
 @Composable
 fun RestrictedNavigation(
     destination: String
@@ -19,8 +21,7 @@ fun RestrictedNavigation(
     val navController = rememberNavController()
 
     BackHandler(enabled = true) {
-        val activity = (navController.context as? android.app.Activity)
-        activity?.finishAffinity()
+        navController.context.findActivity()?.finishAffinity()
     }
 
     NavHost(
@@ -33,16 +34,14 @@ fun RestrictedNavigation(
         composable<MemoryOptimizerRoute> {
             MemoryOptimizerScreen(
                 onBack = {
-                    val activity = (navController.context as? android.app.Activity)
-                    activity?.finishAffinity()
+                    navController.context.findActivity()?.finishAffinity()
                 }
             )
         }
         composable<BackgroundGalleryRoute> {
             BackgroundGalleryScreen(
                 onBack = {
-                    val activity = (navController.context as? android.app.Activity)
-                    activity?.finishAffinity()
+                    navController.context.findActivity()?.finishAffinity()
                 },
                 onBackgroundClick = { url, id ->
                     val encodedUrl = URLEncoder.encode(url, "UTF-8")
