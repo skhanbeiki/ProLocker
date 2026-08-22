@@ -59,6 +59,10 @@ class HideFileStorage(val context: Context) {
             val appExtFile = File(appExtDir, ".${item.name}")
             if (appExtFile.exists()) return appExtFile
         }
+        val appLockerLegacy = File(File(storageRoot, "AppLocker/.hideFile"), ".${item.name}")
+        if (appLockerLegacy.exists()) return appLockerLegacy
+        val proLockerLegacy = File(File(storageRoot, "ProLocker/.hideFile"), ".${item.name}")
+        if (proLockerLegacy.exists()) return proLockerLegacy
         val internalDir = File(context.filesDir, HIDE_FILE_DIR)
         val internalFile = File(internalDir, ".${item.name}")
         if (internalFile.exists()) return internalFile

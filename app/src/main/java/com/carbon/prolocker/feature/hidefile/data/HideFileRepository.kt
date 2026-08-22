@@ -50,7 +50,7 @@ class HideFileRepository(
                     restoreFromJsonBackup()
                     loaded = database.getAllItems()
                 }
-                _items.value = loaded
+                _items.value = loaded.distinctBy { it.name }
             } catch (_: Exception) {
                 // Defensive
             }
@@ -59,41 +59,52 @@ class HideFileRepository(
 
     private fun scanAndRecoverOrphans(existingDbItems: List<HideItem>) {
         try {
-            val dir = storage.hiddenDir
-            if (!dir.exists() || !dir.isDirectory) return
+            val candidateDirs = mutableListOf<File>()
+            candidateDirs.add(storage.hiddenDir)
+            candidateDirs.add(File(storage.storageRoot, HideFileStorage.HIDE_FILE_DIR))
+            storage.context.getExternalFilesDir(null)?.let {
+                candidateDirs.add(File(it, HideFileStorage.HIDE_FILE_DIR))
+            }
+            candidateDirs.add(File(storage.storageRoot, "AppLocker/.hideFile"))
+            candidateDirs.add(File(storage.storageRoot, "ProLocker/.hideFile"))
+            candidateDirs.add(File(storage.context.filesDir, HideFileStorage.HIDE_FILE_DIR))
 
             val existingNames = existingDbItems.map { it.name }.toSet()
-            val filesOnDisk = dir.listFiles() ?: return
 
-            for (file in filesOnDisk) {
-                if (file.isDirectory || file.name.endsWith(".meta")) continue
+            for (dir in candidateDirs.distinct()) {
+                if (!dir.exists() || !dir.isDirectory) continue
+                val filesOnDisk = dir.listFiles() ?: continue
 
-                val rawName = file.name
-                val originalName = if (rawName.startsWith(".")) rawName.substring(1) else rawName
-                if (originalName.isEmpty() || existingNames.contains(originalName)) continue
+                for (file in filesOnDisk) {
+                    if (file.isDirectory || file.name.endsWith(".meta")) continue
 
-                var recoveredItem = storage.readSidecarMeta(file)
-                if (recoveredItem == null) {
-                    val detectedType = inferFileType(originalName)
-                    val size = file.length()
-                    val lastMod = file.lastModified()
-                    val defaultRelPath = when (detectedType) {
-                        HideItem.TYPE_IMAGE -> "/Pictures/Restored"
-                        HideItem.TYPE_VIDEO -> "/Movies/Restored"
-                        HideItem.TYPE_AUDIO -> "/Music/Restored"
-                        else -> "/Download/Restored"
+                    val rawName = file.name
+                    val originalName = if (rawName.startsWith(".")) rawName.substring(1) else rawName
+                    if (originalName.isEmpty() || existingNames.contains(originalName)) continue
+
+                    var recoveredItem = storage.readSidecarMeta(file)
+                    if (recoveredItem == null) {
+                        val detectedType = inferFileType(originalName)
+                        val size = file.length()
+                        val lastMod = file.lastModified()
+                        val defaultRelPath = when (detectedType) {
+                            HideItem.TYPE_IMAGE -> "/Pictures/Restored"
+                            HideItem.TYPE_VIDEO -> "/Movies/Restored"
+                            HideItem.TYPE_AUDIO -> "/Music/Restored"
+                            else -> "/Download/Restored"
+                        }
+                        recoveredItem = HideItem(
+                            name = originalName,
+                            path = defaultRelPath,
+                            type = detectedType,
+                            date = try { Date(lastMod).toString() } catch (_: Exception) { "" },
+                            size = try { Formatter.formatShortFileSize(storage.context, size) } catch (_: Exception) { "${size}B" }
+                        )
                     }
-                    recoveredItem = HideItem(
-                        name = originalName,
-                        path = defaultRelPath,
-                        type = detectedType,
-                        date = try { Date(lastMod).toString() } catch (_: Exception) { "" },
-                        size = try { Formatter.formatShortFileSize(storage.context, size) } catch (_: Exception) { "${size}B" }
-                    )
-                }
 
-                database.addItem(recoveredItem)
-                storage.writeSidecarMeta(recoveredItem)
+                    database.addItem(recoveredItem)
+                    storage.writeSidecarMeta(recoveredItem)
+                }
             }
         } catch (_: Exception) {
             // Defensive: ensure orphan recovery never crashes the application

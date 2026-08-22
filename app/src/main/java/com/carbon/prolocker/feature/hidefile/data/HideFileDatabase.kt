@@ -28,7 +28,10 @@ class HideFileDatabase(context: Context) :
             put(KEY_IMAGE_PATH, item.imagePath)
             put(KEY_IMAGE, item.image)
         }
-        db.insert(TABLE, null, values)
+        val updated = db.update(TABLE, values, "$KEY_NAME = ?", arrayOf(item.name))
+        if (updated == 0) {
+            db.insert(TABLE, null, values)
+        }
         db.close()
     }
 
@@ -36,6 +39,9 @@ class HideFileDatabase(context: Context) :
         val result = mutableListOf<HideItem>()
         try {
             val db = writableDatabase
+            try {
+                db.execSQL("DELETE FROM $TABLE WHERE id NOT IN (SELECT MIN(id) FROM $TABLE GROUP BY name)")
+            } catch (_: Exception) {}
             db.rawQuery("SELECT * FROM $TABLE", null)?.use { cursor ->
                 while (cursor.moveToNext()) {
                     val item = cursorToItem(cursor)
@@ -48,7 +54,7 @@ class HideFileDatabase(context: Context) :
         } catch (e: Exception) {
             // ignore: mirror old behavior of silently returning empty list
         }
-        return result
+        return result.distinctBy { it.name }
     }
 
     fun updateItem(item: HideItem): Int {

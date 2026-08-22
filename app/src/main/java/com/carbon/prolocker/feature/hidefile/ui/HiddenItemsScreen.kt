@@ -90,6 +90,7 @@ import com.carbon.prolocker.core.theme.ProLockerError
 import com.carbon.prolocker.core.theme.ProLockerPrimary
 import com.carbon.prolocker.core.ui.components.EmptyState
 import com.carbon.prolocker.feature.hidefile.HideFileViewModel
+import com.carbon.prolocker.feature.hidefile.data.HideFileStorage
 import com.carbon.prolocker.feature.hidefile.data.HideItem
 import androidx.activity.compose.BackHandler
 import com.carbon.prolocker.ad.AdManager
@@ -381,6 +382,9 @@ fun HiddenItemsScreen(
 @Composable
 private fun HiddenMediaThumb(item: HideItem, onClick: () -> Unit) {
     val isVideo = item.type == HideItem.TYPE_VIDEO
+    val context = LocalContext.current
+    val storage = remember(context) { HideFileStorage(context) }
+    val file = remember(item.name) { storage.hiddenFile(item) }
 
     Box(
         modifier = Modifier
@@ -389,10 +393,6 @@ private fun HiddenMediaThumb(item: HideItem, onClick: () -> Unit) {
             .background(MaterialTheme.colorScheme.surfaceVariant)
             .clickable(onClick = onClick)
     ) {
-        val file = File(
-            Environment.getExternalStorageDirectory(),
-            "${com.carbon.prolocker.feature.hidefile.data.HideFileStorage.HIDE_FILE_DIR}/.${item.name}"
-        )
         if (file.exists()) {
             if (isVideo) {
                 val videoThumb by produceState<Bitmap?>(initialValue = null, key1 = item.name) {
@@ -504,10 +504,9 @@ private fun HiddenFileRow(item: HideItem, onClick: () -> Unit) {
 
 @Composable
 private fun HiddenSheetPreview(item: HideItem) {
-    val file = File(
-        Environment.getExternalStorageDirectory(),
-        "${com.carbon.prolocker.feature.hidefile.data.HideFileStorage.HIDE_FILE_DIR}/.${item.name}"
-    )
+    val context = LocalContext.current
+    val storage = remember(context) { HideFileStorage(context) }
+    val file = remember(item.name) { storage.hiddenFile(item) }
     Box(
         modifier = Modifier
             .size(72.dp)
