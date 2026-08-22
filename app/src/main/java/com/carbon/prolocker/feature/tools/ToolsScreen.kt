@@ -6,6 +6,7 @@ import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -30,7 +31,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Backup
 import androidx.compose.material.icons.outlined.ChevronLeft
-import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.PhoneDisabled
 import androidx.compose.material.icons.outlined.PrivacyTip
 import androidx.compose.material.icons.outlined.Security
@@ -60,6 +60,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -136,7 +137,7 @@ fun FeatureCard(
                 Box(
                     modifier = Modifier
                         .size(42.dp)
-                        .background(Color.White.copy(alpha = 0.24f), CircleShape),
+                        .background(Color.White.copy(alpha = 0.24f),CircleShape),
                     contentAlignment = Alignment.Center
                 ) {
                     if (item.lottieRes != null) {
@@ -346,7 +347,7 @@ fun AppLockHeroCard(
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
-                            imageVector = Icons.Outlined.Lock,
+                            painterResource(id = R.drawable.ic_notifi),
                             contentDescription = null,
                             tint = Color.White,
                             modifier = Modifier.size(26.dp)
@@ -550,17 +551,16 @@ fun ToolsScreen(
                                 .size(40.dp)
                                 .background(
                                     Brush.linearGradient(
-                                        listOf(ProLockerPrimary, ProLockerSecondary)
+                                        colors = listOf(ProLockerPrimary, ProLockerSecondary)
                                     ),
-                                    CircleShape
+                                    RoundedCornerShape(12.dp)
                                 ),
                             contentAlignment = Alignment.Center
                         ) {
-                            Icon(
-                                Icons.Outlined.Lock,
+                            Image(
+                                painter = painterResource(id = R.drawable.ic_launcher_icon),
                                 contentDescription = null,
-                                tint = Color.White,
-                                modifier = Modifier.size(22.dp)
+                                modifier = Modifier.size(26.dp)
                             )
                         }
                         Spacer(modifier = Modifier.width(12.dp))
