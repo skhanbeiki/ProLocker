@@ -138,7 +138,7 @@ class HideFileRepository(
             } else null
             val item = storage.hideFile(path, type, artBytes) ?: continue
             database.addItem(item)
-            storage.removeFromMediaStore(type, path, size)
+            storage.deleteFileFromMediaStore(type, path, size)
         }
         refresh()
         writeJsonBackup()

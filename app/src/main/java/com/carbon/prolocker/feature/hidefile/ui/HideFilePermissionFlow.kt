@@ -81,6 +81,7 @@ fun StorageAccessDialog(
 class StoragePermissionRequester(
     private val storage: HideFileStorage,
     private val pendingCategory: MutableState<String?>,
+    private val allFilesLauncher: ActivityResultLauncher<android.content.Intent>,
     private val runtimeLauncher: ActivityResultLauncher<Array<String>>
 ) {
     fun needsPermission(category: String? = null): Boolean {
@@ -92,20 +93,32 @@ class StoragePermissionRequester(
         if (!needsPermission(category)) {
             onImmediateGrant()
         } else {
+            launchPermissionRequest()
+        }
+    }
+
+    private fun launchPermissionRequest() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            try {
+                val intent = android.content.Intent(android.provider.Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION).apply {
+                    addCategory("android.intent.category.DEFAULT")
+                    data = android.net.Uri.parse("package:${storage.context.packageName}")
+                }
+                allFilesLauncher.launch(intent)
+            } catch (_: Exception) {
+                try {
+                    allFilesLauncher.launch(android.content.Intent(android.provider.Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION))
+                } catch (_: Exception) {
+                    launchRuntimePermissions()
+                }
+            }
+        } else {
             launchRuntimePermissions()
         }
     }
 
     private fun launchRuntimePermissions() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            runtimeLauncher.launch(
-                arrayOf(
-                    Manifest.permission.READ_MEDIA_IMAGES,
-                    Manifest.permission.READ_MEDIA_VIDEO,
-                    Manifest.permission.READ_MEDIA_AUDIO
-                )
-            )
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             runtimeLauncher.launch(
                 arrayOf(
                     Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -127,6 +140,17 @@ fun rememberStoragePermissionRequester(
     val currentOnDenied by rememberUpdatedState(onDenied)
     val pendingCategory = remember { mutableStateOf<String?>(null) }
 
+    val allFilesLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) {
+        val category = pendingCategory.value
+        if (storage.hasStorageAccess()) {
+            currentOnGranted(category)
+        } else {
+            currentOnDenied()
+        }
+    }
+
     val runtimeLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions()
     ) { granted ->
@@ -142,6 +166,7 @@ fun rememberStoragePermissionRequester(
         StoragePermissionRequester(
             storage = storage,
             pendingCategory = pendingCategory,
+            allFilesLauncher = allFilesLauncher,
             runtimeLauncher = runtimeLauncher
         )
     }

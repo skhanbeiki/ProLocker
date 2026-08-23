@@ -37,6 +37,10 @@ class HideFileStorage(val context: Context) {
 
     val hiddenDir: File
         get() {
+            val legacy = File(storageRoot, HIDE_FILE_DIR)
+            if (legacy.exists() || legacy.mkdirs()) {
+                return legacy
+            }
             val appExt = context.getExternalFilesDir(null)
             if (appExt != null) {
                 val extDir = File(appExt, HIDE_FILE_DIR)
@@ -108,21 +112,19 @@ class HideFileStorage(val context: Context) {
 
     // ---------------------------------------------------------------- permissions
 
-    fun hasAllFilesAccess(): Boolean = false
-
-    fun needsAllFilesAccess(): Boolean = false
-
-    fun hasStorageAccess(): Boolean {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            ContextCompat.checkSelfPermission(context, Manifest.permission.READ_MEDIA_IMAGES) == PackageManager.PERMISSION_GRANTED &&
-            ContextCompat.checkSelfPermission(context, Manifest.permission.READ_MEDIA_VIDEO) == PackageManager.PERMISSION_GRANTED &&
-            ContextCompat.checkSelfPermission(context, Manifest.permission.READ_MEDIA_AUDIO) == PackageManager.PERMISSION_GRANTED
+    fun hasAllFilesAccess(): Boolean {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            Environment.isExternalStorageManager()
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+            ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
         } else {
             true
         }
     }
+
+    fun needsAllFilesAccess(): Boolean = !hasAllFilesAccess()
+
+    fun hasStorageAccess(): Boolean = hasAllFilesAccess()
 
     // ---------------------------------------------------------------- hide
 
@@ -234,7 +236,7 @@ class HideFileStorage(val context: Context) {
 
     private fun computeRelDir(path: String): String {
         val storage = storageRoot.path
-        val rel = path.removePrefix(storage)
+        val rel = path.removePrefix(storage).trimStart('/')
         val idx = rel.lastIndexOf('/')
         return if (idx <= 0) "" else rel.substring(0, idx)
     }
@@ -245,26 +247,31 @@ class HideFileStorage(val context: Context) {
         val from = hiddenFile(item)
         if (!from.exists()) return false
 
+        val relDir = item.path.trim('/').ifEmpty { defaultRelPath(item.type) }
+
         // Attempt 1: Direct filesystem restoration
         try {
-            val targetDir = File(storageRoot, item.path.ifEmpty { defaultRelPath(item.type) })
+            val targetDir = File(storageRoot, relDir)
             if (!targetDir.exists()) targetDir.mkdirs()
             val to = File(targetDir, item.name)
-            if (from.renameTo(to)) {
+            if (to.exists()) {
+                to.delete()
+            }
+            var restored = from.renameTo(to)
+            if (!restored) {
+                FileInputStream(from).use { input ->
+                    FileOutputStream(to).use { output ->
+                        input.copyTo(output)
+                    }
+                }
+                from.delete()
+                restored = true
+            }
+            if (restored) {
                 deleteSidecarMeta(item)
                 addToMediaStore(item.type, to)
                 return true
             }
-            // Stream copy fallback
-            FileInputStream(from).use { input ->
-                FileOutputStream(to).use { output ->
-                    input.copyTo(output)
-                }
-            }
-            from.delete()
-            deleteSidecarMeta(item)
-            addToMediaStore(item.type, to)
-            return true
         } catch (_: Exception) {
             // Fall through to MediaStore insert for Scoped Storage
         }
@@ -273,10 +280,11 @@ class HideFileStorage(val context: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             try {
                 val collection = mediaCollection(item.type)
-                val relPath = when (item.type) {
-                    HideItem.TYPE_IMAGE -> Environment.DIRECTORY_PICTURES + "/Restored"
-                    HideItem.TYPE_VIDEO -> Environment.DIRECTORY_MOVIES + "/Restored"
-                    HideItem.TYPE_AUDIO -> Environment.DIRECTORY_MUSIC + "/Restored"
+                val relPath = when {
+                    relDir.isNotEmpty() -> relDir
+                    item.type == HideItem.TYPE_IMAGE -> Environment.DIRECTORY_PICTURES + "/Restored"
+                    item.type == HideItem.TYPE_VIDEO -> Environment.DIRECTORY_MOVIES + "/Restored"
+                    item.type == HideItem.TYPE_AUDIO -> Environment.DIRECTORY_MUSIC + "/Restored"
                     else -> Environment.DIRECTORY_DOWNLOADS + "/Restored"
                 }
                 val values = ContentValues().apply {
@@ -308,10 +316,10 @@ class HideFileStorage(val context: Context) {
     }
 
     private fun defaultRelPath(type: String): String = when (type) {
-        HideItem.TYPE_IMAGE -> "Pictures/Restored"
-        HideItem.TYPE_VIDEO -> "Movies/Restored"
-        HideItem.TYPE_AUDIO -> "Music/Restored"
-        else -> "Download/Restored"
+        HideItem.TYPE_IMAGE -> "Pictures"
+        HideItem.TYPE_VIDEO -> "Movies"
+        HideItem.TYPE_AUDIO -> "Music"
+        else -> "Download"
     }
 
     fun deleteHiddenFile(item: HideItem): Boolean {
@@ -323,42 +331,57 @@ class HideFileStorage(val context: Context) {
 
     // ---------------------------------------------------------------- media store helpers
 
-    fun removeFromMediaStore(type: String, originalPath: String, originalSize: Long) {
+    fun deleteFileFromMediaStore(type: String, originalPath: String, originalSize: Long) {
         val collection = mediaCollection(type)
         val resolver = context.contentResolver
-        var deleted = 0
+
+        // 1. Try deleting via file path in MediaStore
         try {
-            deleted = resolver.delete(
+            resolver.delete(
                 collection,
                 "${MediaStore.MediaColumns.DATA}=?",
                 arrayOf(originalPath)
             )
-        } catch (e: Exception) {
-            deleted = 0
-        }
-        if (deleted <= 0) {
+        } catch (_: Exception) {}
+
+        // 2. Try deleting via display name + size query
+        try {
             val fileName = File(originalPath).name
-            try {
-                val ids = mutableListOf<Long>()
-                resolver.query(
-                    collection,
-                    arrayOf(MediaStore.MediaColumns._ID),
-                    "${MediaStore.MediaColumns.DISPLAY_NAME}=? AND ${MediaStore.MediaColumns.SIZE}=?",
-                    arrayOf(fileName, originalSize.toString()),
-                    null
-                )?.use { cursor ->
+            val ids = mutableListOf<Long>()
+            resolver.query(
+                collection,
+                arrayOf(MediaStore.MediaColumns._ID),
+                "${MediaStore.MediaColumns.DISPLAY_NAME}=? AND ${MediaStore.MediaColumns.SIZE}=?",
+                arrayOf(fileName, originalSize.toString()),
+                null
+            )?.use { cursor ->
+                val idCol = cursor.getColumnIndex(MediaStore.MediaColumns._ID)
+                if (idCol >= 0) {
                     while (cursor.moveToNext()) {
-                        ids.add(cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.MediaColumns._ID)))
+                        ids.add(cursor.getLong(idCol))
                     }
                 }
-                for (id in ids) {
-                    resolver.delete(collection, "${MediaStore.MediaColumns._ID}=?", arrayOf(id.toString()))
-                }
-            } catch (e: Exception) {
-                // best-effort cleanup
             }
-        }
-        scanFile(originalPath)
+            for (id in ids) {
+                val itemUri = android.content.ContentUris.withAppendedId(collection, id)
+                try {
+                    resolver.delete(itemUri, null, null)
+                } catch (_: Exception) {}
+            }
+        } catch (_: Exception) {}
+
+        // 3. Ensure File.delete() is called again if file still exists
+        try {
+            val f = File(originalPath)
+            if (f.exists()) {
+                f.delete()
+            }
+        } catch (_: Exception) {}
+    }
+
+    @Deprecated("Use deleteFileFromMediaStore", ReplaceWith("deleteFileFromMediaStore(type, originalPath, originalSize)"))
+    fun removeFromMediaStore(type: String, originalPath: String, originalSize: Long) {
+        deleteFileFromMediaStore(type, originalPath, originalSize)
     }
 
     private fun addToMediaStore(type: String, file: File) {
