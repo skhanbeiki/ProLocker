@@ -66,6 +66,9 @@ class AdiveryNativeAdProvider(override val providerName: String = "adivery") : N
 
                         override fun onAdClicked() {
                             Log.i("AD_PROVIDER_DEBUG", "🖱️ [ADIVERY] onAdClicked (zoneId=$zoneId)")
+                            try {
+                                com.carbon.prolocker.feature.lock.LockService.dismiss(context)
+                            } catch (_e: Exception) {}
                         }
 
                         override fun onAdClosed() {}

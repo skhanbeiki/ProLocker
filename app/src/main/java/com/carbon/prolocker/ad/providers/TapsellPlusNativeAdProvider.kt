@@ -121,6 +121,9 @@ class TapsellPlusNativeAdProvider(override val providerName: String = "tapsell")
                 }
                 override fun onAdClicked() {
                     Log.i("AD_PROVIDER_DEBUG", "🖱️ [TAPSELL] onAdClicked (adId=$adId)")
+                    try {
+                        com.carbon.prolocker.feature.lock.LockService.dismiss(context)
+                    } catch (_e: Exception) {}
                 }
                 override fun onAdClosed(completionState: AdShowCompletionState) {}
                 override fun onAdFailed(message: String) {
