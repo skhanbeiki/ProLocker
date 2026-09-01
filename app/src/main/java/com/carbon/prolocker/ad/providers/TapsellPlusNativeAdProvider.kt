@@ -20,6 +20,9 @@ import ir.tapsell.mediation.ad.show.AdShowCompletionState
 import ir.tapsell.mediation.ad.views.ntv.NativeAdView
 import ir.tapsell.mediation.ad.views.ntv.NativeAdViewContainer
 
+import com.carbon.prolocker.ProLockerApplication
+import com.carbon.prolocker.core.language.findActivity
+
 class TapsellPlusNativeAdProvider(override val providerName: String = "tapsell") : NativeAdProvider {
 
     companion object {
@@ -44,21 +47,35 @@ class TapsellPlusNativeAdProvider(override val providerName: String = "tapsell")
         onRendered: (View) -> Unit,
         onError: (String) -> Unit
     ) {
+        val targetActivity = (context as? Activity)
+            ?: context.findActivity()
+            ?: ProLockerApplication.currentActivity
+
         Tapsell.requestNativeAd(zoneId, object : RequestResultListener {
             override fun onSuccess(adId: String) {
-                val activity = context as? Activity
-                if (activity != null && activity.isDestroyed) return
+                Log.i("AD_PROVIDER_DEBUG", "🎯 [TAPSELL] requestNativeAd onSuccess -> adId=$adId | zoneId=$zoneId")
+                val act = targetActivity
+                    ?: (context as? Activity)
+                    ?: context.findActivity()
+                    ?: ProLockerApplication.currentActivity
+
+                if (act == null || act.isDestroyed || act.isFinishing) {
+                    Log.w(TAG, "Tapsell showNativeAd skipped — no active Activity available")
+                    onError("No active Activity available for Tapsell native ad")
+                    return
+                }
+
                 try {
-                    val adView = renderNativeAd(context, adId, container, layoutRes)
+                    val adView = renderNativeAd(context, act, adId, container, layoutRes)
                     onRendered(adView)
                 } catch (e: Exception) {
                     Log.e(TAG, "renderNativeAd failed", e)
+                    onError(e.message ?: "renderNativeAd failed")
                 }
             }
 
             override fun onFailure(message: String) {
-                val activity = context as? Activity
-                if (activity != null && activity.isDestroyed) return
+                Log.e("AD_PROVIDER_DEBUG", "❌ [TAPSELL] requestNativeAd onFailure -> message=$message | zoneId=$zoneId")
                 onError(message)
             }
         })
@@ -66,6 +83,7 @@ class TapsellPlusNativeAdProvider(override val providerName: String = "tapsell")
 
     private fun renderNativeAd(
         context: Context,
+        activity: Activity,
         adId: String,
         container: ViewGroup,
         @LayoutRes layoutRes: Int
@@ -93,22 +111,20 @@ class TapsellPlusNativeAdProvider(override val providerName: String = "tapsell")
 
         val nativeAdView = builder.build()
 
-        val activity = context as? Activity
-        if (activity == null) {
-            Log.w(TAG, "showNativeAd skipped — no Activity available (context=${context::class.java.name})")
-            return adContainer
-        }
-
         Tapsell.showNativeAd(
             adId,
             nativeAdView,
             activity,
             object : AdStateListener.Native {
-                override fun onAdImpression() {}
-                override fun onAdClicked() {}
+                override fun onAdImpression() {
+                    Log.i("AD_PROVIDER_DEBUG", "👀 [TAPSELL] onAdImpression -> TAPSELL NATIVE AD IS VISIBLE ON SCREEN! (adId=$adId)")
+                }
+                override fun onAdClicked() {
+                    Log.i("AD_PROVIDER_DEBUG", "🖱️ [TAPSELL] onAdClicked (adId=$adId)")
+                }
                 override fun onAdClosed(completionState: AdShowCompletionState) {}
                 override fun onAdFailed(message: String) {
-                    Log.e(TAG, "showNativeAd failed: $message")
+                    Log.e("AD_PROVIDER_DEBUG", "❌ [TAPSELL] showNativeAd failed: $message")
                 }
             }
         )

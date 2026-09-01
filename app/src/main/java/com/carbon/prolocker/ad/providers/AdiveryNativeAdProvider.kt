@@ -43,30 +43,35 @@ class AdiveryNativeAdProvider(override val providerName: String = "adivery") : N
     ) {
         Adivery.requestNativeAd(context, zoneId, object : AdiveryNativeCallback() {
             override fun onAdLoaded(ad: NativeAd) {
+                Log.i("AD_PROVIDER_DEBUG", "🎯 [ADIVERY] requestNativeAd onAdLoaded -> zoneId=$zoneId")
                 try {
                     val adView = AdiveryNativeAdView(context)
                     adView.setNativeAdLayout(layoutRes)
                     adView.setPlacementId(zoneId)
 
                     if (!validateLayoutIds(context, layoutRes)) {
+                        Log.e("AD_PROVIDER_DEBUG", "❌ [ADIVERY] validateLayoutIds failed for layoutRes=$layoutRes")
                         return
                     }
 
                     adView.setListener(object : AdiveryAdListener() {
                         override fun onAdLoaded() {
+                            Log.i("AD_PROVIDER_DEBUG", "🎯 [ADIVERY] adViewListener.onAdLoaded -> zoneId=$zoneId")
                         }
 
                         override fun onAdShown() {
+                            Log.i("AD_PROVIDER_DEBUG", "👀 [ADIVERY] onAdShown -> ADIVERY NATIVE AD IS VISIBLE ON SCREEN! (zoneId=$zoneId)")
                             onRendered(adView)
                         }
 
                         override fun onAdClicked() {
+                            Log.i("AD_PROVIDER_DEBUG", "🖱️ [ADIVERY] onAdClicked (zoneId=$zoneId)")
                         }
 
-                        override fun onAdClosed() {
-                        }
+                        override fun onAdClosed() {}
 
                         override fun onError(reason: String) {
+                            Log.e("AD_PROVIDER_DEBUG", "❌ [ADIVERY] adViewListener onError: $reason | zoneId=$zoneId")
                             onError(reason)
                         }
                     })
@@ -74,16 +79,17 @@ class AdiveryNativeAdProvider(override val providerName: String = "adivery") : N
                     container.addView(adView)
                     adView.loadAd()
                 } catch (e: Exception) {
+                    Log.e("AD_PROVIDER_DEBUG", "❌ [ADIVERY] Exception rendering native ad: ${e.message}")
                     onError(e.message ?: "Failed to render Adivery native ad")
                 }
             }
 
             override fun onAdShown() {
-                Log.d(TAG, "ADS_RENDERED provider=$providerName zoneId=$zoneId")
+                Log.i("AD_PROVIDER_DEBUG", "👀 [ADIVERY] AdiveryNativeCallback.onAdShown -> zoneId=$zoneId")
             }
 
             override fun onAdClicked() {
-                Log.d(TAG, "ADS_CLICKED provider=$providerName zoneId=$zoneId")
+                Log.i("AD_PROVIDER_DEBUG", "🖱️ [ADIVERY] AdiveryNativeCallback.onAdClicked -> zoneId=$zoneId")
             }
         })
     }

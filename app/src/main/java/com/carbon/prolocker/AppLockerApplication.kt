@@ -30,8 +30,12 @@ import org.koin.core.context.startKoin
 
 class ProLockerApplication : Application(), Application.ActivityLifecycleCallbacks {
 
-    private companion object {
+    companion object {
         const val TAG = "Moslemprolocker"
+        private var currentActivityRef: java.lang.ref.WeakReference<Activity>? = null
+
+        val currentActivity: Activity?
+            get() = currentActivityRef?.get()?.takeIf { !it.isDestroyed && !it.isFinishing }
     }
 
     private val coroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
@@ -75,6 +79,7 @@ class ProLockerApplication : Application(), Application.ActivityLifecycleCallbac
     }
 
     override fun onActivityStarted(activity: Activity) {
+        currentActivityRef = java.lang.ref.WeakReference(activity)
         startedActivityCount++
         if (startedActivityCount == 1) {
             AppEntryLockActivity.markNeedsAuthentication()
@@ -86,11 +91,19 @@ class ProLockerApplication : Application(), Application.ActivityLifecycleCallbac
         startedActivityCount--
     }
 
-    override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {}
-    override fun onActivityResumed(activity: Activity) {}
+    override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
+        currentActivityRef = java.lang.ref.WeakReference(activity)
+    }
+    override fun onActivityResumed(activity: Activity) {
+        currentActivityRef = java.lang.ref.WeakReference(activity)
+    }
     override fun onActivityPaused(activity: Activity) {}
     override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {}
-    override fun onActivityDestroyed(activity: Activity) {}
+    override fun onActivityDestroyed(activity: Activity) {
+        if (currentActivityRef?.get() == activity) {
+            currentActivityRef = null
+        }
+    }
 
     /**
      * Detect if the app was just updated. If so, force-restart the monitoring service

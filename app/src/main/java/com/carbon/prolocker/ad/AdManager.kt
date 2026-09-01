@@ -153,7 +153,7 @@ class AdManager(
     fun getNativeProviderName(placement: String): String = runBlocking {
         val config = getConfig()
         val isLockscreen = placement == AdPlacement.LOCKSCREEN_TOP || placement == AdPlacement.LOCKSCREEN_BOTTOM
-        if (isLockscreen) {
+        val provider = if (isLockscreen) {
             when {
                 MarketConfig.isBazaar -> config.configs.nativeAdBazaarLockScreen
                 MarketConfig.isMyket -> config.configs.nativeAdMyketLockScreen
@@ -166,15 +166,19 @@ class AdManager(
                 else -> config.configs.displayAdTypeGooglePlayApp
             }
         }.lowercase()
+        Log.i("AD_PROVIDER_DEBUG", "🔍 RESOLVED PROVIDER: placement=$placement -> provider=$provider (isLockscreen=$isLockscreen, Market=${MarketConfig.MARKET_NAME})")
+        provider
     }
 
     fun getInterstitialProviderName(): String = runBlocking {
         val config = getConfig()
-        when {
+        val provider = when {
             MarketConfig.isBazaar -> config.configs.displayAdTypeBazaarApp
             MarketConfig.isMyket -> config.configs.displayAdTypeMyketApp
             else -> config.configs.displayAdTypeGooglePlayApp
         }.lowercase()
+        Log.i("AD_PROVIDER_DEBUG", "🔍 RESOLVED INTERSTITIAL PROVIDER -> provider=$provider (Market=${MarketConfig.MARKET_NAME})")
+        provider
     }
 
     fun getUnitId(providerName: String, placement: String): String {
@@ -255,6 +259,7 @@ class AdManager(
         onError: (String) -> Unit
     ) {
         if (!areAdsEnabled()) {
+            Log.w("AD_PROVIDER_DEBUG", "⚠️ loadNativeAd skipped: Ads are disabled for placement=$placement")
             onError("Ads disabled")
             return
         }
@@ -262,14 +267,24 @@ class AdManager(
         val providerName = getNativeProviderName(placement)
         val provider = nativeProviders[providerName]
         if (provider == null) {
-            Log.e(TAG, "AD_PLACEMENT_SELECTED placement=$placement provider=$providerName (unknown)")
+            Log.e("AD_PROVIDER_DEBUG", "❌ AD_PLACEMENT_FAILED: placement=$placement provider=$providerName (Unknown Provider)")
             onError("Unknown provider: $providerName")
             return
         }
 
         val unitId = getUnitId(providerName, placement)
+        Log.i("AD_PROVIDER_DEBUG", "🚀 REQUESTING NATIVE AD -> Provider: [$providerName] | Placement: [$placement] | ZoneId: [$unitId]")
+
         provider.loadNativeAd(
-            activity, unitId, container, layoutRes, onRendered, onError
+            activity, unitId, container, layoutRes,
+            onRendered = { view ->
+                Log.i("AD_PROVIDER_DEBUG", "✅ NATIVE AD RENDERED SUCCESS -> Provider: [$providerName] | Placement: [$placement]")
+                onRendered(view)
+            },
+            onError = { error ->
+                Log.e("AD_PROVIDER_DEBUG", "❌ NATIVE AD RENDER FAILED -> Provider: [$providerName] | Placement: [$placement] | Error: $error")
+                onError(error)
+            }
         )
     }
 
@@ -284,27 +299,32 @@ class AdManager(
             return
         }
         if (!areAdsEnabled()) {
+            Log.w("AD_PROVIDER_DEBUG", "⚠️ showInterstitialAd skipped: Ads disabled")
             onError("Ads disabled")
             return
         }
         val providerName = getInterstitialProviderName()
         val provider = interstitialProviders[providerName]
         if (provider == null) {
-            Log.e(TAG, "INTERSTITIAL_PLACEMENT_SELECTED placement=$placement provider=$providerName (unknown)")
+            Log.e("AD_PROVIDER_DEBUG", "❌ INTERSTITIAL_FAILED: placement=$placement provider=$providerName (Unknown Provider)")
             onError("Unknown provider: $providerName")
             return
         }
 
         isShowingInterstitial = true
         val unitId = getUnitId(providerName, placement)
+        Log.i("AD_PROVIDER_DEBUG", "🚀 REQUESTING INTERSTITIAL AD -> Provider: [$providerName] | Placement: [$placement] | ZoneId: [$unitId]")
+
         provider.loadAndShowInterstitialAd(
             activity,
             unitId,
             onClosed = {
+                Log.i("AD_PROVIDER_DEBUG", "ℹ️ INTERSTITIAL AD CLOSED -> Provider: [$providerName] | Placement: [$placement]")
                 isShowingInterstitial = false
                 onClosed()
             },
             onError = { error ->
+                Log.e("AD_PROVIDER_DEBUG", "❌ INTERSTITIAL AD FAILED -> Provider: [$providerName] | Placement: [$placement] | Error: $error")
                 isShowingInterstitial = false
                 onError(error)
             }
