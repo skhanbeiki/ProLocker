@@ -166,7 +166,6 @@ class AdManager(
                 else -> config.configs.displayAdTypeGooglePlayApp
             }
         }.lowercase()
-        Log.i("AD_PROVIDER_DEBUG", "🔍 RESOLVED PROVIDER: placement=$placement -> provider=$provider (isLockscreen=$isLockscreen, Market=${MarketConfig.MARKET_NAME})")
         provider
     }
 
@@ -177,7 +176,6 @@ class AdManager(
             MarketConfig.isMyket -> config.configs.displayAdTypeMyketApp
             else -> config.configs.displayAdTypeGooglePlayApp
         }.lowercase()
-        Log.i("AD_PROVIDER_DEBUG", "🔍 RESOLVED INTERSTITIAL PROVIDER -> provider=$provider (Market=${MarketConfig.MARKET_NAME})")
         provider
     }
 

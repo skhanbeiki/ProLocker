@@ -2,6 +2,8 @@ package com.carbon.prolocker.ad.providers
 
 import android.app.Activity
 import android.content.Context
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -11,8 +13,10 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.LayoutRes
+import com.carbon.prolocker.ProLockerApplication
 import com.carbon.prolocker.R
 import com.carbon.prolocker.ad.NativeAdProvider
+import com.carbon.prolocker.core.language.findActivity
 import ir.tapsell.mediation.Tapsell
 import ir.tapsell.mediation.ad.AdStateListener
 import ir.tapsell.mediation.ad.request.RequestResultListener
@@ -20,13 +24,12 @@ import ir.tapsell.mediation.ad.show.AdShowCompletionState
 import ir.tapsell.mediation.ad.views.ntv.NativeAdView
 import ir.tapsell.mediation.ad.views.ntv.NativeAdViewContainer
 
-import com.carbon.prolocker.ProLockerApplication
-import com.carbon.prolocker.core.language.findActivity
+private const val TAG = "TapsellNativeAd"
+private val mainHandler = Handler(Looper.getMainLooper())
 
 class TapsellPlusNativeAdProvider(override val providerName: String = "tapsell") : NativeAdProvider {
 
     companion object {
-        private const val TAG = "TapsellPlusNativeAd"
         private var isInitialized = false
     }
 
@@ -34,6 +37,7 @@ class TapsellPlusNativeAdProvider(override val providerName: String = "tapsell")
         try {
             Tapsell.setInitializationListener {
                 isInitialized = true
+                Log.i("AD_PROVIDER_DEBUG", "✅ [TAPSELL] SDK initialized")
             }
         } catch (_e: Exception) {
         }
@@ -47,35 +51,53 @@ class TapsellPlusNativeAdProvider(override val providerName: String = "tapsell")
         onRendered: (View) -> Unit,
         onError: (String) -> Unit
     ) {
-        val targetActivity = (context as? Activity)
-            ?: context.findActivity()
-            ?: ProLockerApplication.currentActivity
+        Log.i("AD_PROVIDER_DEBUG", "📡 [TAPSELL NATIVE] Requesting ad for zoneId=$zoneId (context=${context::class.java.simpleName})")
 
         Tapsell.requestNativeAd(zoneId, object : RequestResultListener {
             override fun onSuccess(adId: String) {
-                Log.i("AD_PROVIDER_DEBUG", "🎯 [TAPSELL] requestNativeAd onSuccess -> adId=$adId | zoneId=$zoneId")
-                val act = targetActivity
-                    ?: (context as? Activity)
-                    ?: context.findActivity()
+                Log.i("AD_PROVIDER_DEBUG", "✅ [TAPSELL NATIVE] requestNativeAd onSuccess -> adId=$adId | zoneId=$zoneId")
+
+                // Always resolve Activity fresh at render time — this is critical for the
+                // LockScreen case where context is a Service and the Activity is tracked
+                // globally via ProLockerApplication.currentActivity.
+                val act: Activity? = (context as? Activity)?.takeIf { !it.isDestroyed && !it.isFinishing }
+                    ?: context.findActivity()?.takeIf { !it.isDestroyed && !it.isFinishing }
                     ?: ProLockerApplication.currentActivity
 
-                if (act == null || act.isDestroyed || act.isFinishing) {
-                    Log.w(TAG, "Tapsell showNativeAd skipped — no active Activity available")
-                    onError("No active Activity available for Tapsell native ad")
+                if (act == null) {
+                    Log.e("AD_PROVIDER_DEBUG", "❌ [TAPSELL NATIVE] RENDER ERROR: No live Activity found (zoneId=$zoneId). Will retry on main thread.")
+                    // Retry once on the main thread — the activity may appear just after the callback fires
+                    mainHandler.postDelayed({
+                        val retryAct = ProLockerApplication.currentActivity
+                        if (retryAct != null) {
+                            Log.i("AD_PROVIDER_DEBUG", "🔄 [TAPSELL NATIVE] Retry: Activity found -> ${retryAct.javaClass.simpleName}")
+                            try {
+                                val adView = renderNativeAd(context, retryAct, adId, container, layoutRes)
+                                onRendered(adView)
+                            } catch (e: Exception) {
+                                Log.e("AD_PROVIDER_DEBUG", "❌ [TAPSELL NATIVE] Retry render failed: ${e.message}", e)
+                                onError(e.message ?: "renderNativeAd failed on retry")
+                            }
+                        } else {
+                            Log.e("AD_PROVIDER_DEBUG", "❌ [TAPSELL NATIVE] Retry failed: still no Activity (zoneId=$zoneId)")
+                            onError("No active Activity for Tapsell native ad")
+                        }
+                    }, 200)
                     return
                 }
 
                 try {
                     val adView = renderNativeAd(context, act, adId, container, layoutRes)
+                    Log.i("AD_PROVIDER_DEBUG", "🎉 [TAPSELL NATIVE] Native ad rendered for zoneId=$zoneId activity=${act.javaClass.simpleName}")
                     onRendered(adView)
                 } catch (e: Exception) {
-                    Log.e(TAG, "renderNativeAd failed", e)
+                    Log.e("AD_PROVIDER_DEBUG", "❌ [TAPSELL NATIVE] Exception during renderNativeAd for zoneId=$zoneId: ${e.message}", e)
                     onError(e.message ?: "renderNativeAd failed")
                 }
             }
 
             override fun onFailure(message: String) {
-                Log.e("AD_PROVIDER_DEBUG", "❌ [TAPSELL] requestNativeAd onFailure -> message=$message | zoneId=$zoneId")
+                Log.e("AD_PROVIDER_DEBUG", "❌ [TAPSELL NATIVE] requestNativeAd onFailure -> Tapsell Error: '$message' | zoneId=$zoneId")
                 onError(message)
             }
         })
@@ -117,17 +139,20 @@ class TapsellPlusNativeAdProvider(override val providerName: String = "tapsell")
             activity,
             object : AdStateListener.Native {
                 override fun onAdImpression() {
-                    Log.i("AD_PROVIDER_DEBUG", "👀 [TAPSELL] onAdImpression -> TAPSELL NATIVE AD IS VISIBLE ON SCREEN! (adId=$adId)")
+                    Log.i("AD_PROVIDER_DEBUG", "👀 [TAPSELL] onAdImpression -> AD IS VISIBLE ON SCREEN! (adId=$adId)")
                 }
+
                 override fun onAdClicked() {
                     Log.i("AD_PROVIDER_DEBUG", "🖱️ [TAPSELL] onAdClicked (adId=$adId)")
                     try {
                         com.carbon.prolocker.feature.lock.LockService.dismiss(context)
                     } catch (_e: Exception) {}
                 }
+
                 override fun onAdClosed(completionState: AdShowCompletionState) {}
+
                 override fun onAdFailed(message: String) {
-                    Log.e("AD_PROVIDER_DEBUG", "❌ [TAPSELL] showNativeAd failed: $message")
+                    Log.e("AD_PROVIDER_DEBUG", "❌ [TAPSELL] showNativeAd onAdFailed: $message (adId=$adId)")
                 }
             }
         )
