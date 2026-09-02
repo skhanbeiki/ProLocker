@@ -263,6 +263,85 @@ fun AccountScreen(
                 }
             }
 
+            // Privacy Policy section — visible only on Google Play
+            if (MarketConfig.isGooglePlay) {
+                item {
+                    Text(
+                        text = stringResource(R.string.privacy_policy),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = ProLockerPrimary,
+                        modifier = Modifier.padding(horizontal = 4.dp)
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Card(
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+                        shape = RoundedCornerShape(16.dp),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+                    ) {
+                        Column(modifier = Modifier.fillMaxWidth()) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        try {
+                                            context.startActivity(
+                                                Intent(Intent.ACTION_VIEW, Uri.parse(MarketConfig.privacyPolicyUrl))
+                                            )
+                                        } catch (_: Exception) {}
+                                    }
+                                    .padding(horizontal = 16.dp, vertical = 14.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    stringResource(R.string.privacy_policy),
+                                    style = MaterialTheme.typography.titleMedium,
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                    modifier = Modifier.weight(1f)
+                                )
+                                Icon(
+                                    imageVector = if (isRtl) Icons.Default.ChevronLeft else Icons.Default.ChevronRight,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+
+                            HorizontalDivider(
+                                color = MaterialTheme.colorScheme.outlineVariant,
+                                modifier = Modifier.padding(horizontal = 16.dp)
+                            )
+
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        try {
+                                            context.startActivity(
+                                                Intent(Intent.ACTION_VIEW, Uri.parse(MarketConfig.termsOfUseUrl))
+                                            )
+                                        } catch (_: Exception) {}
+                                    }
+                                    .padding(horizontal = 16.dp, vertical = 14.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    stringResource(R.string.terms_of_use),
+                                    style = MaterialTheme.typography.titleMedium,
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                    modifier = Modifier.weight(1f)
+                                )
+                                Icon(
+                                    imageVector = if (isRtl) Icons.Default.ChevronLeft else Icons.Default.ChevronRight,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
             item {
                 Text(
                     text = stringResource(R.string.other),

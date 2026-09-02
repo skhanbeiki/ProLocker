@@ -25,7 +25,8 @@ object MarketConfig {
 
     val contactUsUrl: String = "mailto:carbon.prolocker@gmail.com"
     val aboutUsUrl: String = "https://carbonprolocker.com/about"
-    val privacyPolicyUrl: String = "https://carbonprolocker.com/privacy-policy"
+    val privacyPolicyUrl: String = "https://elaan.ir/prolocker/privacy-policy/"
+    val termsOfUseUrl: String = "https://elaan.ir/prolocker/terms-of-use/"
 
     fun shareUrl(context: Context): String {
         val packageName = context.packageName

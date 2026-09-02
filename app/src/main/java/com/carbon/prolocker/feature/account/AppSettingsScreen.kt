@@ -201,26 +201,6 @@ fun AppSettingsScreen(
                                 Text(if (currentLanguage == "fa") stringResource(R.string.persian) else stringResource(R.string.english), style = AppTypography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                             }
                         }
-
-                        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant, modifier = Modifier.padding(horizontal = 16.dp))
-
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable {
-                                    try {
-                                        val intent = Intent(Intent.ACTION_VIEW, android.net.Uri.parse(com.carbon.prolocker.core.config.MarketConfig.privacyPolicyUrl))
-                                        context.startActivity(intent)
-                                    } catch (_: Exception) {}
-                                }
-                                .padding(horizontal = 16.dp, vertical = 14.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text(stringResource(R.string.privacy_policy), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
-                            }
-                        }
                     }
                 }
             }
