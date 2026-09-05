@@ -91,9 +91,15 @@ fun ProLockerTheme(
         }
     }
 
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val isPersian = context.resources.configuration.locales[0].language == "fa"
+    val typography = androidx.compose.runtime.remember(isPersian) {
+        createTypography(if (isPersian) PersianFontFamily else RobotoFontFamily)
+    }
+
     MaterialTheme(
         colorScheme = colors,
-        typography = AppTypography,
+        typography = typography,
         content = content
     )
 }

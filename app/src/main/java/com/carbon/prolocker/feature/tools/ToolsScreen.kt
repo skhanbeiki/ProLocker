@@ -29,6 +29,8 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ChevronLeft
+import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.outlined.Backup
 import androidx.compose.material.icons.outlined.ChevronLeft
 import androidx.compose.material.icons.outlined.PhoneDisabled
@@ -60,11 +62,13 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.carbon.prolocker.R
@@ -272,13 +276,13 @@ fun MemoryOptimizerCard(
                         )
                     }
                 }
-
+                val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
                 Surface(
                     color = Color.White.copy(alpha = 0.22f),
                     shape = CircleShape
                 ) {
                     Icon(
-                        imageVector = Icons.Outlined.ChevronLeft,
+                        imageVector = if (isRtl) Icons.Default.ChevronLeft else Icons.Default.ChevronRight,
                         contentDescription = null,
                         tint = Color.White,
                         modifier = Modifier
@@ -375,7 +379,7 @@ fun AppLockHeroCard(
 //                )
 
                 Spacer(modifier = Modifier.height(16.dp))
-
+                val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
                 Surface(
                     color = Color.White,
                     shape = RoundedCornerShape(32.dp),
@@ -387,13 +391,13 @@ fun AppLockHeroCard(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            "مدیریت برنامه‌ها",
+                            stringResource(R.string.tools_app_manager),
                             fontWeight = FontWeight.Bold,
                             color = Color(0xFF4F46E5),
                             fontSize = 13.sp
                         )
                         Icon(
-                            imageVector = Icons.Outlined.ChevronLeft,
+                            imageVector = if (isRtl) Icons.Default.ChevronLeft else Icons.Default.ChevronRight,
                             contentDescription = null,
                             tint = Color(0xFF4F46E5)
                         )
