@@ -72,9 +72,10 @@
         android:theme="@style/Theme.MyApplication"
         android:usesCleartextTraffic="true">
 
-        <meta-data
-            android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-3940256099942544~3347511713" />
+        <!-- Disable automatic Google Mobile Ads initialization to prevent crash and remove test ads dialog -->
+        <provider
+            android:name="com.google.android.gms.ads.MobileAdsInitProvider"
+            tools:node="remove" />
 
         <activity
             android:name=".MainActivity"
