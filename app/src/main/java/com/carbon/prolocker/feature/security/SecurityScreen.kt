@@ -797,6 +797,8 @@ fun SecurityScreen(
                         stringResource(R.string.cancel),
                         fontWeight = FontWeight.Medium
                     )
+                }
+            }
         )
     }
 

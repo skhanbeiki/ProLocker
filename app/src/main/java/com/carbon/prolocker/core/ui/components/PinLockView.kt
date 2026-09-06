@@ -184,7 +184,7 @@ fun PinLockView(
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(if (isLandscape) 16.dp else 32.dp)
+            verticalArrangement = Arrangement.spacedBy(if (isLandscape) 12.dp else 20.dp)
         ) {
             // PIN dot indicators
             Row(
@@ -214,14 +214,14 @@ fun PinLockView(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = if (isLandscape) 8.dp else 16.dp)
+                    .padding(bottom = if (isLandscape) 4.dp else 8.dp)
                     .graphicsLayer { alpha = keypadAlpha },
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(if (isLandscape) 8.dp else 8.dp)
+                verticalArrangement = Arrangement.spacedBy(if (isLandscape) 6.dp else 12.dp)
             ) {
                 // Rows 1-3 (1-9)
                 for (row in 0..2) {
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                         for (col in 1..3) {
                             val number = row * 3 + col
                             PinKeypadButton(
@@ -233,8 +233,8 @@ fun PinLockView(
                 }
 
                 // Row 4: empty, 0, delete
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Spacer(modifier = Modifier.size(64.dp))
+                Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                    Spacer(modifier = Modifier.size(74.dp))
                     PinKeypadButton(
                         text = "0",
                         onClick = onDigit
@@ -266,7 +266,7 @@ fun PinKeypadButton(text: String, onClick: (String) -> Unit) {
 
     Box(
         modifier = Modifier
-            .size(64.dp)
+            .size(74.dp)
             .graphicsLayer {
                 scaleX = scale
                 scaleY = scale
@@ -282,7 +282,7 @@ fun PinKeypadButton(text: String, onClick: (String) -> Unit) {
     ) {
         Text(
             text = text,
-            fontSize = 28.sp,
+            fontSize = 30.sp,
             color = Color.White
         )
     }
@@ -304,7 +304,7 @@ fun PinKeypadDeleteButton(onClick: () -> Unit) {
 
     Box(
         modifier = Modifier
-            .size(64.dp)
+            .size(74.dp)
             .graphicsLayer {
                 scaleX = scale
                 scaleY = scale
@@ -320,7 +320,8 @@ fun PinKeypadDeleteButton(onClick: () -> Unit) {
         Icon(
             Icons.Default.Clear,
             contentDescription = "Delete",
-            tint = Color.White
+            tint = Color.White,
+            modifier = Modifier.size(28.dp)
         )
     }
 }
