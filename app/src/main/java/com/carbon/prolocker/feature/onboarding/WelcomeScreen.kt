@@ -178,6 +178,7 @@ fun WelcomeScreen(
                             isSelected = currentLanguage == "en",
                             onClick = {
                                 if (currentLanguage != "en") {
+                                    languageManager?.setLanguage("en")
                                     scope.launch(kotlinx.coroutines.Dispatchers.IO) {
                                         preferencesRepository?.updatePreferences { it.copy(language = "en") }
                                     }
@@ -192,6 +193,7 @@ fun WelcomeScreen(
                             isSelected = currentLanguage == "fa",
                             onClick = {
                                 if (currentLanguage != "fa") {
+                                    languageManager?.setLanguage("fa")
                                     scope.launch(kotlinx.coroutines.Dispatchers.IO) {
                                         preferencesRepository?.updatePreferences { it.copy(language = "fa") }
                                     }
