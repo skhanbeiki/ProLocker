@@ -143,6 +143,7 @@ fun SecurityScreen(
     var showDeleteAllPhotosDialog by remember { mutableStateOf(false) }
     var showDeleteSinglePhotoDialog by remember { mutableStateOf<IntruderEventEntity?>(null) }
     var showDeleteAllHistoryDialog by remember { mutableStateOf(false) }
+    var showCameraDisclosureDialog by remember { mutableStateOf(false) }
 
     val gridState = androidx.compose.foundation.lazy.grid.rememberLazyGridState()
     var isSettingsVisible by remember { mutableStateOf(true) }
@@ -275,7 +276,7 @@ fun SecurityScreen(
                                             ) {
                                                 viewModel?.toggleCaptureSelfie(true)
                                             } else {
-                                                cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+                                                showCameraDisclosureDialog = true
                                             }
                                         } else {
                                             viewModel?.toggleCaptureSelfie(false)
@@ -796,6 +797,37 @@ fun SecurityScreen(
                         stringResource(R.string.cancel),
                         fontWeight = FontWeight.Medium
                     )
+        )
+    }
+
+    if (showCameraDisclosureDialog) {
+        AlertDialog(
+            onDismissRequest = { showCameraDisclosureDialog = false },
+            title = {
+                Text(
+                    text = stringResource(R.string.camera_permission_disclosure_title),
+                    style = MaterialTheme.typography.titleLarge
+                )
+            },
+            text = {
+                Text(
+                    text = stringResource(R.string.camera_permission_disclosure_message),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showCameraDisclosureDialog = false
+                        cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+                    }
+                ) {
+                    Text(stringResource(R.string.grant_permission))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showCameraDisclosureDialog = false }) {
+                    Text(stringResource(R.string.cancel))
                 }
             }
         )
