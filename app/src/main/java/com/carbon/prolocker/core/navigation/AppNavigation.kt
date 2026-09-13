@@ -314,9 +314,9 @@ fun AppNavigation(
                         navController.popBackStack()
                     }
                 },
-                onBackgroundClick = { url, id ->
+                onBackgroundClick = { url, id, fromDownloaded ->
                     val encodedUrl = java.net.URLEncoder.encode(url, "UTF-8")
-                    navController.navigate(BackgroundPreviewRoute(encodedUrl, id))
+                    navController.navigate(BackgroundPreviewRoute(encodedUrl, id, fromDownloaded))
                 }
             )
         }
@@ -326,6 +326,7 @@ fun AppNavigation(
             com.carbon.prolocker.feature.gallery.BackgroundPreviewScreen(
                 url = decodedUrl,
                 id = route.id,
+                fromDownloaded = route.fromDownloaded,
                 onBack = { navController.popBackStack() }
             )
         }

@@ -212,7 +212,8 @@ class BackgroundGalleryViewModel(
     }
 
     fun isItemDownloaded(id: Int): Boolean {
-        return downloadedBackgrounds.value.any { it.id == id }
+        if (id <= 0) return false
+        return downloadedBackgrounds.value.any { it.id == id } || downloadManager.isFileDownloaded(id)
     }
 
     fun isBackgroundActive(item: BackgroundItem): Boolean {

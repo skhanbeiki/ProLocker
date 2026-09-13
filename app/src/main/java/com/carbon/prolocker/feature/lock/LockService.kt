@@ -336,9 +336,9 @@ class LockService : Service(), OnBackPressedDispatcherOwner {
                                 is LockNavScreen.Gallery -> {
                                     BackgroundGalleryScreen(
                                         onBack = { currentScreen.value = LockNavScreen.Lock },
-                                        onBackgroundClick = { url, id ->
+                                        onBackgroundClick = { url, id, fromDownloaded ->
                                             val encodedUrl = URLEncoder.encode(url, "UTF-8")
-                                            currentScreen.value = LockNavScreen.Preview(encodedUrl, id)
+                                            currentScreen.value = LockNavScreen.Preview(encodedUrl, id, fromDownloaded)
                                         }
                                     )
                                 }
@@ -348,6 +348,7 @@ class LockService : Service(), OnBackPressedDispatcherOwner {
                                     BackgroundPreviewScreen(
                                         url = decodedUrl,
                                         id = targetScreen.id,
+                                        fromDownloaded = targetScreen.fromDownloaded,
                                         onBack = { currentScreen.value = LockNavScreen.Gallery }
                                     )
                                 }

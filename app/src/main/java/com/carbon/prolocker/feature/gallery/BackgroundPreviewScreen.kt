@@ -82,6 +82,7 @@ import java.io.File
 fun BackgroundPreviewScreen(
     url: String,
     id: Int,
+    fromDownloaded: Boolean = false,
     onBack: () -> Unit,
     viewModel: BackgroundGalleryViewModel = koinViewModel()
 ) {
@@ -94,9 +95,29 @@ fun BackgroundPreviewScreen(
     val downloadingIds by viewModel.downloadingIds.collectAsState()
     val isDownloading = downloadingIds.contains(id)
 
+    val downloadedBackgrounds by viewModel.downloadedBackgrounds.collectAsState()
+    val isDownloadedLocally = remember(id, context) {
+        if (id <= 0) false
+        else {
+            val file = File(context.filesDir, "backgrounds/bg_${id}.jpg")
+            file.exists() && file.length() > 0
+        }
+    }
+    val isFromDownloaded = fromDownloaded || File(url).exists() || url.startsWith("/") || url.contains("backgrounds")
+    val isDownloaded = if (isDefaultItem) true else {
+        isFromDownloaded || isDownloadedLocally || downloadedBackgrounds.any {
+            it.id == id ||
+            it.localPath == url ||
+            (it.photoGallery.isNotEmpty() && it.photoGallery == url) ||
+            (it.photoThumb2x.isNotEmpty() && it.photoThumb2x == url) ||
+            (it.photoThumb.isNotEmpty() && it.photoThumb == url)
+        }
+    }
+
     val selectedBackgroundUrl by viewModel.selectedBackgroundUrl.collectAsState()
-    val item = if (isDefaultItem) null else viewModel.findBackgroundItem(id, url)
-    val isDownloaded = if (isDefaultItem) true else viewModel.isItemDownloaded(id)
+    val item = remember(id, url, downloadedBackgrounds) {
+        if (isDefaultItem) null else viewModel.findBackgroundItem(id, url)
+    }
     val isActive = if (isDefaultItem) {
         selectedBackgroundUrl.isNullOrEmpty()
     } else {
@@ -106,13 +127,15 @@ fun BackgroundPreviewScreen(
     var showDeleteConfirmDialog by remember { mutableStateOf(false) }
 
     // Resolve preview image path
-    val previewImageModel = remember(url, isDownloaded, isDefaultItem) {
+    val previewImageModel = remember(url, isDownloaded, isDefaultItem, downloadedBackgrounds) {
         if (isDefaultItem) {
             "default"
         } else {
-            val downloaded = viewModel.downloadedBackgrounds.value.find { it.id == id }
+            val downloaded = downloadedBackgrounds.find { it.id == id }
             if (downloaded != null && File(downloaded.localPath).exists()) {
                 downloaded.localPath
+            } else if (File(context.filesDir, "backgrounds/bg_${id}.jpg").exists()) {
+                File(context.filesDir, "backgrounds/bg_${id}.jpg").absolutePath
             } else {
                 url
             }
@@ -438,88 +461,104 @@ fun BackgroundPreviewScreen(
                         horizontalArrangement = Arrangement.spacedBy(10.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        // 1. Download Button
-                        if (!isDownloaded) {
-                            OutlinedButton(
-                                onClick = {
-                                    if (item != null && !isDownloading) {
-                                        viewModel.downloadBackground(
-                                            item = item,
-                                            packageName = packageName,
-                                            onSuccess = {
-                                                analyticsManager.trackBackgroundSelected(id)
-                                                Toast.makeText(
-                                                    context,
-                                                    context.getString(R.string.wallpaper_download_success),
-                                                    Toast.LENGTH_SHORT
-                                                ).show()
-                                            }
+                        // 1. Download Button (Only show if NOT opened from Downloaded tab)
+                        if (!isFromDownloaded) {
+                            if (!isDownloaded) {
+                                OutlinedButton(
+                                    onClick = {
+                                        if (item != null && !isDownloading) {
+                                            viewModel.downloadBackground(
+                                                item = item,
+                                                packageName = packageName,
+                                                onSuccess = {
+                                                    analyticsManager.trackBackgroundSelected(id)
+                                                    Toast.makeText(
+                                                        context,
+                                                        context.getString(R.string.wallpaper_download_success),
+                                                        Toast.LENGTH_SHORT
+                                                    ).show()
+                                                }
+                                            )
+                                        }
+                                    },
+                                    enabled = !isDownloading,
+                                    shape = RoundedCornerShape(16.dp),
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .height(52.dp),
+                                    border = BorderStroke(1.5.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.6f))
+                                ) {
+                                    if (isDownloading) {
+                                        CircularProgressIndicator(
+                                            strokeWidth = 2.5.dp,
+                                            modifier = Modifier.size(20.dp)
+                                        )
+                                        Spacer(modifier = Modifier.width(6.dp))
+                                        Text(
+                                            text = stringResource(R.string.downloading),
+                                            style = AppTypography.labelLarge,
+                                            fontWeight = FontWeight.Bold,
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis
+                                        )
+                                    } else {
+                                        Icon(
+                                            imageVector = Icons.Default.Download,
+                                            contentDescription = null,
+                                            modifier = Modifier.size(18.dp)
+                                        )
+                                        Spacer(modifier = Modifier.width(6.dp))
+                                        Text(
+                                            text = stringResource(R.string.download_wallpaper),
+                                            style = AppTypography.labelLarge,
+                                            fontWeight = FontWeight.Bold,
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis
                                         )
                                     }
-                                },
-                                enabled = !isDownloading,
-                                shape = RoundedCornerShape(16.dp),
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .height(52.dp),
-                                border = BorderStroke(1.5.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.6f))
-                            ) {
-                                if (isDownloading) {
-                                    CircularProgressIndicator(
-                                        strokeWidth = 2.5.dp,
-                                        modifier = Modifier.size(20.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(6.dp))
-                                    Text(
-                                        text = stringResource(R.string.downloading),
-                                        style = AppTypography.labelLarge,
-                                        fontWeight = FontWeight.Bold,
-                                        maxLines = 1,
-                                        overflow = TextOverflow.Ellipsis
-                                    )
-                                } else {
+                                }
+                            } else {
+                                // Downloaded badge button (disabled)
+                                FilledTonalButton(
+                                    onClick = { },
+                                    enabled = false,
+                                    shape = RoundedCornerShape(16.dp),
+                                    colors = ButtonDefaults.filledTonalButtonColors(
+                                        disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                                        disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant
+                                    ),
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .height(52.dp)
+                                ) {
                                     Icon(
-                                        imageVector = Icons.Default.Download,
+                                        imageVector = Icons.Default.Check,
                                         contentDescription = null,
+                                        tint = Color(0xFF4CAF50),
                                         modifier = Modifier.size(18.dp)
                                     )
                                     Spacer(modifier = Modifier.width(6.dp))
                                     Text(
-                                        text = stringResource(R.string.download_wallpaper),
+                                        text = stringResource(R.string.downloaded),
                                         style = AppTypography.labelLarge,
                                         fontWeight = FontWeight.Bold,
-                                        maxLines = 1,
-                                        overflow = TextOverflow.Ellipsis
+                                        maxLines = 1
                                     )
                                 }
-                            }
-                        } else {
-                            // Downloaded badge button
-                            FilledTonalButton(
-                                onClick = { },
-                                enabled = false,
-                                shape = RoundedCornerShape(16.dp),
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .height(52.dp)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Check,
-                                    contentDescription = null,
-                                    tint = Color(0xFF4CAF50),
-                                    modifier = Modifier.size(18.dp)
-                                )
-                                Spacer(modifier = Modifier.width(6.dp))
-                                Text(
-                                    text = stringResource(R.string.downloaded),
-                                    style = AppTypography.labelLarge,
-                                    fontWeight = FontWeight.Bold,
-                                    maxLines = 1
-                                )
                             }
                         }
 
                         // 2. Set / Remove Background Button
+                        val buttonModifier = if (isFromDownloaded) {
+                            Modifier
+                                .fillMaxWidth()
+                                .height(52.dp)
+                        } else {
+                            Modifier
+                                .weight(1f)
+                                .height(52.dp)
+                        }
+
                         if (isActive) {
                             Button(
                                 onClick = {
@@ -530,9 +569,7 @@ fun BackgroundPreviewScreen(
                                 colors = ButtonDefaults.buttonColors(
                                     containerColor = MaterialTheme.colorScheme.error
                                 ),
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .height(52.dp)
+                                modifier = buttonModifier
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.DeleteOutline,
@@ -564,9 +601,7 @@ fun BackgroundPreviewScreen(
                                 colors = ButtonDefaults.buttonColors(
                                     containerColor = MaterialTheme.colorScheme.primary
                                 ),
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .height(52.dp)
+                                modifier = buttonModifier
                             ) {
                                 Icon(
                                     imageVector = Icons.Outlined.Wallpaper,

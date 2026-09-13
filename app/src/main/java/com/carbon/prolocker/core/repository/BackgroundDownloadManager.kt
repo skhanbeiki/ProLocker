@@ -39,6 +39,12 @@ class BackgroundDownloadManager(
     suspend fun getDownloadedById(id: Int): DownloadedBackgroundEntity? =
         downloadedBackgroundDao.getById(id)
 
+    fun isFileDownloaded(id: Int): Boolean {
+        if (id <= 0) return false
+        val file = File(context.filesDir, "backgrounds/bg_${id}.jpg")
+        return file.exists() && file.length() > 0
+    }
+
     suspend fun downloadBackground(
         item: BackgroundItem,
         packageName: String

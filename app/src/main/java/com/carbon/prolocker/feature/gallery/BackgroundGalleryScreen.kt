@@ -91,7 +91,7 @@ sealed interface DownloadedGridItem {
 @Composable
 fun BackgroundGalleryScreen(
     onBack: () -> Unit,
-    onBackgroundClick: (String, Int) -> Unit,
+    onBackgroundClick: (String, Int, Boolean) -> Unit,
     viewModel: BackgroundGalleryViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -264,7 +264,7 @@ fun BackgroundGalleryScreen(
                                             isDownloaded = isDownloaded,
                                             onClick = {
                                                 val targetUrl = bg.photoGallery.ifEmpty { bg.photoThumb }
-                                                onBackgroundClick(targetUrl, bg.id)
+                                                onBackgroundClick(targetUrl, bg.id, false)
                                             }
                                         )
                                     }
@@ -313,7 +313,7 @@ fun BackgroundGalleryScreen(
                                     DefaultBackgroundCard(
                                         isActive = isDefaultActive,
                                         onClick = {
-                                            onBackgroundClick("default", 0)
+                                            onBackgroundClick("default", 0, true)
                                         }
                                     )
                                 }
@@ -349,7 +349,7 @@ fun BackgroundGalleryScreen(
                                             } else {
                                                 downloaded.photoGallery.ifEmpty { downloaded.photoThumb }
                                             }
-                                            onBackgroundClick(targetUrl, downloaded.id)
+                                            onBackgroundClick(targetUrl, downloaded.id, true)
                                         }
                                     )
                                 }

@@ -43,9 +43,9 @@ fun RestrictedNavigation(
                 onBack = {
                     navController.context.findActivity()?.finishAffinity()
                 },
-                onBackgroundClick = { url, id ->
+                onBackgroundClick = { url, id, fromDownloaded ->
                     val encodedUrl = URLEncoder.encode(url, "UTF-8")
-                    navController.navigate(BackgroundPreviewRoute(encodedUrl, id))
+                    navController.navigate(BackgroundPreviewRoute(encodedUrl, id, fromDownloaded))
                 }
             )
         }
@@ -55,6 +55,7 @@ fun RestrictedNavigation(
             BackgroundPreviewScreen(
                 url = decodedUrl,
                 id = route.id,
+                fromDownloaded = route.fromDownloaded,
                 onBack = { navController.popBackStack() }
             )
         }
