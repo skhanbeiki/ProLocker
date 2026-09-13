@@ -41,6 +41,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import com.carbon.prolocker.core.datastore.UserPreferences
+import kotlinx.coroutines.flow.first
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -178,9 +180,12 @@ fun WelcomeScreen(
                             isSelected = currentLanguage == "en",
                             onClick = {
                                 if (currentLanguage != "en") {
-                                    languageManager?.setLanguage("en")
-                                    scope.launch(kotlinx.coroutines.Dispatchers.IO) {
-                                        preferencesRepository?.updatePreferences { it.copy(language = "en") }
+                                    scope.launch {
+                                        preferencesRepository?.updatePreferences { prefs: UserPreferences -> prefs.copy(language = "en") }
+                                        runCatching {
+                                            preferencesRepository?.userPreferencesFlow?.first { prefs: UserPreferences -> prefs.language == "en" }
+                                        }
+                                        languageManager?.setLanguage("en")
                                     }
                                 }
                             },
@@ -193,9 +198,12 @@ fun WelcomeScreen(
                             isSelected = currentLanguage == "fa",
                             onClick = {
                                 if (currentLanguage != "fa") {
-                                    languageManager?.setLanguage("fa")
-                                    scope.launch(kotlinx.coroutines.Dispatchers.IO) {
-                                        preferencesRepository?.updatePreferences { it.copy(language = "fa") }
+                                    scope.launch {
+                                        preferencesRepository?.updatePreferences { prefs: UserPreferences -> prefs.copy(language = "fa") }
+                                        runCatching {
+                                            preferencesRepository?.userPreferencesFlow?.first { prefs: UserPreferences -> prefs.language == "fa" }
+                                        }
+                                        languageManager?.setLanguage("fa")
                                     }
                                 }
                             },

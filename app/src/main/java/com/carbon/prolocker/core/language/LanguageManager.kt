@@ -25,6 +25,45 @@ class LanguageManager(private val preferencesRepository: PreferencesRepository) 
     companion object {
         const val TAG = "MoslemProLocker"
 
+        fun getAppLocaleTag(): String? {
+            return try {
+                val appLocales = AppCompatDelegate.getApplicationLocales()
+                if (!appLocales.isEmpty) {
+                    appLocales.get(0)?.language?.takeIf { it.isNotEmpty() }
+                } else null
+            } catch (_: Exception) {
+                null
+            }
+        }
+
+        fun resolveEffectiveLanguage(repo: PreferencesRepository?, newBase: Context? = null): String {
+            val lang = try {
+                repo?.currentPreferences?.language?.takeIf { it.isNotEmpty() }
+            } catch (_: Exception) {
+                null
+            }
+            if (lang != null) return lang
+
+            val appLocale = getAppLocaleTag()
+            if (appLocale != null) return appLocale
+
+            val baseLocale = try {
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                    newBase?.resources?.configuration?.locales?.get(0)?.language?.takeIf { it.isNotEmpty() }
+                } else {
+                    @Suppress("DEPRECATION")
+                    newBase?.resources?.configuration?.locale?.language?.takeIf { it.isNotEmpty() }
+                }
+            } catch (_: Exception) {
+                null
+            }
+            if (baseLocale == "fa" || baseLocale == "en") {
+                return baseLocale
+            }
+
+            return if (MarketConfig.isGooglePlay) "en" else "fa"
+        }
+
         fun createLocalizedContextStatic(baseContext: Context, languageTag: String): Context {
             val locale = Locale(languageTag)
             Locale.setDefault(locale)
@@ -43,15 +82,18 @@ class LanguageManager(private val preferencesRepository: PreferencesRepository) 
             return rawLanguage
         }
         val lang = try {
-            preferencesRepository.currentPreferences.language
+            preferencesRepository.currentPreferences.language.takeIf { it.isNotEmpty() }
         } catch (_: Exception) {
             null
         }
-        return if (!lang.isNullOrEmpty()) {
-            lang
-        } else {
-            if (MarketConfig.isGooglePlay) "en" else "fa"
+        if (lang != null) {
+            return lang
         }
+        val appLocale = getAppLocaleTag()
+        if (appLocale != null) {
+            return appLocale
+        }
+        return if (MarketConfig.isGooglePlay) "en" else "fa"
     }
 
     fun getLayoutDirection(languageTag: String): LayoutDirection {

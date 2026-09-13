@@ -94,12 +94,7 @@ class AppEntryLockActivity : FragmentActivity() {
         } catch (_: Exception) {
             null
         }
-        val lang = try {
-            repo?.currentPreferences?.language
-        } catch (_: Exception) {
-            null
-        }
-        val effective = if (!lang.isNullOrEmpty()) lang else if (com.carbon.prolocker.core.config.MarketConfig.isGooglePlay) "en" else "fa"
+        val effective = com.carbon.prolocker.core.language.LanguageManager.resolveEffectiveLanguage(repo, newBase)
         val localizedContext = com.carbon.prolocker.core.language.LanguageManager.createLocalizedContextStatic(newBase, effective)
         super.attachBaseContext(localizedContext)
     }

@@ -89,6 +89,9 @@ class AccountViewModel(
     fun changeLanguage(language: String) {
         viewModelScope.launch {
             preferencesRepository.updatePreferences { it.copy(language = language) }
+            runCatching {
+                preferencesRepository.userPreferencesFlow.first { it.language == language }
+            }
             languageManager.setLanguage(language)
         }
     }

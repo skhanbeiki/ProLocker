@@ -70,12 +70,7 @@ class MainActivity : AppCompatActivity() {
         } catch (_: Exception) {
             null
         }
-        val lang = try {
-            repo?.currentPreferences?.language
-        } catch (_: Exception) {
-            null
-        }
-        val effective = if (!lang.isNullOrEmpty()) lang else if (com.carbon.prolocker.core.config.MarketConfig.isGooglePlay) "en" else "fa"
+        val effective = LanguageManager.resolveEffectiveLanguage(repo, newBase)
         val localizedContext = LanguageManager.createLocalizedContextStatic(newBase, effective)
         super.attachBaseContext(localizedContext)
     }
