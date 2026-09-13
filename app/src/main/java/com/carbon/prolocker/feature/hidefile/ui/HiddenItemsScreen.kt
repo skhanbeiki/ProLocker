@@ -121,7 +121,6 @@ fun HiddenItemsScreen(
 
     var selectedItem by remember { mutableStateOf<HideItem?>(null) }
     var showDeleteDialog by remember { mutableStateOf<HideItem?>(null) }
-    var showPermissionDialog by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     val context = LocalContext.current
@@ -146,6 +145,7 @@ fun HiddenItemsScreen(
         viewModel.refresh()
     }
 
+    var retryTrigger by remember { mutableStateOf(0) }
     val requester = rememberStoragePermissionRequester(
         onGranted = { category ->
             viewModel.refresh()
@@ -159,11 +159,17 @@ fun HiddenItemsScreen(
                     duration = SnackbarDuration.Long
                 )
                 if (result == SnackbarResult.ActionPerformed) {
-                    showPermissionDialog = true
+                    retryTrigger++
                 }
             }
         }
     )
+
+    LaunchedEffect(retryTrigger) {
+        if (retryTrigger > 0) {
+            requester.request(type) { onOpenPicker(type) }
+        }
+    }
 
     val isMedia = type == HideItem.TYPE_IMAGE || type == HideItem.TYPE_VIDEO
 
@@ -194,7 +200,7 @@ fun HiddenItemsScreen(
             ExtendedFloatingActionButton(
                 onClick = {
                     if (requester.needsPermission(type)) {
-                        showPermissionDialog = true
+                        requester.request(type) { onOpenPicker(type) }
                     } else {
                         onOpenPicker(type)
                     }
@@ -357,17 +363,6 @@ fun HiddenItemsScreen(
                     Text(stringResource(R.string.cancel))
                 }
             }
-        )
-    }
-
-    if (showPermissionDialog) {
-        StorageAccessDialog(
-            category = type,
-            onConfirm = {
-                showPermissionDialog = false
-                requester.request(type) { onOpenPicker(type) }
-            },
-            onDismiss = { showPermissionDialog = false }
         )
     }
 

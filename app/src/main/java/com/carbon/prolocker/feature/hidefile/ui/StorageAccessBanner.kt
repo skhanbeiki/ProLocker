@@ -84,7 +84,7 @@ fun StorageAccessBanner(modifier: Modifier = Modifier) {
                     )
                 }
                 TextButton(
-                    onClick = { showDialog = true }
+                    onClick = { requester.request(null) { hasAccess = true } }
                 ) {
                     Text(
                         stringResource(R.string.hide_files_allow_access),
@@ -94,16 +94,5 @@ fun StorageAccessBanner(modifier: Modifier = Modifier) {
                 }
             }
         }
-    }
-
-    if (showDialog) {
-        StorageAccessDialog(
-            category = null,
-            onConfirm = {
-                showDialog = false
-                requester.request(null) { hasAccess = true }
-            },
-            onDismiss = { showDialog = false }
-        )
     }
 }

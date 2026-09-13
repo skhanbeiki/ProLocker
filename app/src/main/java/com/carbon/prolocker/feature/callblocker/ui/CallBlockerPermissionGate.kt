@@ -21,12 +21,14 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Block
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -113,6 +115,20 @@ fun CallBlockerPermissionGate(
         }
     )
 
+    val requestPermissionsFlow = {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            val roleManager = context.getSystemService(Context.ROLE_SERVICE) as? RoleManager
+            if (roleManager != null && !roleManager.isRoleHeld(RoleManager.ROLE_CALL_SCREENING)) {
+                val intent = roleManager.createRequestRoleIntent(RoleManager.ROLE_CALL_SCREENING)
+                roleLauncher.launch(intent)
+            } else {
+                permLauncher.launch(perms)
+            }
+        } else {
+            permLauncher.launch(perms)
+        }
+    }
+
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_RESUME) {
@@ -124,11 +140,7 @@ fun CallBlockerPermissionGate(
     }
 
     LaunchedEffect(Unit) {
-        if (!checkCallBlockerPermissions(context)) {
-            permLauncher.launch(perms)
-        } else {
-            isGranted = true
-        }
+        isGranted = checkCallBlockerPermissions(context)
     }
 
     if (isGranted) {
@@ -180,19 +192,7 @@ fun CallBlockerPermissionGate(
             Spacer(modifier = Modifier.height(24.dp))
 
             Button(
-                onClick = {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                        val roleManager = context.getSystemService(Context.ROLE_SERVICE) as? RoleManager
-                        if (roleManager != null && !roleManager.isRoleHeld(RoleManager.ROLE_CALL_SCREENING)) {
-                            val intent = roleManager.createRequestRoleIntent(RoleManager.ROLE_CALL_SCREENING)
-                            roleLauncher.launch(intent)
-                        } else {
-                            permLauncher.launch(perms)
-                        }
-                    } else {
-                        permLauncher.launch(perms)
-                    }
-                },
+                onClick = { requestPermissionsFlow() },
                 shape = RoundedCornerShape(16.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = ProLockerPrimary),
                 modifier = Modifier.fillMaxWidth().height(48.dp)

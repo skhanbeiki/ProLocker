@@ -19,12 +19,14 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Shield
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -117,24 +119,24 @@ fun BackupPermissionGate(
     }
 
     LaunchedEffect(category) {
-        if (requiredPerms.isNotEmpty() && !checkAllPermissionsGranted(context, requiredPerms)) {
-            launcher.launch(requiredPerms)
-        } else {
+        if (requiredPerms.isEmpty() || checkAllPermissionsGranted(context, requiredPerms)) {
             hasPermission = true
             onPermissionsGranted()
+        } else {
+            hasPermission = false
         }
+    }
+
+    val categoryNameStr = when (category) {
+        BackupCategory.CONTACTS -> stringResource(R.string.backup_category_contacts)
+        BackupCategory.CALL_LOGS -> stringResource(R.string.backup_category_call_logs)
+        BackupCategory.SMS -> stringResource(R.string.backup_category_sms)
+        BackupCategory.APPLICATIONS -> stringResource(R.string.backup_category_applications)
     }
 
     if (hasPermission) {
         content()
     } else {
-        val categoryNameStr = when (category) {
-            BackupCategory.CONTACTS -> stringResource(R.string.backup_category_contacts)
-            BackupCategory.CALL_LOGS -> stringResource(R.string.backup_category_call_logs)
-            BackupCategory.SMS -> stringResource(R.string.backup_category_sms)
-            BackupCategory.APPLICATIONS -> stringResource(R.string.backup_category_applications)
-        }
-
         Column(
             modifier = Modifier
                 .fillMaxWidth()
