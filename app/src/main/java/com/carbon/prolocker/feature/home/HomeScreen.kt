@@ -37,11 +37,17 @@ import androidx.compose.material3.Badge
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.ui.text.PlatformTextStyle
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -345,33 +351,68 @@ fun HomeScreen(
             }
 
             // Search Bar
-            OutlinedTextField(
+            BasicTextField(
                 value = searchQuery,
                 onValueChange = { viewModel?.updateSearchQuery(it) },
-                placeholder = {
-                    Text(
-                        stringResource(R.string.search_apps),
-                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
-                    )
-                },
-                leadingIcon = {
-                    Icon(
-                        Icons.Default.Search,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
-                        modifier = Modifier.size(20.dp)
-                    )
-                },
                 modifier = Modifier
-                    .fillMaxWidth(),
-                shape = RoundedCornerShape(16.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    unfocusedBorderColor = Color.Transparent,
-                    focusedBorderColor = ProLockerPrimary,
-                    unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-                    focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant
+                    .fillMaxWidth()
+                    .height(50.dp),
+                textStyle = LocalTextStyle.current.copy(
+                    fontSize = 14.sp,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    platformStyle = PlatformTextStyle(includeFontPadding = false)
                 ),
-                singleLine = true
+                singleLine = true,
+                cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+                decorationBox = @Composable { innerTextField ->
+                    OutlinedTextFieldDefaults.DecorationBox(
+                        value = searchQuery,
+                        innerTextField = innerTextField,
+                        enabled = true,
+                        singleLine = true,
+                        visualTransformation = VisualTransformation.None,
+                        interactionSource = remember { MutableInteractionSource() },
+                        placeholder = {
+                            Text(
+                                text = stringResource(R.string.search_apps),
+                                fontSize = 14.sp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                                style = LocalTextStyle.current.copy(
+                                    platformStyle = PlatformTextStyle(includeFontPadding = false)
+                                )
+                            )
+                        },
+                        leadingIcon = {
+                            Icon(
+                                Icons.Default.Search,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+                                modifier = Modifier.size(20.dp)
+                            )
+                        },
+                        colors = OutlinedTextFieldDefaults.colors(
+                            unfocusedBorderColor = Color.Transparent,
+                            focusedBorderColor = ProLockerPrimary,
+                            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                            focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant
+                        ),
+                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 0.dp),
+                        container = {
+                            OutlinedTextFieldDefaults.ContainerBox(
+                                enabled = true,
+                                isError = false,
+                                interactionSource = remember { MutableInteractionSource() },
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    unfocusedBorderColor = Color.Transparent,
+                                    focusedBorderColor = ProLockerPrimary,
+                                    unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                                    focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant
+                                ),
+                                shape = RoundedCornerShape(16.dp)
+                            )
+                        }
+                    )
+                }
             )
 
             // Apps Section Header
