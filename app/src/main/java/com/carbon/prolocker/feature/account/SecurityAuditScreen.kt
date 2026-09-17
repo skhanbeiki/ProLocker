@@ -83,7 +83,7 @@ fun SecurityAuditScreen(onBack: () -> Unit) {
     val overlay = if (isInspection) true else PermissionManager.hasOverlayPermission(context)
     val batteryOpt = if (isInspection) true else PermissionManager.isIgnoringBatteryOptimizations(context)
     val admin = if (isInspection) false else deviceAdminManager?.isAdminActive() ?: false
-    val accessibility = if (isInspection) false else isAccessibilityServiceEnabled(context, AppMonitorAccessibilityService::class.java)
+    // val accessibility = if (isInspection) false else isAccessibilityServiceEnabled(context, AppMonitorAccessibilityService::class.java)
     val service = true
 
     Scaffold(
@@ -167,7 +167,7 @@ fun SecurityAuditScreen(onBack: () -> Unit) {
             item { AuditItem(stringResource(R.string.audit_draw_over_apps), stringResource(R.string.audit_draw_over_apps_desc), overlay) }
             item { AuditItem(stringResource(R.string.audit_battery_opt), stringResource(R.string.audit_battery_opt_desc), batteryOpt) }
             item { AuditItem(stringResource(R.string.audit_device_admin), stringResource(R.string.audit_device_admin_desc), admin, isWarningMode = true) }
-            item { AuditItem(stringResource(R.string.audit_accessibility_mode), stringResource(R.string.audit_accessibility_mode_desc), accessibility, isWarningMode = true) }
+            // item { AuditItem(stringResource(R.string.audit_accessibility_mode), stringResource(R.string.audit_accessibility_mode_desc), accessibility, isWarningMode = true) }
             item { AuditItem(stringResource(R.string.audit_background_service), stringResource(R.string.audit_background_service_desc), service) }
 
             item {

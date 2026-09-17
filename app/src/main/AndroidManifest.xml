@@ -184,6 +184,7 @@
             android:name="com.carbon.prolocker.feature.lock.LockService"
             android:enabled="true"
             android:exported="false" />
+        <!-- Accessibility service disabled for Google Play compliance
         <service
             android:name="com.carbon.prolocker.core.service.AppMonitorAccessibilityService"
             android:exported="false"
@@ -196,6 +197,7 @@
                 android:name="android.accessibilityservice"
                 android:resource="@xml/accessibility_service_config" />
         </service>
+        -->
 
         <service
             android:name="com.carbon.prolocker.core.service.AppFirebaseMessagingService"

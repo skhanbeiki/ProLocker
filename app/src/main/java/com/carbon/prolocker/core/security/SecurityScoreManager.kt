@@ -17,12 +17,12 @@ class SecurityScoreManager(
         val prefs = preferencesRepository.userPreferencesFlow.first()
         
         // Base points
-        if (PermissionManager.hasUsageAccess(context)) score += 20
-        if (PermissionManager.hasOverlayPermission(context)) score += 20
+        if (PermissionManager.hasUsageAccess(context)) score += 25
+        if (PermissionManager.hasOverlayPermission(context)) score += 25
         if (PermissionManager.isIgnoringBatteryOptimizations(context)) score += 10
         
         // Optional security features
-        if (isAccessibilityServiceEnabled(context, AppMonitorAccessibilityService::class.java)) score += 10
+        // if (isAccessibilityServiceEnabled(context, AppMonitorAccessibilityService::class.java)) score += 10
         if (deviceAdminManager.isAdminActive()) score += 15
         
         // Intruder & Recovery

@@ -79,20 +79,20 @@ fun AppSettingsScreen(
     var showLanguageDialog by remember { mutableStateOf(false) }
     var showStealthWarningDialog by remember { mutableStateOf(false) }
     var showStealthRequiresLockDialog by remember { mutableStateOf(false) }
-    var showAccessibilityDisclosure by remember { mutableStateOf(false) }
+    // var showAccessibilityDisclosure by remember { mutableStateOf(false) }
     var isAdminActive by remember {
         mutableStateOf(
             if (isInspection) false else com.carbon.prolocker.core.security.DeviceAdminManager(context).isAdminActive()
         )
     }
-    var isAccessibilityActive by remember {
-        mutableStateOf(
-            if (isInspection) false else PermissionManager.isAccessibilityServiceEnabled(
-                context,
-                com.carbon.prolocker.core.service.AppMonitorAccessibilityService::class.java
-            )
-        )
-    }
+    // var isAccessibilityActive by remember {
+    //     mutableStateOf(
+    //         if (isInspection) false else PermissionManager.isAccessibilityServiceEnabled(
+    //             context,
+    //             com.carbon.prolocker.core.service.AppMonitorAccessibilityService::class.java
+    //         )
+    //     )
+    // }
     var isStealthActive by remember {
         mutableStateOf(
             if (isInspection) false else PermissionManager.isLauncherComponentDisabled(context)
@@ -103,10 +103,10 @@ fun AppSettingsScreen(
         if (!isInspection) {
             val deviceAdminManager = com.carbon.prolocker.core.security.DeviceAdminManager(context)
             isAdminActive = deviceAdminManager.isAdminActive()
-            isAccessibilityActive = PermissionManager.isAccessibilityServiceEnabled(
-                context,
-                com.carbon.prolocker.core.service.AppMonitorAccessibilityService::class.java
-            )
+            // isAccessibilityActive = PermissionManager.isAccessibilityServiceEnabled(
+            //     context,
+            //     com.carbon.prolocker.core.service.AppMonitorAccessibilityService::class.java
+            // )
             isStealthActive = PermissionManager.isLauncherComponentDisabled(context)
         }
     }
@@ -500,6 +500,7 @@ fun AppSettingsScreen(
 
                         HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant, modifier = Modifier.padding(horizontal = 16.dp))
 
+                        /* Accessibility Mode disabled for Google Play compliance
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -528,6 +529,7 @@ fun AppSettingsScreen(
                         }
 
                         HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant, modifier = Modifier.padding(horizontal = 16.dp))
+                        */
 
                         Row(
                             modifier = Modifier
@@ -713,6 +715,7 @@ fun AppSettingsScreen(
             )
         }
 
+        /*
         if (showAccessibilityDisclosure) {
             com.carbon.prolocker.core.ui.components.AccessibilityDisclosureDialog(
                 onAccept = {
@@ -725,6 +728,7 @@ fun AppSettingsScreen(
                 }
             )
         }
+        */
     }
 }
 
