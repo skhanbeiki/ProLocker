@@ -309,6 +309,8 @@ fun JunkCleanerScreen(onBack: () -> Unit) {
                     progress = scanningProgress,
                     activeCategory = scanningCategory,
                     completedCategories = completedScanCategories,
+                    cleanerAdEnabled = cleanerAdEnabled,
+                    adManager = adManager,
                     onBack = {
                         cleanerState = CleanerState.IDLE
                     }
@@ -319,6 +321,8 @@ fun JunkCleanerScreen(onBack: () -> Unit) {
                 ReviewStateContent(
                     groups = junkGroups,
                     selectedItems = selectedJunkItems,
+                    cleanerAdEnabled = cleanerAdEnabled,
+                    adManager = adManager,
                     onItemToggle = { item ->
                         selectedJunkItems = if (selectedJunkItems.contains(item)) {
                             selectedJunkItems - item
@@ -366,6 +370,8 @@ fun JunkCleanerScreen(onBack: () -> Unit) {
                     progress = deletingProgress,
                     activeCategory = deletingCategory,
                     completedCategories = completedDeleteCategories,
+                    cleanerAdEnabled = cleanerAdEnabled,
+                    adManager = adManager,
                     onBack = { }
                 )
             }
@@ -395,6 +401,8 @@ private fun ScanningStateContent(
     progress: Float,
     activeCategory: JunkCategory,
     completedCategories: Set<JunkCategory>,
+    cleanerAdEnabled: Boolean,
+    adManager: AdManager,
     onBack: () -> Unit
 ) {
     val (sizeValue, sizeUnit) = splitSize(scanningBytes)
@@ -513,48 +521,66 @@ private fun ScanningStateContent(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = 24.dp, vertical = 24.dp),
-                verticalArrangement = Arrangement.spacedBy(22.dp)
+                    .padding(20.dp)
+                    .navigationBarsPadding(),
+                verticalArrangement = Arrangement.SpaceBetween
             ) {
-                JunkCategory.values().forEach { cat ->
-                    val isDone = completedCategories.contains(cat)
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text(
-                                text = stringResource(cat.titleRes),
-                                color = Color.White,
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.SemiBold
-                            )
-                            if (cat == JunkCategory.TEMP_FILES) {
-                                Spacer(modifier = Modifier.width(6.dp))
-                                Icon(
-                                    imageVector = Icons.Default.HelpOutline,
-                                    contentDescription = null,
-                                    tint = Color.White.copy(alpha = 0.7f),
-                                    modifier = Modifier.size(16.dp)
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(20.dp)
+                ) {
+                    JunkCategory.values().forEach { cat ->
+                        val isDone = completedCategories.contains(cat)
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(
+                                    text = stringResource(cat.titleRes),
+                                    color = Color.White,
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.SemiBold
                                 )
-                            } else if (cat == JunkCategory.RESIDUAL_JUNK) {
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Icon(
-                                    imageVector = Icons.Default.KeyboardArrowDown,
-                                    contentDescription = null,
-                                    tint = Color.White.copy(alpha = 0.7f),
-                                    modifier = Modifier.size(20.dp)
-                                )
+                                if (cat == JunkCategory.TEMP_FILES) {
+                                    Spacer(modifier = Modifier.width(6.dp))
+                                    Icon(
+                                        imageVector = Icons.Default.HelpOutline,
+                                        contentDescription = null,
+                                        tint = Color.White.copy(alpha = 0.7f),
+                                        modifier = Modifier.size(16.dp)
+                                    )
+                                } else if (cat == JunkCategory.RESIDUAL_JUNK) {
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Icon(
+                                        imageVector = Icons.Default.KeyboardArrowDown,
+                                        contentDescription = null,
+                                        tint = Color.White.copy(alpha = 0.7f),
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                }
+                            }
+
+                            if (isDone) {
+                                CustomBlueCheckbox(checked = true)
+                            } else {
+                                CategoryProgressSpinner()
                             }
                         }
-
-                        if (isDone) {
-                            CustomBlueCheckbox(checked = true)
-                        } else {
-                            CategoryProgressSpinner()
-                        }
                     }
+                }
+
+                if (cleanerAdEnabled) {
+                    NativeAdContainer(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 8.dp)
+                            .clip(RoundedCornerShape(16.dp)),
+                        placement = AdPlacement.RAM_CLEANER_NATIVE,
+                        adType = NativeAdType.TYPE_1,
+                        adManager = adManager
+                    )
                 }
             }
         }
@@ -568,6 +594,8 @@ private fun ScanningStateContent(
 private fun ReviewStateContent(
     groups: List<JunkCategoryGroup>,
     selectedItems: Set<JunkItem>,
+    cleanerAdEnabled: Boolean,
+    adManager: AdManager,
     onItemToggle: (JunkItem) -> Unit,
     onGroupToggle: (JunkCategoryGroup, Boolean) -> Unit,
     onCleanClick: () -> Unit,
@@ -797,20 +825,32 @@ private fun ReviewStateContent(
                     }
 
                     item {
-                        Spacer(modifier = Modifier.height(84.dp))
+                        Spacer(modifier = Modifier.height(180.dp))
                     }
                 }
             }
         }
 
-        // Floating Action Button at Bottom
-        Box(
+        // Floating Action Ad + Button at Bottom
+        Column(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()
                 .navigationBarsPadding()
-                .padding(bottom = 20.dp, start = 24.dp, end = 24.dp)
+                .padding(bottom = 16.dp, start = 20.dp, end = 20.dp)
         ) {
+            if (cleanerAdEnabled) {
+                NativeAdContainer(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 12.dp)
+                        .clip(RoundedCornerShape(16.dp)),
+                    placement = AdPlacement.RAM_CLEANER_NATIVE,
+                    adType = NativeAdType.TYPE_1,
+                    adManager = adManager
+                )
+            }
+
             Button(
                 onClick = onCleanClick,
                 enabled = selectedItems.isNotEmpty(),
@@ -859,6 +899,8 @@ private fun CleaningStateContent(
     progress: Float,
     activeCategory: JunkCategory,
     completedCategories: Set<JunkCategory>,
+    cleanerAdEnabled: Boolean,
+    adManager: AdManager,
     onBack: () -> Unit
 ) {
     val (sizeValue, sizeUnit) = splitSize(remainingBytes)
@@ -977,40 +1019,58 @@ private fun CleaningStateContent(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = 24.dp, vertical = 24.dp),
-                verticalArrangement = Arrangement.spacedBy(22.dp)
+                    .padding(20.dp)
+                    .navigationBarsPadding(),
+                verticalArrangement = Arrangement.SpaceBetween
             ) {
-                JunkCategory.values().forEach { cat ->
-                    val isDone = completedCategories.contains(cat)
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text(
-                                text = stringResource(cat.titleRes),
-                                color = Color.White,
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.SemiBold
-                            )
-                            if (cat == JunkCategory.TEMP_FILES) {
-                                Spacer(modifier = Modifier.width(6.dp))
-                                Icon(
-                                    imageVector = Icons.Default.HelpOutline,
-                                    contentDescription = null,
-                                    tint = Color.White.copy(alpha = 0.7f),
-                                    modifier = Modifier.size(16.dp)
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(20.dp)
+                ) {
+                    JunkCategory.values().forEach { cat ->
+                        val isDone = completedCategories.contains(cat)
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(
+                                    text = stringResource(cat.titleRes),
+                                    color = Color.White,
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.SemiBold
                                 )
+                                if (cat == JunkCategory.TEMP_FILES) {
+                                    Spacer(modifier = Modifier.width(6.dp))
+                                    Icon(
+                                        imageVector = Icons.Default.HelpOutline,
+                                        contentDescription = null,
+                                        tint = Color.White.copy(alpha = 0.7f),
+                                        modifier = Modifier.size(16.dp)
+                                    )
+                                }
+                            }
+
+                            if (isDone) {
+                                CustomBlueCheckbox(checked = true)
+                            } else {
+                                CategoryProgressSpinner()
                             }
                         }
-
-                        if (isDone) {
-                            CustomBlueCheckbox(checked = true)
-                        } else {
-                            CategoryProgressSpinner()
-                        }
                     }
+                }
+
+                if (cleanerAdEnabled) {
+                    NativeAdContainer(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 8.dp)
+                            .clip(RoundedCornerShape(16.dp)),
+                        placement = AdPlacement.RAM_CLEANER_NATIVE,
+                        adType = NativeAdType.TYPE_1,
+                        adManager = adManager
+                    )
                 }
             }
         }
@@ -1153,10 +1213,10 @@ private fun IdleStateContent(
                         NativeAdContainer(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(135.dp)
-                                .padding(bottom = 12.dp),
+                                .padding(bottom = 12.dp)
+                                .clip(RoundedCornerShape(16.dp)),
                             placement = AdPlacement.RAM_CLEANER_NATIVE,
-                            adType = NativeAdType.TYPE_5,
+                            adType = NativeAdType.TYPE_1,
                             adManager = adManager
                         )
                     }
@@ -1317,10 +1377,10 @@ private fun CompletedStateContent(
                 NativeAdContainer(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(135.dp)
-                        .padding(bottom = 12.dp),
+                        .padding(bottom = 12.dp)
+                        .clip(RoundedCornerShape(16.dp)),
                     placement = AdPlacement.RAM_CLEANER_NATIVE,
-                    adType = NativeAdType.TYPE_5,
+                    adType = NativeAdType.TYPE_1,
                     adManager = adManager
                 )
             }
@@ -1475,10 +1535,10 @@ private fun JunkPermissionFullScreenContent(
                 NativeAdContainer(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(135.dp)
-                        .padding(bottom = 12.dp),
+                        .padding(bottom = 12.dp)
+                        .clip(RoundedCornerShape(16.dp)),
                     placement = AdPlacement.RAM_CLEANER_NATIVE,
-                    adType = NativeAdType.TYPE_5,
+                    adType = NativeAdType.TYPE_1,
                     adManager = adManager
                 )
             }
