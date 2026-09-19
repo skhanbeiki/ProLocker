@@ -57,7 +57,6 @@ import com.carbon.prolocker.core.theme.ProLockerSecondary
 fun getCallBlockerPermissions(): Array<String> {
     val list = mutableListOf(
         android.Manifest.permission.READ_PHONE_STATE,
-        android.Manifest.permission.READ_CALL_LOG,
         android.Manifest.permission.READ_CONTACTS
     )
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

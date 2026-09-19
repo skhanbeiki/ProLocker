@@ -92,12 +92,6 @@ class BackupCategoryViewModel(
                     BackupCategory.CONTACTS -> repository.backupContacts { progress ->
                         _uiState.value = _uiState.value.copy(backupProgress = progress)
                     }
-                    BackupCategory.CALL_LOGS -> repository.backupCallLogs { progress ->
-                        _uiState.value = _uiState.value.copy(backupProgress = progress)
-                    }
-                    BackupCategory.SMS -> repository.backupSms { progress ->
-                        _uiState.value = _uiState.value.copy(backupProgress = progress)
-                    }
                     BackupCategory.APPLICATIONS -> ""
                 }
 
@@ -129,8 +123,6 @@ class BackupCategoryViewModel(
             try {
                 val restoredCount = when (fileInfo.category) {
                     BackupCategory.CONTACTS -> repository.restoreContacts(fileInfo)
-                    BackupCategory.CALL_LOGS -> repository.restoreCallLogs(fileInfo)
-                    BackupCategory.SMS -> repository.restoreSms(fileInfo)
                     BackupCategory.APPLICATIONS -> 0
                 }
                 _uiState.value = _uiState.value.copy(

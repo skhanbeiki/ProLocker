@@ -25,12 +25,10 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.outlined.Call
 import androidx.compose.material.icons.outlined.Contacts
 import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.PlayArrow
 import androidx.compose.material.icons.outlined.RestorePage
-import androidx.compose.material.icons.outlined.Sms
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -126,15 +124,11 @@ fun BackupCategoryDetailScreen(
 
     val categoryTitle = when (category) {
         BackupCategory.CONTACTS -> stringResource(R.string.backup_contacts_title)
-        BackupCategory.CALL_LOGS -> stringResource(R.string.backup_call_logs_title)
-        BackupCategory.SMS -> stringResource(R.string.backup_sms_title)
         BackupCategory.APPLICATIONS -> stringResource(R.string.backup_apps_title)
     }
 
     val categoryIcon: ImageVector = when (category) {
         BackupCategory.CONTACTS -> Icons.Outlined.Contacts
-        BackupCategory.CALL_LOGS -> Icons.Outlined.Call
-        BackupCategory.SMS -> Icons.Outlined.Sms
         BackupCategory.APPLICATIONS -> Icons.Outlined.Description
     }
 

@@ -62,20 +62,18 @@ import com.carbon.prolocker.R
 import com.carbon.prolocker.core.theme.ProLockerPrimary
 import com.carbon.prolocker.feature.callblocker.data.BlockRuleType
 import com.carbon.prolocker.feature.callblocker.data.BlockSourceCategory
-import com.carbon.prolocker.feature.callblocker.data.PickableCallLogItem
 import com.carbon.prolocker.feature.callblocker.data.PickableContactItem
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddBlockRuleDialog(
     contacts: List<PickableContactItem>,
-    callLogs: List<PickableCallLogItem>,
     isLoadingPickers: Boolean,
     onDismiss: () -> Unit,
     onAddRule: (numberOrPattern: String, displayName: String, ruleType: BlockRuleType, sourceCategory: BlockSourceCategory) -> Unit
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    var selectedTab by remember { mutableStateOf(0) } // 0: Contacts, 1: Call Logs, 2: Specific Number, 3: Pattern
+    var selectedTab by remember { mutableStateOf(0) } // 0: Contacts, 1: Specific Number, 2: Pattern
 
     var searchQuery by remember { mutableStateOf("") }
     var customNumber by remember { mutableStateOf("") }
@@ -126,16 +124,11 @@ fun AddBlockRuleDialog(
                 Tab(
                     selected = selectedTab == 1,
                     onClick = { selectedTab = 1 },
-                    text = { Text(stringResource(R.string.call_blocker_mode_call_logs), fontSize = 12.sp, maxLines = 1) }
+                    text = { Text(stringResource(R.string.call_blocker_mode_custom), fontSize = 12.sp, maxLines = 1) }
                 )
                 Tab(
                     selected = selectedTab == 2,
                     onClick = { selectedTab = 2 },
-                    text = { Text(stringResource(R.string.call_blocker_mode_custom), fontSize = 12.sp, maxLines = 1) }
-                )
-                Tab(
-                    selected = selectedTab == 3,
-                    onClick = { selectedTab = 3 },
                     text = { Text(stringResource(R.string.call_blocker_mode_pattern), fontSize = 12.sp, maxLines = 1) }
                 )
             }
@@ -152,16 +145,7 @@ fun AddBlockRuleDialog(
                         onAddRule(contact.number, contact.name, BlockRuleType.EXACT, BlockSourceCategory.CONTACT)
                     }
                 )
-                1 -> CallLogsPickerTabContent(
-                    callLogs = callLogs,
-                    isLoading = isLoadingPickers,
-                    searchQuery = searchQuery,
-                    onSearchQueryChanged = { searchQuery = it },
-                    onSelectCallLog = { callLog ->
-                        onAddRule(callLog.number, callLog.name ?: callLog.number, BlockRuleType.EXACT, BlockSourceCategory.CALL_LOG)
-                    }
-                )
-                2 -> CustomNumberTabContent(
+                1 -> CustomNumberTabContent(
                     customNumber = customNumber,
                     customName = customName,
                     onNumberChanged = { customNumber = it },
@@ -172,7 +156,7 @@ fun AddBlockRuleDialog(
                         }
                     }
                 )
-                3 -> PatternTabContent(
+                2 -> PatternTabContent(
                     patternText = patternText,
                     patternName = patternName,
                     selectedPatternType = selectedPatternType,
@@ -241,58 +225,6 @@ fun ContactsPickerTabContent(
                         title = item.name.ifBlank { item.number },
                         subtitle = item.number,
                         onClick = { onSelectContact(item) }
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun CallLogsPickerTabContent(
-    callLogs: List<PickableCallLogItem>,
-    isLoading: Boolean,
-    searchQuery: String,
-    onSearchQueryChanged: (String) -> Unit,
-    onSelectCallLog: (PickableCallLogItem) -> Unit
-) {
-    val filtered = remember(callLogs, searchQuery) {
-        if (searchQuery.isBlank()) callLogs else callLogs.filter {
-            (it.name ?: "").contains(searchQuery, ignoreCase = true) || it.number.contains(searchQuery)
-        }
-    }
-
-    Column(modifier = Modifier.fillMaxWidth().height(360.dp)) {
-        OutlinedTextField(
-            value = searchQuery,
-            onValueChange = onSearchQueryChanged,
-            placeholder = { Text(stringResource(R.string.call_blocker_search_placeholder)) },
-            leadingIcon = { Icon(Icons.Outlined.Search, contentDescription = null) },
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 6.dp),
-            shape = RoundedCornerShape(16.dp),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-                unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant
-            ),
-            singleLine = true
-        )
-
-        if (isLoading) {
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator(color = ProLockerPrimary)
-            }
-        } else {
-            LazyColumn(
-                contentPadding = PaddingValues(horizontal = 20.dp, vertical = 8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.fillMaxSize()
-            ) {
-                itemsIndexed(filtered, key = { index, item -> "${item.number}_${item.timestampMs}_$index" }) { _, item ->
-                    PickerRowItem(
-                        icon = Icons.Outlined.Call,
-                        title = item.name ?: item.number,
-                        subtitle = item.number,
-                        onClick = { onSelectCallLog(item) }
                     )
                 }
             }

@@ -59,13 +59,6 @@ fun getRequiredPermissions(category: BackupCategory): Array<String> {
             android.Manifest.permission.READ_CONTACTS,
             android.Manifest.permission.WRITE_CONTACTS
         )
-        BackupCategory.CALL_LOGS -> arrayOf(
-            android.Manifest.permission.READ_CALL_LOG,
-            android.Manifest.permission.WRITE_CALL_LOG
-        )
-        BackupCategory.SMS -> arrayOf(
-            android.Manifest.permission.READ_SMS
-        )
         BackupCategory.APPLICATIONS -> emptyArray()
     }
 }
@@ -129,8 +122,6 @@ fun BackupPermissionGate(
 
     val categoryNameStr = when (category) {
         BackupCategory.CONTACTS -> stringResource(R.string.backup_category_contacts)
-        BackupCategory.CALL_LOGS -> stringResource(R.string.backup_category_call_logs)
-        BackupCategory.SMS -> stringResource(R.string.backup_category_sms)
         BackupCategory.APPLICATIONS -> stringResource(R.string.backup_category_applications)
     }
 

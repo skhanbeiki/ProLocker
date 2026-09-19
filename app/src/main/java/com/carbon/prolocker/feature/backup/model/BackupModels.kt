@@ -5,9 +5,7 @@ import kotlinx.serialization.Serializable
 
 enum class BackupCategory {
     CONTACTS,
-    CALL_LOGS,
-    APPLICATIONS,
-    SMS
+    APPLICATIONS
 }
 
 data class BackupItemCount(
@@ -29,24 +27,6 @@ data class ContactBackupData(
     val displayName: String,
     val phoneNumbers: List<String> = emptyList(),
     val emails: List<String> = emptyList()
-)
-
-@Serializable
-data class CallLogBackupData(
-    val number: String,
-    val name: String? = null,
-    val type: Int,
-    val dateMs: Long,
-    val durationSec: Long
-)
-
-@Serializable
-data class SmsBackupData(
-    val address: String,
-    val body: String,
-    val dateMs: Long,
-    val type: Int,
-    val read: Int
 )
 
 data class InstalledAppItem(

@@ -9,7 +9,6 @@ import com.carbon.prolocker.feature.callblocker.data.BlockSourceCategory
 import com.carbon.prolocker.feature.callblocker.data.BlockedCallLogEntity
 import com.carbon.prolocker.feature.callblocker.data.BlockedNumberEntity
 import com.carbon.prolocker.feature.callblocker.data.CallBlockerRepository
-import com.carbon.prolocker.feature.callblocker.data.PickableCallLogItem
 import com.carbon.prolocker.feature.callblocker.data.PickableContactItem
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -26,7 +25,6 @@ data class CallBlockerUiState(
     val blockedHistory: List<BlockedCallLogEntity> = emptyList(),
     val totalBlockedCallsCount: Int = 0,
     val deviceContacts: List<PickableContactItem> = emptyList(),
-    val deviceCallLogs: List<PickableCallLogItem> = emptyList(),
     val isLoadingPickers: Boolean = false,
     val showAddDialog: Boolean = false,
     val ruleToDelete: BlockedNumberEntity? = null,
@@ -71,10 +69,8 @@ class CallBlockerViewModel(
         _uiState.value = _uiState.value.copy(showAddDialog = true, isLoadingPickers = true)
         viewModelScope.launch {
             val contacts = repository.getDeviceContacts()
-            val callLogs = repository.getDeviceCallLogs()
             _uiState.value = _uiState.value.copy(
                 deviceContacts = contacts,
-                deviceCallLogs = callLogs,
                 isLoadingPickers = false
             )
         }

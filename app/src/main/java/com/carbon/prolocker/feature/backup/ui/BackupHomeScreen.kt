@@ -31,10 +31,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.outlined.Android
-import androidx.compose.material.icons.outlined.Call
 import androidx.compose.material.icons.outlined.Contacts
 import androidx.compose.material.icons.outlined.FolderSpecial
-import androidx.compose.material.icons.outlined.Sms
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -211,18 +209,6 @@ fun BackupHomeScreen(
                 titleRes = R.string.backup_category_contacts,
                 icon = Icons.Outlined.Contacts,
                 gradient = listOf(Color(0xFF4F8CFF), Color(0xFF2563EB))
-            ),
-            BackupCategoryCardItem(
-                category = BackupCategory.CALL_LOGS,
-                titleRes = R.string.backup_category_call_logs,
-                icon = Icons.Outlined.Call,
-                gradient = listOf(Color(0xFF00D1B2), Color(0xFF00A896))
-            ),
-            BackupCategoryCardItem(
-                category = BackupCategory.SMS,
-                titleRes = R.string.backup_category_sms,
-                icon = Icons.Outlined.Sms,
-                gradient = listOf(Color(0xFFF472B6), Color(0xFFEC4899))
             ),
             BackupCategoryCardItem(
                 category = BackupCategory.APPLICATIONS,

@@ -1,7 +1,6 @@
 package com.carbon.prolocker.feature.callblocker.data
 
 import android.content.Context
-import android.provider.CallLog
 import android.provider.ContactsContract
 import com.carbon.prolocker.feature.callblocker.util.PhoneNumberUtils
 import kotlinx.coroutines.Dispatchers
@@ -13,12 +12,6 @@ import saman.zamani.persiandate.PersianDateFormat
 data class PickableContactItem(
     val name: String,
     val number: String
-)
-
-data class PickableCallLogItem(
-    val number: String,
-    val name: String?,
-    val timestampMs: Long
 )
 
 class CallBlockerRepository(
@@ -104,46 +97,6 @@ class CallBlockerRepository(
                     val number = if (numberIndex >= 0) cursor.getString(numberIndex) ?: "" else ""
                     if (number.isNotBlank()) {
                         list.add(PickableContactItem(name = name, number = number))
-                    }
-                }
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-
-        list.distinctBy { PhoneNumberUtils.normalize(it.number) }
-    }
-
-    /**
-     * Queries device Call Logs database
-     */
-    suspend fun getDeviceCallLogs(): List<PickableCallLogItem> = withContext(Dispatchers.IO) {
-        val list = mutableListOf<PickableCallLogItem>()
-        val projection = arrayOf(
-            CallLog.Calls.NUMBER,
-            CallLog.Calls.CACHED_NAME,
-            CallLog.Calls.DATE
-        )
-
-        try {
-            context.contentResolver.query(
-                CallLog.Calls.CONTENT_URI,
-                projection,
-                null,
-                null,
-                "${CallLog.Calls.DATE} DESC"
-            )?.use { cursor ->
-                val numberIndex = cursor.getColumnIndex(CallLog.Calls.NUMBER)
-                val nameIndex = cursor.getColumnIndex(CallLog.Calls.CACHED_NAME)
-                val dateIndex = cursor.getColumnIndex(CallLog.Calls.DATE)
-
-                while (cursor.moveToNext()) {
-                    val number = if (numberIndex >= 0) cursor.getString(numberIndex) ?: "" else ""
-                    val name = if (nameIndex >= 0) cursor.getString(nameIndex) else null
-                    val date = if (dateIndex >= 0) cursor.getLong(dateIndex) else 0L
-
-                    if (number.isNotBlank()) {
-                        list.add(PickableCallLogItem(number = number, name = name, timestampMs = date))
                     }
                 }
             }

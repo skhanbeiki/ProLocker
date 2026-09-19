@@ -172,7 +172,6 @@ fun CallBlockerHomeScreen(
     if (uiState.showAddDialog) {
         AddBlockRuleDialog(
             contacts = uiState.deviceContacts,
-            callLogs = uiState.deviceCallLogs,
             isLoadingPickers = uiState.isLoadingPickers,
             onDismiss = { viewModel.closeAddDialog() },
             onAddRule = { num, name, ruleType, src ->

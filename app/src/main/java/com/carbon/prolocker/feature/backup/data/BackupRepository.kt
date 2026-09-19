@@ -7,19 +7,15 @@ import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.net.Uri
-import android.provider.CallLog
 import android.provider.ContactsContract
-import android.provider.Telephony
 import androidx.core.content.FileProvider
 import androidx.documentfile.provider.DocumentFile
 import com.carbon.prolocker.feature.backup.model.AppBackupProgressItem
 import com.carbon.prolocker.feature.backup.model.AppBackupStatus
 import com.carbon.prolocker.feature.backup.model.BackupCategory
 import com.carbon.prolocker.feature.backup.model.BackupFileInfo
-import com.carbon.prolocker.feature.backup.model.CallLogBackupData
 import com.carbon.prolocker.feature.backup.model.ContactBackupData
 import com.carbon.prolocker.feature.backup.model.InstalledAppItem
-import com.carbon.prolocker.feature.backup.model.SmsBackupData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -49,8 +45,6 @@ class BackupRepository(
 
     private val categorySubfolders = mapOf(
         BackupCategory.CONTACTS to "Contacts",
-        BackupCategory.CALL_LOGS to "Call Logs",
-        BackupCategory.SMS to "SMS",
         BackupCategory.APPLICATIONS to "Applications"
     )
 
@@ -60,8 +54,6 @@ class BackupRepository(
         try {
             when (category) {
                 BackupCategory.CONTACTS -> getContactsCount()
-                BackupCategory.CALL_LOGS -> getCallLogsCount()
-                BackupCategory.SMS -> getSmsCount()
                 BackupCategory.APPLICATIONS -> getInstalledApps().size
             }
         } catch (e: Exception) {
@@ -73,32 +65,6 @@ class BackupRepository(
         val cursor = context.contentResolver.query(
             ContactsContract.Contacts.CONTENT_URI,
             arrayOf(ContactsContract.Contacts._ID),
-            null,
-            null,
-            null
-        )
-        val count = cursor?.count ?: 0
-        cursor?.close()
-        return count
-    }
-
-    private fun getCallLogsCount(): Int {
-        val cursor = context.contentResolver.query(
-            CallLog.Calls.CONTENT_URI,
-            arrayOf(CallLog.Calls._ID),
-            null,
-            null,
-            null
-        )
-        val count = cursor?.count ?: 0
-        cursor?.close()
-        return count
-    }
-
-    private fun getSmsCount(): Int {
-        val cursor = context.contentResolver.query(
-            Telephony.Sms.CONTENT_URI,
-            arrayOf(Telephony.Sms._ID),
             null,
             null,
             null
@@ -317,170 +283,6 @@ class BackupRepository(
 
             try {
                 context.contentResolver.applyBatch(ContactsContract.AUTHORITY, ops)
-                restoredCount++
-            } catch (_: Exception) {
-            }
-        }
-        restoredCount
-    }
-
-    // --- Call Logs Backup & Restore ---
-
-    suspend fun backupCallLogs(onProgress: (Float) -> Unit): String = withContext(Dispatchers.IO) {
-        val callLogsList = mutableListOf<CallLogBackupData>()
-        val cr = context.contentResolver
-
-        val cursor = cr.query(
-            CallLog.Calls.CONTENT_URI,
-            arrayOf(
-                CallLog.Calls.NUMBER,
-                CallLog.Calls.CACHED_NAME,
-                CallLog.Calls.TYPE,
-                CallLog.Calls.DATE,
-                CallLog.Calls.DURATION
-            ),
-            null,
-            null,
-            null
-        )
-
-        cursor?.use { c ->
-            val total = c.count.coerceAtLeast(1)
-            val numIndex = c.getColumnIndex(CallLog.Calls.NUMBER)
-            val nameIndex = c.getColumnIndex(CallLog.Calls.CACHED_NAME)
-            val typeIndex = c.getColumnIndex(CallLog.Calls.TYPE)
-            val dateIndex = c.getColumnIndex(CallLog.Calls.DATE)
-            val durIndex = c.getColumnIndex(CallLog.Calls.DURATION)
-
-            var processed = 0
-            while (c.moveToNext()) {
-                val number = c.getString(numIndex) ?: ""
-                val name = c.getString(nameIndex)
-                val type = c.getInt(typeIndex)
-                val dateMs = c.getLong(dateIndex)
-                val duration = c.getLong(durIndex)
-
-                callLogsList.add(
-                    CallLogBackupData(
-                        number = number,
-                        name = name,
-                        type = type,
-                        dateMs = dateMs,
-                        durationSec = duration
-                    )
-                )
-
-                processed++
-                onProgress(processed.toFloat() / total)
-            }
-        }
-
-        val jsonContent = json.encodeToString(callLogsList)
-        val fileName = generateFileName("CallLogs", "json")
-        saveFileContent(BackupCategory.CALL_LOGS, fileName, jsonContent)
-        fileName
-    }
-
-    suspend fun restoreCallLogs(fileInfo: BackupFileInfo): Int = withContext(Dispatchers.IO) {
-        val jsonContent = readTextFromFile(fileInfo)
-        val list: List<CallLogBackupData> = json.decodeFromString(jsonContent)
-        var restoredCount = 0
-
-        val cr = context.contentResolver
-        for (item in list) {
-            val values = ContentValues().apply {
-                put(CallLog.Calls.NUMBER, item.number)
-                put(CallLog.Calls.CACHED_NAME, item.name)
-                put(CallLog.Calls.TYPE, item.type)
-                put(CallLog.Calls.DATE, item.dateMs)
-                put(CallLog.Calls.DURATION, item.durationSec)
-                put(CallLog.Calls.NEW, 1)
-            }
-
-            try {
-                cr.insert(CallLog.Calls.CONTENT_URI, values)
-                restoredCount++
-            } catch (_: Exception) {
-            }
-        }
-        restoredCount
-    }
-
-    // --- SMS Backup & Restore ---
-
-    suspend fun backupSms(onProgress: (Float) -> Unit): String = withContext(Dispatchers.IO) {
-        val smsList = mutableListOf<SmsBackupData>()
-        val cr = context.contentResolver
-
-        val cursor = cr.query(
-            Telephony.Sms.CONTENT_URI,
-            arrayOf(
-                Telephony.Sms.ADDRESS,
-                Telephony.Sms.BODY,
-                Telephony.Sms.DATE,
-                Telephony.Sms.TYPE,
-                Telephony.Sms.READ
-            ),
-            null,
-            null,
-            null
-        )
-
-        cursor?.use { c ->
-            val total = c.count.coerceAtLeast(1)
-            val addrIndex = c.getColumnIndex(Telephony.Sms.ADDRESS)
-            val bodyIndex = c.getColumnIndex(Telephony.Sms.BODY)
-            val dateIndex = c.getColumnIndex(Telephony.Sms.DATE)
-            val typeIndex = c.getColumnIndex(Telephony.Sms.TYPE)
-            val readIndex = c.getColumnIndex(Telephony.Sms.READ)
-
-            var processed = 0
-            while (c.moveToNext()) {
-                val address = c.getString(addrIndex) ?: ""
-                val body = c.getString(bodyIndex) ?: ""
-                val dateMs = c.getLong(dateIndex)
-                val type = c.getInt(typeIndex)
-                val read = c.getInt(readIndex)
-
-                smsList.add(
-                    SmsBackupData(
-                        address = address,
-                        body = body,
-                        dateMs = dateMs,
-                        type = type,
-                        read = read
-                    )
-                )
-
-                processed++
-                onProgress(processed.toFloat() / total)
-            }
-        }
-
-        val jsonContent = json.encodeToString(smsList)
-        val fileName = generateFileName("SMS", "json")
-        saveFileContent(BackupCategory.SMS, fileName, jsonContent)
-        fileName
-    }
-
-    suspend fun restoreSms(fileInfo: BackupFileInfo): Int = withContext(Dispatchers.IO) {
-        val jsonContent = readTextFromFile(fileInfo)
-        val list: List<SmsBackupData> = json.decodeFromString(jsonContent)
-        var restoredCount = 0
-
-        val cr = context.contentResolver
-        val uri = Telephony.Sms.Inbox.CONTENT_URI
-        for (item in list) {
-            val values = ContentValues().apply {
-                put(Telephony.Sms.ADDRESS, item.address)
-                put(Telephony.Sms.BODY, item.body)
-                put(Telephony.Sms.DATE, item.dateMs)
-                put(Telephony.Sms.TYPE, item.type)
-                put(Telephony.Sms.READ, item.read)
-            }
-
-            try {
-                cr.insert(uri, values)
                 restoredCount++
             } catch (_: Exception) {
             }
