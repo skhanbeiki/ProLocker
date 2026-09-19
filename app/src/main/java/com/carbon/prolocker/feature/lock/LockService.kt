@@ -44,7 +44,7 @@ import com.carbon.prolocker.core.theme.ProLockerTheme
 import com.carbon.prolocker.core.utils.VibrationManager
 import com.carbon.prolocker.feature.gallery.BackgroundGalleryScreen
 import com.carbon.prolocker.feature.gallery.BackgroundPreviewScreen
-import com.carbon.prolocker.feature.home.MemoryOptimizerScreen
+import com.carbon.prolocker.feature.junkcleaner.JunkCleanerScreen
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -328,7 +328,7 @@ class LockService : Service(), OnBackPressedDispatcherOwner {
                                             currentScreen.value = LockNavScreen.Gallery
                                         },
                                         onNavigateToMemory = {
-                                            currentScreen.value = LockNavScreen.MemoryOptimizer
+                                            currentScreen.value = LockNavScreen.JunkCleaner
                                         }
                                     )
                                 }
@@ -353,8 +353,8 @@ class LockService : Service(), OnBackPressedDispatcherOwner {
                                     )
                                 }
 
-                                is LockNavScreen.MemoryOptimizer -> {
-                                    MemoryOptimizerScreen(
+                                is LockNavScreen.JunkCleaner -> {
+                                    JunkCleanerScreen(
                                         onBack = { currentScreen.value = LockNavScreen.Lock }
                                     )
                                 }
@@ -381,7 +381,7 @@ class LockService : Service(), OnBackPressedDispatcherOwner {
                 if (currentForSettings) dismissLockScreen() else navigateToHome()
             }
             is LockNavScreen.Preview -> currentScreen.value = LockNavScreen.Gallery
-            is LockNavScreen.Gallery, is LockNavScreen.MemoryOptimizer -> currentScreen.value = LockNavScreen.Lock
+            is LockNavScreen.Gallery, is LockNavScreen.JunkCleaner -> currentScreen.value = LockNavScreen.Lock
         }
     }
 

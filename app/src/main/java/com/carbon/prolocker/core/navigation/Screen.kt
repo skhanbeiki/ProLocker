@@ -13,7 +13,7 @@ import kotlinx.serialization.Serializable
 @Serializable data object SecurityAuditRoute
 @Serializable data object AppSettingsRoute
 @Serializable data object AboutUsRoute
-@Serializable data object MemoryOptimizerRoute
+@Serializable data object JunkCleanerRoute
 @Serializable data object BackgroundGalleryRoute
 @Serializable data class BackgroundPreviewRoute(val url: String, val id: Int, val fromDownloaded: Boolean = false)
 @Serializable data object SecurityRoute

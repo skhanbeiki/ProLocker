@@ -10,7 +10,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.carbon.prolocker.feature.home.LockedAppsScreen
-import com.carbon.prolocker.feature.home.MemoryOptimizerScreen
+import com.carbon.prolocker.feature.junkcleaner.JunkCleanerScreen
 import com.carbon.prolocker.feature.lock.LockTypeSelectionScreen
 import com.carbon.prolocker.feature.lock.PatternSetupScreen
 import com.carbon.prolocker.feature.lock.PinSetupScreen
@@ -71,12 +71,12 @@ fun AppNavigation(
                 "update" -> {
                     navController.navigate(HomeRoute("update")) { popUpTo(startDest) { inclusive = true } }
                 }
-                "memory" -> {
+                "memory", "junk" -> {
                     if (trustedLaunchDestination != null) {
-                        navController.navigate(MemoryOptimizerRoute)
+                        navController.navigate(JunkCleanerRoute)
                     } else {
                         navController.navigate(HomeRoute()) { popUpTo(startDest) { inclusive = true } }
-                        navController.navigate(MemoryOptimizerRoute)
+                        navController.navigate(JunkCleanerRoute)
                     }
                 }
                 else -> navController.navigate(HomeRoute()) { popUpTo(startDest) { inclusive = true } }
@@ -149,8 +149,8 @@ fun AppNavigation(
                 onNavigateToAppSettings = {
                     navController.navigate(AppSettingsRoute)
                 },
-                onNavigateToMemoryOptimizer = {
-                    navController.navigate(MemoryOptimizerRoute)
+                onNavigateToJunkCleaner = {
+                    navController.navigate(JunkCleanerRoute)
                 },
                 onNavigateToGallery = {
                     navController.navigate(BackgroundGalleryRoute)
@@ -292,9 +292,9 @@ fun AppNavigation(
                 }
             )
         }
-        composable<MemoryOptimizerRoute> {
-            val shouldFinishAffinity = isStandaloneExit && trustedLaunchDestination == "memory"
-            MemoryOptimizerScreen(
+        composable<JunkCleanerRoute> {
+            val shouldFinishAffinity = isStandaloneExit && (trustedLaunchDestination == "memory" || trustedLaunchDestination == "junk")
+            JunkCleanerScreen(
                 onBack = {
                     if (shouldFinishAffinity) {
                         context.findActivity()?.finishAffinity()

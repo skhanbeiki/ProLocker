@@ -89,7 +89,7 @@ fun MainScreen(
     onNavigateToLockSetup: () -> Unit = {},
     onNavigateToAudit: () -> Unit = {},
     onNavigateToAppSettings: () -> Unit = {},
-    onNavigateToMemoryOptimizer: () -> Unit = {},
+    onNavigateToJunkCleaner: () -> Unit = {},
     onNavigateToGallery: () -> Unit = {},
     onNavigateToPermissions: (String) -> Unit = {},
     onNavigateToSecurity: () -> Unit = {},
@@ -408,7 +408,7 @@ fun MainScreen(
                     onNavigateToHideFiles = onNavigateToHideFiles,
                     onNavigateToBackup = onNavigateToBackup,
                     onNavigateToAppLock = { viewModel.setSelectedTab(MainTab.HOME) },
-                    onNavigateToMemoryOptimizer = onNavigateToMemoryOptimizer,
+                    onNavigateToJunkCleaner = onNavigateToJunkCleaner,
                     onNavigateToCallBlocker = onNavigateToCallBlocker,
                     onNavigateToAudit = onNavigateToAudit
                 )

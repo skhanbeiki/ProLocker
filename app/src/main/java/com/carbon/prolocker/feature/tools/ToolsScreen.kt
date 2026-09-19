@@ -8,6 +8,7 @@ import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
@@ -29,6 +30,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Bolt
 import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.outlined.Backup
@@ -36,7 +38,7 @@ import androidx.compose.material.icons.outlined.ChevronLeft
 import androidx.compose.material.icons.outlined.PhoneDisabled
 import androidx.compose.material.icons.outlined.PrivacyTip
 import androidx.compose.material.icons.outlined.Security
-import androidx.compose.material.icons.outlined.Speed
+import androidx.compose.material.icons.outlined.CleaningServices
 import androidx.compose.material.icons.outlined.VisibilityOff
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -60,11 +62,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.material3.LocalTextStyle
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -81,7 +86,7 @@ enum class FeatureId {
     INTRUDER,
     BACKUP,
     CALL_BLOCKER,
-    MEMORY_OPTIMIZER,
+    JUNK_CLEANER,
     PRIVACY_AUDITOR
 }
 
@@ -187,10 +192,11 @@ fun FeatureCard(
 }
 
 @Composable
-fun MemoryOptimizerCard(
+fun JunkCleanerCard(
     item: ToolsFeatureItem,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    badgeText: String? = null
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
@@ -200,7 +206,7 @@ fun MemoryOptimizerCard(
             dampingRatio = Spring.DampingRatioMediumBouncy,
             stiffness = Spring.StiffnessMedium
         ),
-        label = "memoryOptCardScale"
+        label = "junkCleanerCardScale"
     )
 
     Surface(
@@ -258,13 +264,56 @@ fun MemoryOptimizerCard(
                     }
                     Spacer(modifier = Modifier.width(16.dp))
                     Column(verticalArrangement = Arrangement.Center) {
-                        Text(
-                            text = item.title,
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.White,
-                            fontSize = 17.sp
-                        )
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                text = item.title,
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White,
+                                fontSize = 17.sp
+                            )
+                            if (!badgeText.isNullOrEmpty()) {
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Surface(
+                                    modifier = Modifier.shadow(
+                                        elevation = 4.dp,
+                                        shape = RoundedCornerShape(percent = 50),
+                                        spotColor = Color(0xFFFF3D00).copy(alpha = 0.5f)
+                                    ),
+                                    shape = RoundedCornerShape(percent = 50),
+                                    color = Color.Transparent
+                                ) {
+                                    Row(
+                                        modifier = Modifier
+                                            .background(
+                                                brush = Brush.horizontalGradient(
+                                                    colors = listOf(Color(0xFFFF6200), Color(0xFFFF1B28))
+                                                )
+                                            )
+                                            .padding(horizontal = 7.dp, vertical = 2.5.dp),
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.Center
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Filled.Bolt,
+                                            contentDescription = null,
+                                            tint = Color.White,
+                                            modifier = Modifier.size(13.dp)
+                                        )
+                                        Spacer(modifier = Modifier.width(2.dp))
+                                        Text(
+                                            text = badgeText,
+                                            color = Color.White,
+                                            fontSize = 11.sp,
+                                            fontWeight = FontWeight.Black,
+                                            style = LocalTextStyle.current.copy(
+                                                platformStyle = PlatformTextStyle(includeFontPadding = false)
+                                            )
+                                        )
+                                    }
+                                }
+                            }
+                        }
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
                             text = item.subtitle,
@@ -415,13 +464,14 @@ fun ToolsGrid(
     heroSubtitle: String,
     onHeroClick: () -> Unit,
     onFeatureClick: (ToolsFeatureItem) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    badgeText: String? = null
 ) {
     val gridItems = remember(features) {
-        features.filter { it.id != FeatureId.MEMORY_OPTIMIZER }
+        features.filter { it.id != FeatureId.JUNK_CLEANER }
     }
-    val memoryItem = remember(features) {
-        features.find { it.id == FeatureId.MEMORY_OPTIMIZER }
+    val junkCleanerItem = remember(features) {
+        features.find { it.id == FeatureId.JUNK_CLEANER }
     }
 
     LazyVerticalGrid(
@@ -454,11 +504,12 @@ fun ToolsGrid(
             }
         }
 
-        if (memoryItem != null) {
-            item(span = { GridItemSpan(2) }, key = memoryItem.id.name) {
-                MemoryOptimizerCard(
-                    item = memoryItem,
-                    onClick = { onFeatureClick(memoryItem) },
+        if (junkCleanerItem != null) {
+            item(span = { GridItemSpan(2) }, key = junkCleanerItem.id.name) {
+                JunkCleanerCard(
+                    item = junkCleanerItem,
+                    onClick = { onFeatureClick(junkCleanerItem) },
+                    badgeText = badgeText,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 2.dp)
@@ -484,7 +535,7 @@ fun ToolsScreen(
     onNavigateToHideFiles: () -> Unit = {},
     onNavigateToBackup: () -> Unit = {},
     onNavigateToAppLock: () -> Unit = {},
-    onNavigateToMemoryOptimizer: () -> Unit = {},
+    onNavigateToJunkCleaner: () -> Unit = {},
     onNavigateToCallBlocker: () -> Unit = {},
     onNavigateToAudit: () -> Unit = {}
 ) {
@@ -526,15 +577,30 @@ fun ToolsScreen(
             available = true
         ),
         ToolsFeatureItem(
-            id = FeatureId.MEMORY_OPTIMIZER,
-            title = stringResource(R.string.tools_memory_optimizer),
-            subtitle = stringResource(R.string.tools_memory_optimizer_subtitle),
-            icon = Icons.Outlined.Speed,
-            gradient = listOf(Color(0xFF34D399), Color(0xFF10B981)),
+            id = FeatureId.JUNK_CLEANER,
+            title = stringResource(R.string.junk_cleaner),
+            subtitle = stringResource(R.string.junk_cleaner_desc),
+            icon = Icons.Outlined.CleaningServices,
+            gradient = listOf(Color(0xFF38B8F8), Color(0xFF0078FF)),
             available = true,
             lottieRes = R.raw.trash_clean
         )
     )
+
+    var junkPercentage by remember { androidx.compose.runtime.mutableIntStateOf(0) }
+    LaunchedEffect(Unit) {
+        kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+            try {
+                val stat = android.os.Environment.getDataDirectory()
+                val total = stat.totalSpace
+                val free = stat.freeSpace
+                if (total > 0L) {
+                    val used = total - free
+                    junkPercentage = ((used.toDouble() / total.toDouble()) * 100).toInt().coerceIn(0, 99)
+                }
+            } catch (_: Exception) {}
+        }
+    }
 
     var contentVisible by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) { contentVisible = true }
@@ -593,6 +659,7 @@ fun ToolsScreen(
             features = features,
             heroTitle = appLockTitle,
             heroSubtitle = stringResource(R.string.tools_app_lock_subtitle),
+            badgeText = if (junkPercentage > 0) "$junkPercentage%" else null,
             onHeroClick = {
                 analyticsManager.trackToolClick("app_locker")
                 onNavigateToAppLock()
@@ -604,7 +671,7 @@ fun ToolsScreen(
                     FeatureId.INTRUDER -> onNavigateToSecurity()
                     FeatureId.BACKUP -> onNavigateToBackup()
                     FeatureId.CALL_BLOCKER -> onNavigateToCallBlocker()
-                    FeatureId.MEMORY_OPTIMIZER -> onNavigateToMemoryOptimizer()
+                    FeatureId.JUNK_CLEANER -> onNavigateToJunkCleaner()
                     FeatureId.PRIVACY_AUDITOR -> onNavigateToAudit()
                 }
             },

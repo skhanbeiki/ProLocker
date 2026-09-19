@@ -19,11 +19,11 @@ import org.koin.java.KoinJavaComponent
 import java.util.Locale
 import kotlin.random.Random
 
-class RamCleanerNotificationManager(private val context: Context) {
+class JunkCleanerNotificationManager(private val context: Context) {
 
     companion object {
         private const val TAG = "Moslemprolocker"
-        const val CHANNEL_ID = "ram_cleaner_notification"
+        const val CHANNEL_ID = "junk_cleaner_notification"
         const val NOTIFICATION_ID = 9002
         const val EXTRA_FROM_NOTIFICATION = "extra_from_notification"
     }
@@ -35,27 +35,20 @@ class RamCleanerNotificationManager(private val context: Context) {
         PreferencesRepository::class.java
     )
 
-    /**
-     * Returns a Context whose resources resolve strings in the currently selected app language.
-     */
     private fun getLocalizedContext(): Context {
         val languageTag = try {
             runBlocking {
                 preferencesRepository.userPreferencesFlow.first().language
             }
         } catch (e: Exception) {
-            Log.e(TAG, "RamCleanerNotificationManager: failed to read language preference", e)
+            Log.e(TAG, "JunkCleanerNotificationManager: failed to read language preference", e)
             ""
         }
         val appLocales = androidx.core.os.LocaleListCompat.forLanguageTags(languageTag)
         val locale = if (!appLocales.isEmpty) appLocales[0] else Locale.getDefault()
         val config = android.content.res.Configuration(context.resources.configuration)
         config.setLocales(android.os.LocaleList(locale))
-        val localizedContext = context.createConfigurationContext(config)
-
-        Log.d(TAG, "NOTIFICATION_LANGUAGE RamCleanerNotificationManager: languageTag=$languageTag, locale=$locale")
-
-        return localizedContext
+        return context.createConfigurationContext(config)
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -63,10 +56,10 @@ class RamCleanerNotificationManager(private val context: Context) {
         val localizedContext = getLocalizedContext()
         val channel = NotificationChannel(
             CHANNEL_ID,
-            localizedContext.getString(R.string.ram_cleaner_channel_name),
+            localizedContext.getString(R.string.junk_cleaner_channel_name),
             NotificationManager.IMPORTANCE_DEFAULT
         ).apply {
-            description = localizedContext.getString(R.string.ram_cleaner_channel_desc)
+            description = localizedContext.getString(R.string.junk_cleaner_channel_desc)
         }
         notificationManager.createNotificationChannel(channel)
     }
@@ -83,11 +76,7 @@ class RamCleanerNotificationManager(private val context: Context) {
         }
         val isPersian = appLanguageTag == "fa"
 
-        Log.d(TAG, "NOTIFICATION_LANGUAGE RamCleanerNotificationManager: appLanguage=$appLanguageTag, isPersian=$isPersian, currentLocale=${Locale.getDefault()}")
-
         val (title, body) = if (isPersian) getRandomPersianText() else getRandomEnglishText()
-
-        Log.d(TAG, "NOTIFICATION_LANGUAGE RamCleanerNotificationManager: title=$title, body=$body, contextLocale=${localizedContext.resources.configuration.locales[0]}")
 
         TrustedInternalLaunchManager.arm("memory")
 
@@ -120,28 +109,16 @@ class RamCleanerNotificationManager(private val context: Context) {
     private fun getRandomPersianText(): Pair<String, String> {
         val messages = listOf(
             Pair(
-                "حافظه گوشی شما نیاز به بهینه‌سازی دارد",
-                "با یک لمس حافظه اضافی را آزاد کنید و عملکرد گوشی را بهبود دهید."
+                "زمان پاک‌سازی فایل‌های زائد است",
+                "با پاک‌سازی فایل‌های موقت و کش، فضای ذخیره‌سازی گوشی را آزاد کنید."
             ),
             Pair(
-                "گوشی کند شده؟",
-                "همین حالا حافظه را آزاد کنید و سرعت گوشی را افزایش دهید."
+                "حافظه گوشی پر شده؟",
+                "فایل‌های زائد و فایل‌های نصبی قدیمی را حذف کنید تا فضای بیشتری داشته باشید."
             ),
             Pair(
-                "زمان پاکسازی حافظه فرا رسیده است",
-                "برنامه‌های اضافی را ببندید و فضای بیشتری آزاد کنید."
-            ),
-            Pair(
-                "عملکرد بهتر فقط با یک کلیک",
-                "حافظه دستگاه را بهینه کنید و اجرای برنامه‌ها را سریع‌تر کنید."
-            ),
-            Pair(
-                "بهینه‌سازی حافظه را فراموش نکنید",
-                "برای افزایش سرعت گوشی، حافظه را همین حالا پاکسازی کنید."
-            ),
-            Pair(
-                "گوشی شما آماده یک نفس تازه است",
-                "با پاکسازی حافظه، عملکرد دستگاه را بهبود دهید."
+                "فضای ذخیره‌سازی دستگاه را آزاد کنید",
+                "فایل‌های موقت را پاک کنید تا فضای بیشتری برای عکس‌ها و برنامه‌هایتان داشته باشید."
             )
         )
         return messages[Random.nextInt(messages.size)]
@@ -150,28 +127,16 @@ class RamCleanerNotificationManager(private val context: Context) {
     private fun getRandomEnglishText(): Pair<String, String> {
         val messages = listOf(
             Pair(
-                "Your phone memory can be optimized",
-                "Free memory and improve performance with one tap."
+                "Time to clean junk files",
+                "Clean temporary and cache files to free up valuable storage space."
             ),
             Pair(
-                "Is your phone getting slower?",
-                "Clean memory now and boost device performance."
+                "Running out of storage?",
+                "Remove obsolete APKs and junk files to make room for what matters."
             ),
             Pair(
-                "Time for a memory cleanup",
-                "Close unnecessary apps and free valuable memory."
-            ),
-            Pair(
-                "Boost performance instantly",
-                "Optimize memory and enjoy a smoother experience."
-            ),
-            Pair(
-                "Don't forget memory optimization",
-                "Clean memory now to keep your phone running fast."
-            ),
-            Pair(
-                "Give your phone a fresh start",
-                "Free memory and improve responsiveness."
+                "Free up storage space",
+                "Clean junk and residual files with one quick tap."
             )
         )
         return messages[Random.nextInt(messages.size)]

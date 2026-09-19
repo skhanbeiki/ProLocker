@@ -8,7 +8,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.carbon.prolocker.feature.gallery.BackgroundGalleryScreen
 import com.carbon.prolocker.feature.gallery.BackgroundPreviewScreen
-import com.carbon.prolocker.feature.home.MemoryOptimizerScreen
+import com.carbon.prolocker.feature.junkcleaner.JunkCleanerScreen
 import java.net.URLDecoder
 import java.net.URLEncoder
 
@@ -27,12 +27,12 @@ fun RestrictedNavigation(
     NavHost(
         navController = navController,
         startDestination = when (destination) {
-            "memory" -> MemoryOptimizerRoute
+            "memory", "junk" -> JunkCleanerRoute
             else -> BackgroundGalleryRoute
         }
     ) {
-        composable<MemoryOptimizerRoute> {
-            MemoryOptimizerScreen(
+        composable<JunkCleanerRoute> {
+            JunkCleanerScreen(
                 onBack = {
                     navController.context.findActivity()?.finishAffinity()
                 }

@@ -14,7 +14,7 @@ import org.koin.core.component.inject
 import java.util.Calendar
 import java.util.concurrent.TimeUnit
 
-class RamCleanerNotificationWorker(
+class JunkCleanerNotificationWorker(
     appContext: Context,
     workerParams: WorkerParameters
 ) : CoroutineWorker(appContext, workerParams), KoinComponent {
@@ -23,7 +23,6 @@ class RamCleanerNotificationWorker(
     private val remoteConfigRepository: RemoteConfigRepository by inject()
 
     override suspend fun doWork(): Result {
-
         val prefs = preferencesRepository.userPreferencesFlow.first()
 
         if (!prefs.ramCleanerNotificationEnabled) {
@@ -40,13 +39,11 @@ class RamCleanerNotificationWorker(
         }
 
         val currentHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
-
         if (currentHour !in configHours) {
             return Result.success()
         }
 
         val now = System.currentTimeMillis()
-
         if (now - prefs.lastRamCleanerRunTime < TWENTY_FOUR_HOURS) {
             return Result.success()
         }
@@ -59,7 +56,7 @@ class RamCleanerNotificationWorker(
             it.copy(lastRamCleanerNotificationTime = now)
         }
 
-        val manager = RamCleanerNotificationManager(applicationContext)
+        val manager = JunkCleanerNotificationManager(applicationContext)
         manager.createNotificationChannel()
         manager.showNotification()
 
@@ -75,11 +72,11 @@ class RamCleanerNotificationWorker(
     }
 
     companion object {
-        private const val WORK_NAME = "RamCleanerNotificationWork"
+        private const val WORK_NAME = "JunkCleanerNotificationWork"
         private const val TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000L
 
         fun schedule(context: Context) {
-            val workRequest = PeriodicWorkRequestBuilder<RamCleanerNotificationWorker>(
+            val workRequest = PeriodicWorkRequestBuilder<JunkCleanerNotificationWorker>(
                 1, TimeUnit.HOURS
             ).build()
 

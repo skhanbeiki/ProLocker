@@ -15,7 +15,7 @@ import com.carbon.prolocker.core.rate.RateAppManager
 import com.carbon.prolocker.core.service.AppMonitorService
 import com.carbon.prolocker.di.appModule
 import com.carbon.prolocker.feature.entrylock.AppEntryLockActivity
-import com.carbon.prolocker.worker.RamCleanerNotificationWorker
+import com.carbon.prolocker.worker.JunkCleanerNotificationWorker
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -65,7 +65,7 @@ class ProLockerApplication : Application(), Application.ActivityLifecycleCallbac
 
         setupCrashHandler()
         uploadPendingCrashes()
-        RamCleanerNotificationWorker.schedule(this)
+        JunkCleanerNotificationWorker.schedule(this)
 
         applicationScope.launch {
             adManager.initSdk()

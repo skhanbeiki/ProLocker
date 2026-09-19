@@ -109,7 +109,7 @@ class MainActivity : AppCompatActivity() {
         trustedInternalDestination = intent.getStringExtra(com.carbon.prolocker.feature.lock.LockService.EXTRA_OPEN_DESTINATION)
         storedLockedPackage = intent.getStringExtra(com.carbon.prolocker.feature.lock.LockService.EXTRA_PACKAGE_NAME)
         isNotificationReturn = intent.getBooleanExtra(
-            com.carbon.prolocker.worker.RamCleanerNotificationManager.EXTRA_FROM_NOTIFICATION, false
+            com.carbon.prolocker.worker.JunkCleanerNotificationManager.EXTRA_FROM_NOTIFICATION, false
         )
         val navType = pendingNavType
         if (navType != null) {
@@ -135,7 +135,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         val isFromNotification = intent?.getBooleanExtra(
-            com.carbon.prolocker.worker.RamCleanerNotificationManager.EXTRA_FROM_NOTIFICATION, false
+            com.carbon.prolocker.worker.JunkCleanerNotificationManager.EXTRA_FROM_NOTIFICATION, false
         ) == true
 
         val isRecoveryLaunch = intent?.component?.className ==
