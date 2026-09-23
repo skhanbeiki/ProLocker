@@ -88,7 +88,11 @@ private fun NativeAdContainerInternal(
     val activity = context.findActivity()
     val adContext = activity ?: context
 
-    val container = remember { FrameLayout(adContext) }
+    val container = remember {
+        FrameLayout(adContext).apply {
+            layoutDirection = View.LAYOUT_DIRECTION_RTL
+        }
+    }
 
     // isAdLoaded controls visibility: container stays alpha=0 until ad renders
     var isAdLoaded by remember { mutableStateOf(false) }

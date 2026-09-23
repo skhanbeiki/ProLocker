@@ -2,150 +2,206 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
   <title>Privacy Policy – ProLocker</title>
   <style>
     :root {
-      --primary: #6C3DE8;
-      --primary-dark: #5229c8;
-      --bg: #f6f4ff;
-      --surface: #ffffff;
-      --text: #1a1a2e;
-      --text-muted: #5a5a8a;
-      --border: #e4deff;
-      --accent: #f0ecff;
-      --radius: 14px;
+      --primary: #7C3AED;
+      --primary-dark: #6D28D9;
+      --primary-light: #F5F3FF;
+      --bg: #FAFAFC;
+      --surface: #FFFFFF;
+      --text: #0F172A;
+      --text-muted: #475569;
+      --border: #E2E8F0;
+      --radius: 16px;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.03);
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
       background: var(--bg);
       color: var(--text);
-      line-height: 1.75;
-      font-size: 16px;
+      line-height: 1.7;
+      font-size: 15px;
+      word-wrap: break-word;
     }
     header {
-      background: linear-gradient(135deg, #6C3DE8 0%, #4a1fc8 100%);
-      color: white;
-      padding: 48px 24px 40px;
+      background: linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%);
+      color: #FFFFFF;
+      padding: 36px 20px 32px;
       text-align: center;
     }
-    header .icon {
-      width: 72px; height: 72px;
-      background: rgba(255,255,255,0.15);
-      border-radius: 20px;
+    .header-icon {
+      width: 64px;
+      height: 64px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 18px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      font-size: 36px;
-      margin-bottom: 16px;
-      backdrop-filter: blur(8px);
+      font-size: 32px;
+      margin-bottom: 12px;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
     }
-    header h1 { font-size: 28px; font-weight: 700; margin-bottom: 8px; }
-    header p { font-size: 14px; opacity: 0.85; }
-    .container { max-width: 820px; margin: 0 auto; padding: 40px 24px 64px; }
+    header h1 {
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 6px;
+    }
+    header p {
+      font-size: 13px;
+      opacity: 0.9;
+    }
+    .container {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 24px 16px 48px;
+    }
     .card {
       background: var(--surface);
       border-radius: var(--radius);
       border: 1px solid var(--border);
-      padding: 32px;
-      margin-bottom: 24px;
-      box-shadow: 0 2px 12px rgba(108,61,232,0.06);
+      padding: 24px 20px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow-sm);
     }
     .card-title {
       display: flex;
       align-items: center;
-      gap: 12px;
-      font-size: 18px;
+      gap: 10px;
+      font-size: 17px;
       font-weight: 700;
       color: var(--primary);
-      margin-bottom: 18px;
-      padding-bottom: 14px;
+      margin-bottom: 14px;
+      padding-bottom: 12px;
       border-bottom: 1px solid var(--border);
     }
     .card-title .num {
-      background: var(--accent);
+      background: var(--primary-light);
       color: var(--primary);
       border-radius: 8px;
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 700;
-      padding: 4px 10px;
+      padding: 3px 8px;
     }
-    h3 { font-size: 15px; font-weight: 600; color: var(--text); margin: 18px 0 8px; }
-    p { color: var(--text-muted); margin-bottom: 12px; }
-    ul { padding-left: 20px; margin-bottom: 12px; }
-    li { color: var(--text-muted); margin-bottom: 6px; }
+    h3 {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+      margin: 16px 0 8px;
+    }
+    p {
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+    ul {
+      padding-left: 20px;
+      margin-bottom: 12px;
+    }
+    li {
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
     .badge {
       display: inline-block;
-      background: var(--accent);
+      background: var(--primary-light);
       color: var(--primary);
       border-radius: 6px;
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 600;
-      padding: 2px 9px;
-      margin-right: 4px;
-      margin-bottom: 4px;
+      padding: 2px 7px;
+      margin: 2px 0;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     }
-    .perm-table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 14px; }
-    .perm-table th {
-      background: var(--accent);
-      color: var(--primary);
-      font-weight: 600;
-      text-align: left;
-      padding: 10px 14px;
-    }
-    .perm-table td { padding: 10px 14px; border-bottom: 1px solid var(--border); color: var(--text-muted); vertical-align: top; }
-    .perm-table tr:last-child td { border-bottom: none; }
-    .perm-table tr:nth-child(even) td { background: #faf8ff; }
-    .perm-name { font-family: monospace; color: var(--text); font-size: 13px; }
-    .perm-extra { background: #fff0fe; color: #7e22ce; }
     .highlight {
-      background: var(--accent);
+      background: var(--primary-light);
       border-left: 4px solid var(--primary);
-      border-radius: 0 8px 8px 0;
-      padding: 14px 18px;
-      margin: 16px 0;
-      color: var(--text-muted);
+      border-radius: 0 10px 10px 0;
+      padding: 12px 16px;
+      margin: 14px 0;
+      color: var(--text);
       font-size: 14px;
     }
-    .sensitive-box {
-      background: #fff8f0;
-      border-left: 4px solid #f59e0b;
-      border-radius: 0 8px 8px 0;
-      padding: 14px 18px;
-      margin: 16px 0;
-      color: #92400e;
-      font-size: 14px;
+    .table-container {
+      width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      margin-top: 12px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+    .perm-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      text-align: left;
+    }
+    .perm-table th {
+      background: var(--primary-light);
+      color: var(--primary);
+      font-weight: 700;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    .perm-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-muted);
+      vertical-align: top;
+    }
+    .perm-table tr:last-child td {
+      border-bottom: none;
+    }
+    .perm-table tr:nth-child(even) td {
+      background: #FAFAFC;
+    }
+    .perm-name {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      color: var(--text);
+      font-weight: 600;
+      font-size: 12px;
     }
     .contact-box {
-      background: linear-gradient(135deg, #f5f0ff, #ede8ff);
+      background: linear-gradient(135deg, #F5F3FF 0%, #EDE9FE 100%);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: 24px;
+      padding: 20px;
       text-align: center;
-      margin-top: 24px;
+      margin-top: 16px;
     }
-    .contact-box a { color: var(--primary); font-weight: 600; text-decoration: none; }
-    .contact-box a:hover { text-decoration: underline; }
-    .last-updated {
+    .contact-box a {
+      color: var(--primary);
+      font-weight: 700;
+      text-decoration: none;
+    }
+    .contact-box a:hover {
+      text-decoration: underline;
+    }
+    .footer-text {
       text-align: center;
       color: var(--text-muted);
-      font-size: 13px;
-      margin-top: 32px;
+      font-size: 12px;
+      margin-top: 28px;
     }
-    @media (max-width: 600px) {
-      header { padding: 36px 16px 28px; }
-      .card { padding: 20px; }
-      .perm-table th, .perm-table td { padding: 8px 10px; }
+    @media (max-width: 480px) {
+      header { padding: 28px 16px 24px; }
+      header h1 { font-size: 21px; }
+      .card { padding: 18px 14px; border-radius: 14px; }
+      .card-title { font-size: 16px; }
+      body { font-size: 14px; }
     }
   </style>
 </head>
 <body>
 
 <header>
-  <div class="icon">🛡️</div>
+  <div class="header-icon">🛡️</div>
   <h1>ProLocker – Privacy Policy</h1>
-  <p>Effective Date: September 1, 2025 &nbsp;|&nbsp; Last Updated: September 2, 2026</p>
+  <p>Last Updated: September 2026</p>
 </header>
 
 <div class="container">
@@ -153,225 +209,178 @@
   <!-- Introduction -->
   <div class="card">
     <div class="card-title"><span class="num">01</span> Introduction</div>
-    <p>Welcome to <strong>ProLocker</strong>. We respect your privacy and are committed to protecting your personal data. This Privacy Policy explains what information we collect, how we use it, and your rights when you use the ProLocker application ("App", "Service").</p>
-    <p>ProLocker is an advanced security application that extends beyond standard app locking to include contact backup, SMS management, and call blocking features. Because of these additional capabilities, this policy addresses certain data categories more thoroughly than standard locker apps.</p>
+    <p>Welcome to <strong>ProLocker</strong> ("App", "we", "us", "our"). We are dedicated to protecting your privacy and personal data. This Privacy Policy details how ProLocker handles your information when you use our app locking, call blocking, backup, file vault, and utility services.</p>
+    <p>By using ProLocker, you consent to the data practices described in this document.</p>
     <div class="highlight">
-      <strong>Our Core Principle:</strong> All sensitive personal data (contacts, call logs, SMS, lock credentials) is stored exclusively on your device. We do not upload your personal communications data to any server.
+      <strong>On-Device Security Guarantee:</strong> All your sensitive data—including lock credentials, contacts backup files, hidden vault files, and call blocking rules—remains strictly on your device. We do not upload your personal files, contacts, or communications to our servers.
     </div>
   </div>
 
   <!-- Information We Collect -->
   <div class="card">
-    <div class="card-title"><span class="num">02</span> Information We Collect</div>
+    <div class="card-title"><span class="num">02</span> Information We Collect &amp; Process</div>
 
-    <h3>2.1 Information Stored Locally (Never Sent to Our Servers)</h3>
+    <h3>2.1 Stored Exclusively on Your Device</h3>
     <ul>
-      <li>Your PIN codes, lock patterns, and recovery questions/answers</li>
-      <li>List of apps you choose to lock</li>
-      <li>App settings and preferences</li>
-      <li>Contact data accessed for the Contacts Backup feature (stored locally or exported by you)</li>
-      <li>Call log data accessed for the Call Log Backup and Call Blocker features</li>
-      <li>SMS data read for the SMS Backup feature (read-only, stored locally)</li>
-      <li>Blocked caller lists and call blocking rules</li>
+      <li><strong>Lock Credentials:</strong> Encrypted PIN codes, lock patterns, and recovery security questions.</li>
+      <li><strong>Contacts Backup Data:</strong> Contact lists exported or restored solely during user-initiated backup actions. Stored in standard VCF or local backup files on your device storage.</li>
+      <li><strong>File Vault (Hidden Files):</strong> Photos, videos, audios, and documents protected inside the private vault.</li>
+      <li><strong>Call Blocking Rules:</strong> Phone numbers and blacklist rules configured by you for spam and unwanted call rejection.</li>
+      <li><strong>Intruder Selfies:</strong> Photos taken locally when an unauthorized person attempts to unlock protected apps with an incorrect password.</li>
     </ul>
 
-    <h3>2.2 Information Collected Automatically</h3>
+    <h3>2.2 On-Device Data Processing</h3>
     <ul>
-      <li><strong>Usage Statistics:</strong> App usage data (<span class="badge">PACKAGE_USAGE_STATS</span>) to detect when a locked app is opened — processed on-device only.</li>
-      <li><strong>Installed Packages:</strong> List of installed apps (<span class="badge">QUERY_ALL_PACKAGES</span>) to display lockable apps — local only.</li>
-      <li><strong>Phone State:</strong> Call state information (<span class="badge">READ_PHONE_STATE</span>) to enable call blocking. We detect incoming call numbers to match against your blocked list — no call data is transmitted.</li>
-      <li><strong>Device Advertising ID:</strong> Used by advertising partners to serve relevant ads (see Section 4).</li>
-      <li><strong>Network &amp; Connection Info:</strong> Basic connectivity for remote config and ads.</li>
+      <li><strong>Usage Statistics (<span class="badge">PACKAGE_USAGE_STATS</span>):</strong> Evaluated locally in real-time to detect when a locked app opens so the lock screen appears immediately.</li>
+      <li><strong>Installed Packages (<span class="badge">QUERY_ALL_PACKAGES</span>):</strong> Queried locally to list apps for locking and APK backup extraction.</li>
+      <li><strong>Call Screening &amp; Phone State:</strong> Incoming phone numbers are matched against your local blacklist in real-time to filter unwanted calls via Android Call Screening and Phone State APIs. No call audio or call history is recorded or uploaded.</li>
+      <li><strong>Junk Cleaning:</strong> Scans device storage locally to identify temporary files, cache, and obsolete APKs to free up space.</li>
     </ul>
 
-    <h3>2.3 Sensitive Data Handling</h3>
-    <div class="sensitive-box">
-      ⚠️ <strong>Contacts, Call Logs, and SMS:</strong> ProLocker accesses these only when you explicitly use the Backup or Call Blocker features. This data is:
-      <ul style="margin-top: 8px;">
-        <li>Read directly from your device's local database</li>
-        <li>Never uploaded to our servers</li>
-        <li>Stored only in the backup files you create on your own device or storage</li>
-        <li>Used for call blocking matching exclusively on-device in real-time</li>
-      </ul>
-    </div>
-
-    <h3>2.4 Camera (Optional Feature)</h3>
-    <p>ProLocker may access the camera to capture an intruder photo when a wrong PIN is entered, if you enable this optional feature. Photos are stored locally on your device only.</p>
-
-    <h3>2.5 Firebase Cloud Messaging</h3>
-    <p>Firebase Cloud Messaging (FCM) is used for push notifications (security alerts, app updates). An installation token is assigned by Firebase but is not used for any tracking beyond notification delivery.</p>
+    <h3>2.3 Automatically Collected by Third-Party SDKs</h3>
+    <ul>
+      <li><strong>Advertising Identifiers (<span class="badge">AD_ID</span>):</strong> Used by ad networks to deliver relevant advertisements and measure ad performance.</li>
+      <li><strong>Device Telemetry &amp; Network Info:</strong> Basic device model and OS version used for configuration delivery and crash prevention.</li>
+      <li><strong>Push Notification Token:</strong> Firebase Cloud Messaging token used exclusively to deliver important security and app updates.</li>
+    </ul>
   </div>
 
   <!-- Permissions -->
   <div class="card">
     <div class="card-title"><span class="num">03</span> Permissions Explained</div>
-    <p>ProLocker requests the following permissions. Rows marked with a purple background are additional permissions beyond those in AppLocker:</p>
-    <table class="perm-table">
-      <tr>
-        <th>Permission</th>
-        <th>Purpose</th>
-      </tr>
-      <tr>
-        <td class="perm-name">INTERNET</td>
-        <td>Load advertisements and remote configuration.</td>
-      </tr>
-      <tr>
-        <td class="perm-name">ACCESS_NETWORK_STATE</td>
-        <td>Check network connectivity before making requests.</td>
-      </tr>
-      <tr>
-        <td class="perm-name">PACKAGE_USAGE_STATS</td>
-        <td>Detect when a locked app is in the foreground.</td>
-      </tr>
-      <tr>
-        <td class="perm-name">QUERY_ALL_PACKAGES</td>
-        <td>Enumerate installed apps for the lock list.</td>
-      </tr>
-      <tr>
-        <td class="perm-name">SYSTEM_ALERT_WINDOW</td>
-        <td>Display the lock screen overlay on top of other apps.</td>
-      </tr>
-      <tr>
-        <td class="perm-name">FOREGROUND_SERVICE / FOREGROUND_SERVICE_SPECIAL_USE</td>
-        <td>Run the app monitoring and call blocking service in the background.</td>
-      </tr>
-      <tr>
-        <td class="perm-name">RECEIVE_BOOT_COMPLETED</td>
-        <td>Restart monitoring and blocking services after device reboot.</td>
-      </tr>
-      <tr>
-        <td class="perm-name">CAMERA / FOREGROUND_SERVICE_CAMERA</td>
-        <td>Capture intruder photos on failed unlock attempts (optional, user-enabled only).</td>
-      </tr>
-      <tr>
-        <td class="perm-name">USE_BIOMETRIC / USE_FINGERPRINT</td>
-        <td>Allow biometric unlock of locked apps.</td>
-      </tr>
-      <tr>
-        <td class="perm-name">POST_NOTIFICATIONS</td>
-        <td>Show foreground service notification and security alerts.</td>
-      </tr>
-      <tr>
-        <td class="perm-name">REQUEST_IGNORE_BATTERY_OPTIMIZATIONS</td>
-        <td>Prevent Android from terminating background monitoring service.</td>
-      </tr>
-      <tr>
-        <td class="perm-name">READ / WRITE / MANAGE_EXTERNAL_STORAGE</td>
-        <td>Save wallpaper images and backup files to local storage.</td>
-      </tr>
-      <tr>
-        <td class="perm-name">VIBRATE</td>
-        <td>Haptic feedback during PIN/pattern entry.</td>
-      </tr>
-      <tr>
-        <td class="perm-name">AD_ID</td>
-        <td>Required by advertising SDKs for ad serving and measurement.</td>
-      </tr>
-      <tr>
-        <td class="perm-name">Accessibility Service</td>
-        <td>Detect app foreground transitions to show lock screens reliably.</td>
-      </tr>
-      <tr>
-        <td class="perm-name">Device Administrator</td>
-        <td>Optional: prevent uninstallation without the app's password.</td>
-      </tr>
-      <!-- ProLocker-specific -->
-      <tr class="perm-extra">
-        <td class="perm-name">READ_CONTACTS / WRITE_CONTACTS</td>
-        <td>Read and restore contacts for the Contact Backup feature. Used only when you initiate a backup or restore operation.</td>
-      </tr>
-      <tr class="perm-extra">
-        <td class="perm-name">READ_PHONE_STATE</td>
-        <td>Monitor incoming call state to enable the Call Blocker feature. No call data is transmitted.</td>
-      </tr>
-      <tr class="perm-extra">
-        <td class="perm-name">ANSWER_PHONE_CALLS</td>
-        <td>Programmatically reject/answer calls on Android 8+ as part of Call Blocking functionality.</td>
-      </tr>
-    </table>
+    <p>ProLocker only requests permissions strictly required for its core features:</p>
+    
+    <div class="table-container">
+      <table class="perm-table">
+        <thead>
+          <tr>
+            <th>Permission</th>
+            <th>Purpose</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="perm-name">PACKAGE_USAGE_STATS</td>
+            <td>Detect when a locked app is brought to the foreground to present the lock screen.</td>
+          </tr>
+          <tr>
+            <td class="perm-name">QUERY_ALL_PACKAGES</td>
+            <td>Enumerate installed applications for app locking and APK backup extraction.</td>
+          </tr>
+          <tr>
+            <td class="perm-name">SYSTEM_ALERT_WINDOW</td>
+            <td>Display the lock screen overlay securely on top of locked apps.</td>
+          </tr>
+          <tr>
+            <td class="perm-name">Accessibility Service</td>
+            <td>Ensure timely lock screen display across all Android versions.</td>
+          </tr>
+          <tr>
+            <td class="perm-name">READ_CONTACTS / WRITE_CONTACTS</td>
+            <td>Export and restore contact backups locally when initiated by the user.</td>
+          </tr>
+          <tr>
+            <td class="perm-name">READ_PHONE_STATE / ANSWER_PHONE_CALLS</td>
+            <td>Enable Call Blocker to identify incoming caller numbers against your blacklist and filter spam calls.</td>
+          </tr>
+          <tr>
+            <td class="perm-name">CAMERA</td>
+            <td>Capture photos of intruders entering incorrect passwords (optional feature).</td>
+          </tr>
+          <tr>
+            <td class="perm-name">MANAGE_EXTERNAL_STORAGE / STORAGE</td>
+            <td>Manage File Vault items, save local backup files, and run the Junk Cleaner scan.</td>
+          </tr>
+          <tr>
+            <td class="perm-name">USE_BIOMETRIC / USE_FINGERPRINT</td>
+            <td>Support fingerprint and biometric unlocking.</td>
+          </tr>
+          <tr>
+            <td class="perm-name">POST_NOTIFICATIONS / FOREGROUND_SERVICE</td>
+            <td>Keep continuous background lock and call screening protection active.</td>
+          </tr>
+          <tr>
+            <td class="perm-name">RECEIVE_BOOT_COMPLETED</td>
+            <td>Restart security services automatically after device reboot.</td>
+          </tr>
+          <tr>
+            <td class="perm-name">REQUEST_IGNORE_BATTERY_OPTIMIZATIONS</td>
+            <td>Prevent Android battery savers from disabling lock and call screening services.</td>
+          </tr>
+          <tr>
+            <td class="perm-name">INTERNET / ACCESS_NETWORK_STATE</td>
+            <td>Fetch remote configuration and serve advertisements.</td>
+          </tr>
+          <tr>
+            <td class="perm-name">AD_ID</td>
+            <td>Advertising identifiers for ad delivery.</td>
+          </tr>
+          <tr>
+            <td class="perm-name">VIBRATE</td>
+            <td>Provide haptic feedback on pattern and PIN input.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 
   <!-- Advertising -->
   <div class="card">
-    <div class="card-title"><span class="num">04</span> Advertising</div>
-    <p>ProLocker is a free application supported by advertisements. We work with the following advertising partners:</p>
+    <div class="card-title"><span class="num">04</span> Advertising Partners</div>
+    <p>ProLocker is supported by advertisements provided by trusted advertising networks:</p>
     <ul>
-      <li><strong>Tapsell</strong> – Native and interstitial ads</li>
-      <li><strong>Adivery</strong> – Native ads</li>
-      <li><strong>Google AdMob</strong> – Native and interstitial ads (Google Play variant)</li>
+      <li><strong>Google AdMob</strong> – <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google Privacy Policy</a></li>
+      <li><strong>Adivery</strong> – <a href="https://adivery.com/privacy" target="_blank" rel="noopener">Adivery Privacy Policy</a></li>
+      <li><strong>Tapsell</strong> – <a href="https://tapsell.ir/privacy" target="_blank" rel="noopener">Tapsell Privacy Policy</a></li>
     </ul>
-    <p>These partners may collect your advertising ID, IP address, device information, and interaction data to serve personalized or contextual advertisements. Each partner operates under their own privacy policy:</p>
-    <ul>
-      <li><a href="https://tapsell.ir/privacy" target="_blank">Tapsell Privacy Policy</a></li>
-      <li><a href="https://adivery.com/privacy" target="_blank">Adivery Privacy Policy</a></li>
-      <li><a href="https://policies.google.com/privacy" target="_blank">Google Privacy Policy</a></li>
-    </ul>
-    <p>You can reset your Google Advertising ID at any time in your Android device settings under <strong>Google → Ads → Reset advertising ID</strong>.</p>
-  </div>
-
-  <!-- Data Sharing -->
-  <div class="card">
-    <div class="card-title"><span class="num">05</span> Data Sharing &amp; Third Parties</div>
-    <p>We do <strong>not</strong> sell, rent, or trade your personal data — including your contacts, call logs, or SMS content — to any third party. Data may be shared only in the following limited circumstances:</p>
-    <ul>
-      <li><strong>Advertising Partners:</strong> As described in Section 4, for ad delivery and measurement only.</li>
-      <li><strong>Firebase (Google):</strong> For push notifications. See <a href="https://firebase.google.com/support/privacy" target="_blank">Firebase Privacy</a>.</li>
-      <li><strong>Legal Requirements:</strong> If required by applicable law or valid governmental request.</li>
-    </ul>
+    <p>You can manage your advertising preferences or reset your advertising identifier in your Android device settings under <strong>Settings → Google → Ads</strong>.</p>
   </div>
 
   <!-- Data Security -->
   <div class="card">
-    <div class="card-title"><span class="num">06</span> Data Security</div>
-    <p>Your lock credentials are stored in encrypted form using Android's secure DataStore. All server communication uses HTTPS. Contact, call log, and SMS backup files are stored on your device in a location you control.</p>
-    <p>Since all sensitive personal data (contacts, SMS, call logs) never leaves your device, the risk of server-side breaches affecting this data is minimal by design.</p>
-  </div>
-
-  <!-- Data Retention -->
-  <div class="card">
-    <div class="card-title"><span class="num">07</span> Data Retention</div>
-    <p>All data stored by ProLocker is retained on your device until you uninstall the App or manually clear the App's data. Backup files you create are stored in the location you chose and are under your control.</p>
-    <p>Uninstalling the App removes all App-generated data from the device. Your backup files in external storage will remain until you delete them manually.</p>
-  </div>
-
-  <!-- Children -->
-  <div class="card">
-    <div class="card-title"><span class="num">08</span> Children's Privacy</div>
-    <p>ProLocker is not directed at children under the age of 13. We do not knowingly collect personal information from children under 13. If you believe we have inadvertently collected such information, please contact us immediately and we will delete it promptly.</p>
-  </div>
-
-  <!-- Your Rights -->
-  <div class="card">
-    <div class="card-title"><span class="num">09</span> Your Rights</div>
-    <p>Depending on your jurisdiction, you may have the following rights:</p>
+    <div class="card-title"><span class="num">05</span> Data Security &amp; Retention</div>
+    <p>We implement strict data protection measures:</p>
     <ul>
-      <li><strong>Access:</strong> Request a copy of data we hold about you.</li>
-      <li><strong>Deletion:</strong> Request deletion of your data.</li>
-      <li><strong>Opt-out:</strong> Opt out of personalized advertising by resetting your Advertising ID.</li>
-      <li><strong>Correction:</strong> Request correction of inaccurate data.</li>
-      <li><strong>Portability:</strong> Your backup files are in standard formats and fully portable.</li>
+      <li>All sensitive data (passwords, contacts backups, hidden vault files) is stored locally on your device in secure storage.</li>
+      <li>Network communications (e.g. remote configuration) use HTTPS encryption.</li>
+      <li>Uninstalling the App or clearing app data removes all App-generated configuration and stored credentials. Backup files in your chosen external folders remain under your personal control.</li>
     </ul>
-    <p>To exercise these rights, contact us at the address in Section 11.</p>
   </div>
 
-  <!-- Changes -->
+  <!-- Children's Privacy -->
   <div class="card">
-    <div class="card-title"><span class="num">10</span> Changes to This Policy</div>
-    <p>We may update this Privacy Policy from time to time. We will notify you of material changes by updating the "Last Updated" date. Your continued use of the App after any changes constitutes your acceptance of the updated policy.</p>
+    <div class="card-title"><span class="num">06</span> Children's Privacy</div>
+    <p>ProLocker is not designed for or targeted to children under 13 years of age. We do not knowingly collect personal information from children.</p>
+  </div>
+
+  <!-- Your Choices -->
+  <div class="card">
+    <div class="card-title"><span class="num">07</span> User Control &amp; Rights</div>
+    <p>You have full control over your privacy:</p>
+    <ul>
+      <li>Grant or revoke permissions (Contacts, Storage, Camera, Phone) at any time through Android System Settings.</li>
+      <li>Export, delete, or relocate your local backup files as you choose.</li>
+      <li>Opt out of interest-based ads via Android Google Ads settings.</li>
+    </ul>
+  </div>
+
+  <!-- Changes to Policy -->
+  <div class="card">
+    <div class="card-title"><span class="num">08</span> Policy Updates</div>
+    <p>We may update this Privacy Policy from time to time. Changes will be reflected with an updated date at the top of this page.</p>
   </div>
 
   <!-- Contact -->
   <div class="card">
-    <div class="card-title"><span class="num">11</span> Contact Us</div>
-    <p>If you have any questions, concerns, or requests regarding this Privacy Policy, please contact us:</p>
+    <div class="card-title"><span class="num">09</span> Contact Us</div>
+    <p>If you have any questions or feedback regarding this Privacy Policy, please contact our support team:</p>
     <div class="contact-box">
-      <p style="font-size:15px; color: var(--text); font-weight: 600; margin-bottom: 8px;">ProLocker Support</p>
-      <p style="margin-bottom: 4px;">📧 <a href="mailto:support@prolocker.app">support@prolocker.app</a></p>
-      <p style="font-size: 13px; color: var(--text-muted); margin-top: 8px;">We aim to respond to all inquiries within 5 business days.</p>
+      <p style="font-size:15px; color: var(--text); font-weight: 700; margin-bottom: 6px;">ProLocker Support Team</p>
+      <p>📧 <a href="mailto:support@prolocker.app">support@prolocker.app</a></p>
     </div>
   </div>
 
-  <p class="last-updated">© 2026 ProLocker. All rights reserved. &nbsp;|&nbsp; This policy was last updated on September 2, 2026.</p>
+  <p class="footer-text">© 2026 ProLocker. All rights reserved.</p>
 
 </div>
 </body>

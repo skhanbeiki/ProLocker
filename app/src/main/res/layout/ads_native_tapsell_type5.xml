@@ -4,6 +4,7 @@
     android:id="@+id/tapsell_native_ad_container"
     android:layout_width="match_parent"
     android:background="#ffffff"
+    android:layoutDirection="rtl"
     android:layout_height="wrap_content">
 
     <androidx.cardview.widget.CardView

@@ -3,6 +3,7 @@
     android:id="@+id/tapsell_native_ad_container"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layoutDirection="rtl"
     android:padding="8dp"
     android:background="#efedde">
 
