@@ -40,5 +40,7 @@ data class UserPreferences(
     val isProtectionEnabled: Boolean = true,
     val recoveryOnboardingDismissed: Boolean = false,
     val lastInstalledVersionCode: Int = 0,
-    val fingerprintUnlockEnabled: Boolean = false
+    val fingerprintUnlockEnabled: Boolean = false,
+    val ramCleanerInterstitialCounter: Int = 0,
+    val inAppInterstitialCounter: Int = 0
 )

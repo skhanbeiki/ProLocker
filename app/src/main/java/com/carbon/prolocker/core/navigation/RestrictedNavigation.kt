@@ -33,6 +33,7 @@ fun RestrictedNavigation(
     ) {
         composable<JunkCleanerRoute> {
             JunkCleanerScreen(
+                isExternal = true,
                 onBack = {
                     navController.context.findActivity()?.finishAffinity()
                 }
@@ -40,6 +41,7 @@ fun RestrictedNavigation(
         }
         composable<BackgroundGalleryRoute> {
             BackgroundGalleryScreen(
+                isExternal = true,
                 onBack = {
                     navController.context.findActivity()?.finishAffinity()
                 },

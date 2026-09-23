@@ -21,6 +21,7 @@ object AdUnitIds {
 
         const val INTERSTITIAL_BACKGROUND = "5bd0191b55f5440001d1daa7"
         const val INTERSTITIAL_RAM_CLEANER = "5f14290dc785940001736076"
+        const val INTERSTITIAL_IN_APP = "5bd0191b55f5440001d1daa7"
 
         const val INTERSTITIAL_HIDDEN_ITEMS = "5f142333c78594000173606a"
         const val INTERSTITIAL_HIDE_FILES = "5f325b08b3e30f0001e41753"
@@ -50,6 +51,7 @@ object AdUnitIds {
 
         const val INTERSTITIAL_BACKGROUND = "c1a36f39-d816-46e2-96bf-e65ddb166dff"
         const val INTERSTITIAL_RAM_CLEANER = "49190757-16eb-42f2-aace-13627611750c"
+        const val INTERSTITIAL_IN_APP = "c1a36f39-d816-46e2-96bf-e65ddb166dff"
 
         const val INTERSTITIAL_HIDDEN_ITEMS = "c1a36f39-d816-46e2-96bf-e65ddb166dff"
         const val INTERSTITIAL_HIDE_FILES = "c1a36f39-d816-46e2-96bf-e65ddb166dff"
@@ -79,6 +81,7 @@ object AdUnitIds {
 
         const val INTERSTITIAL_BACKGROUND = "ca-app-pub-3940256099942544/1033173712"
         const val INTERSTITIAL_RAM_CLEANER = "ca-app-pub-3940256099942544/1033173712"
+        const val INTERSTITIAL_IN_APP = ""
 
         const val INTERSTITIAL_HIDDEN_ITEMS = "ca-app-pub-3940256099942544/1033173712"
         const val INTERSTITIAL_HIDE_FILES = "ca-app-pub-3940256099942544/1033173712"
@@ -87,5 +90,12 @@ object AdUnitIds {
         const val INTERSTITIAL_BACKUP_HOME = "ca-app-pub-3940256099942544/1033173712"
         const val INTERSTITIAL_BACKUP_APPS = "ca-app-pub-3940256099942544/1033173712"
         const val INTERSTITIAL_BACKUP_CATEGORY_DETAIL = "ca-app-pub-3940256099942544/1033173712"
+    }
+
+    object Magnet {
+        const val APP_ID = "99d647ce-d554-412f-bce2-d84be0601d58"
+        const val INTERSTITIAL_BACKGROUND = "53d041ff-795f-494a-a632-bf1356d90bb5"
+        const val INTERSTITIAL_RAM_CLEANER = "d7c3b907-c5c5-42e0-a03e-518aaef04c5c"
+        const val INTERSTITIAL_IN_APP = "9694ea0d-5ba5-4ed6-a5c9-c9b8710b52fd"
     }
 }

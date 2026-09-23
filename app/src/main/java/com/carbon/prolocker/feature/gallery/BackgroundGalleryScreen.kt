@@ -90,6 +90,7 @@ sealed interface DownloadedGridItem {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BackgroundGalleryScreen(
+    isExternal: Boolean = false,
     onBack: () -> Unit,
     onBackgroundClick: (String, Int, Boolean) -> Unit,
     viewModel: BackgroundGalleryViewModel = koinViewModel()
@@ -111,8 +112,16 @@ fun BackgroundGalleryScreen(
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
 
+    val handleExit = {
+        if (isExternal) {
+            handleThemeInterstitial(adManager, preferencesRepository, remoteConfigRepository, coroutineScope, context, onBack)
+        } else {
+            onBack()
+        }
+    }
+
     androidx.activity.compose.BackHandler {
-        handleThemeInterstitial(adManager, preferencesRepository, remoteConfigRepository, coroutineScope, context, onBack)
+        handleExit()
     }
 
     LaunchedEffect(Unit) {
@@ -171,16 +180,7 @@ fun BackgroundGalleryScreen(
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = {
-                        handleThemeInterstitial(
-                            adManager,
-                            preferencesRepository,
-                            remoteConfigRepository,
-                            coroutineScope,
-                            context,
-                            onBack
-                        )
-                    }) {
+                    IconButton(onClick = handleExit) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
                 },
@@ -815,7 +815,7 @@ private fun handleThemeInterstitial(
         val config = remoteConfigRepository.getConfig()
         val limit = config.configs.interstitialAdThemeStep
 
-        if (limit > 0) {
+        if (limit > 0 && adManager.areAdsEnabled()) {
             val currentCount = prefs.themeInterstitialCounter + 1
             if (currentCount >= limit) {
                 preferencesRepository.updateThemeInterstitialCounter(false)

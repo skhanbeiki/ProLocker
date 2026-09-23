@@ -19,36 +19,5 @@ fun triggerExitInterstitialAd(
     placement: String,
     onBack: () -> Unit
 ) {
-    val activity = context.findActivity() ?: run {
-        onBack()
-        return
-    }
-
-    coroutineScope.launch {
-        try {
-            val prefs = preferencesRepository.userPreferencesFlow.first()
-            val config = remoteConfigRepository.getConfig()
-            val limit = config.configs.interstitialAdThemeStep
-
-            if (limit > 0) {
-                val currentCount = prefs.themeInterstitialCounter + 1
-                if (currentCount >= limit) {
-                    preferencesRepository.updateThemeInterstitialCounter(false)
-                    adManager.showInterstitialAd(
-                        activity = activity,
-                        placement = placement,
-                        onClosed = { onBack() },
-                        onError = { onBack() }
-                    )
-                } else {
-                    preferencesRepository.updateThemeInterstitialCounter(true)
-                    onBack()
-                }
-            } else {
-                onBack()
-            }
-        } catch (e: Exception) {
-            onBack()
-        }
-    }
+    onBack()
 }

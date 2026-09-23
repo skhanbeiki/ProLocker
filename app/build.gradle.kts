@@ -189,6 +189,10 @@ dependencies {
     implementation(libs.tapsell)
     implementation(libs.legacy)
     implementation(libs.adivery)
+    implementation(files("libs/magnetad-1.8.0.aar"))
+    implementation(libs.okhttp)
+    implementation(libs.logging.interceptor)
+    implementation("com.google.android.gms:play-services-ads-identifier:18.1.0")
 
     testImplementation(libs.androidx.compose.ui.test.junit4)
     testImplementation(libs.androidx.core)

@@ -7,6 +7,7 @@ import com.carbon.prolocker.ad.providers.AdMobInterstitialAdProvider
 import com.carbon.prolocker.ad.providers.AdMobNativeAdProvider
 import com.carbon.prolocker.ad.providers.AdiveryInterstitialAdProvider
 import com.carbon.prolocker.ad.providers.AdiveryNativeAdProvider
+import com.carbon.prolocker.ad.providers.MagnetInterstitialAdProvider
 import com.carbon.prolocker.ad.providers.TapsellPlusInterstitialAdProvider
 import com.carbon.prolocker.ad.providers.TapsellPlusNativeAdProvider
 import org.koin.android.ext.koin.androidContext
@@ -23,7 +24,8 @@ val adModule = module {
         val interstitialProviders: Map<String, InterstitialAdProvider> = mapOf(
             "tapsell" to TapsellPlusInterstitialAdProvider("tapsell"),
             "adivery" to AdiveryInterstitialAdProvider("adivery"),
-            "admob" to AdMobInterstitialAdProvider("admob")
+            "admob" to AdMobInterstitialAdProvider("admob"),
+            "magnet" to MagnetInterstitialAdProvider("magnet")
         )
 
         AdManager(

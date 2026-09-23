@@ -9,6 +9,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.first
 import com.carbon.prolocker.feature.home.LockedAppsScreen
 import com.carbon.prolocker.feature.junkcleaner.JunkCleanerScreen
 import com.carbon.prolocker.feature.lock.LockTypeSelectionScreen
@@ -50,6 +52,43 @@ fun AppNavigation(
         }
     }
     val startDest = if (isOnboardingCompleted) HomeRoute() else WelcomeRoute
+
+    val adManager: com.carbon.prolocker.ad.AdManager = org.koin.compose.koinInject()
+    val preferencesRepository: com.carbon.prolocker.core.datastore.PreferencesRepository = org.koin.compose.koinInject()
+    val remoteConfigRepository: com.carbon.prolocker.network.repository.RemoteConfigRepository = org.koin.compose.koinInject()
+    val coroutineScope = androidx.compose.runtime.rememberCoroutineScope()
+
+    fun navigateWithInAppAd(target: () -> Unit) {
+        val activity = context.findActivity() ?: run {
+            target()
+            return
+        }
+        coroutineScope.launch {
+            try {
+                val config = remoteConfigRepository.getConfig()
+                val step = config.configs.interstitialAdInAppStep
+                if (step > 0 && adManager.areAdsEnabled()) {
+                    val prefs = preferencesRepository.userPreferencesFlow.first()
+                    val currentCount = prefs.inAppInterstitialCounter + 1
+                    if (currentCount >= step) {
+                        preferencesRepository.updateInAppInterstitialCounter(false)
+                        adManager.showInterstitialAd(
+                            activity = activity,
+                            placement = com.carbon.prolocker.ad.AdPlacement.INTERSTITIAL_IN_APP,
+                            onClosed = { target() },
+                            onError = { _ -> target() }
+                        )
+                        return@launch
+                    } else {
+                        preferencesRepository.updateInAppInterstitialCounter(true)
+                    }
+                }
+            } catch (e: Exception) {
+                android.util.Log.e("AppNavigation", "Error in navigateWithInAppAd", e)
+            }
+            target()
+        }
+    }
 
     val effectiveDeepLink = trustedLaunchDestination ?: deepLinkType
 
@@ -150,28 +189,28 @@ fun AppNavigation(
                     navController.navigate(AppSettingsRoute)
                 },
                 onNavigateToJunkCleaner = {
-                    navController.navigate(JunkCleanerRoute)
+                    navigateWithInAppAd { navController.navigate(JunkCleanerRoute) }
                 },
                 onNavigateToGallery = {
-                    navController.navigate(BackgroundGalleryRoute)
+                    navigateWithInAppAd { navController.navigate(BackgroundGalleryRoute) }
                 },
                 onNavigateToPermissions = { pkg ->
                     navController.navigate(PermissionsRoute(pendingPackage = pkg))
                 },
                 onNavigateToSecurity = {
-                    navController.navigate(SecurityRoute)
+                    navigateWithInAppAd { navController.navigate(SecurityRoute) }
                 },
                 onNavigateToHideFiles = {
-                    navController.navigate(HideFilesRoute)
+                    navigateWithInAppAd { navController.navigate(HideFilesRoute) }
                 },
                 onNavigateToAboutUs = {
                     navController.navigate(AboutUsRoute)
                 },
                 onNavigateToBackup = {
-                    navController.navigate(BackupHomeRoute)
+                    navigateWithInAppAd { navController.navigate(BackupHomeRoute) }
                 },
                 onNavigateToCallBlocker = {
-                    navController.navigate(CallBlockerRoute)
+                    navigateWithInAppAd { navController.navigate(CallBlockerRoute) }
                 }
             )
         }
@@ -295,6 +334,7 @@ fun AppNavigation(
         composable<JunkCleanerRoute> {
             val shouldFinishAffinity = isStandaloneExit && (trustedLaunchDestination == "memory" || trustedLaunchDestination == "junk")
             JunkCleanerScreen(
+                isExternal = shouldFinishAffinity,
                 onBack = {
                     if (shouldFinishAffinity) {
                         context.findActivity()?.finishAffinity()
@@ -307,6 +347,7 @@ fun AppNavigation(
         composable<BackgroundGalleryRoute> {
             val isStandalone = trustedLaunchDestination == "backgrounds"
             com.carbon.prolocker.feature.gallery.BackgroundGalleryScreen(
+                isExternal = isStandalone,
                 onBack = {
                     if (isStandalone) {
                         context.findActivity()?.finishAffinity()

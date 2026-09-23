@@ -24,6 +24,8 @@ data class RemoteConfigResponse(
                 nativeAdPlaceLockScreen = "topBanner",
                 interstitialAdThemeStep = 3,
                 interstitialAdRamCleanerStep = 3,
+                interstitialAdInAppStep = 3,
+                interstitialAdType = null,
                 nativeAdRamCleanerPage = true,
                 limitInstallDisplayAdDays = 3,
                 ramCleanerNotifyTimes = listOf(22),
@@ -55,8 +57,10 @@ data class RemoteConfigs(
     @SerialName("nativeAdGooglePLayLockScreen") val nativeAdGooglePlayLockScreen: String = "adivery",
     @SerialName("nativeAdPlaceLockScreen") val nativeAdPlaceLockScreen: String = "topBanner",
     @SerialName("nativeAdRamCleanerPage") val nativeAdRamCleanerPage: Boolean = true,
+    @SerialName("interstitialAdType") val interstitialAdType: String? = null,
     @SerialName("interstitialAdThemeStep") val interstitialAdThemeStep: Int = 3,
     @SerialName("interstitialAdRamCleanerStep") val interstitialAdRamCleanerStep: Int = 3,
+    @SerialName("interstitialAdInAppStep") val interstitialAdInAppStep: Int = 3,
     @SerialName("limitInstallDisplayAdDays") val limitInstallDisplayAdDays: Int = 3,
     @SerialName("surveyDisplay") val surveyDisplay: Int = 1
 )

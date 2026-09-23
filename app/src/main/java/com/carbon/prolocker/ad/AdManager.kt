@@ -171,10 +171,14 @@ class AdManager(
 
     fun getInterstitialProviderName(): String = runBlocking {
         val config = getConfig()
-        val provider = when {
-            MarketConfig.isBazaar -> config.configs.displayAdTypeBazaarApp
-            MarketConfig.isMyket -> config.configs.displayAdTypeMyketApp
-            else -> config.configs.displayAdTypeGooglePlayApp
+        val provider = if (!config.configs.interstitialAdType.isNullOrBlank()) {
+            config.configs.interstitialAdType.lowercase().trim()
+        } else {
+            when {
+                MarketConfig.isBazaar -> config.configs.displayAdTypeBazaarApp
+                MarketConfig.isMyket -> config.configs.displayAdTypeMyketApp
+                else -> config.configs.displayAdTypeGooglePlayApp
+            }
         }.lowercase()
         provider
     }
@@ -193,6 +197,7 @@ class AdManager(
                 AdPlacement.EXIT_NATIVE -> AdUnitIds.Tapsell.EXIT_NATIVE
                 AdPlacement.INTERSTITIAL_BACKGROUND -> AdUnitIds.Tapsell.INTERSTITIAL_BACKGROUND
                 AdPlacement.INTERSTITIAL_RAM_CLEANER -> AdUnitIds.Tapsell.INTERSTITIAL_RAM_CLEANER
+                AdPlacement.INTERSTITIAL_IN_APP -> AdUnitIds.Tapsell.INTERSTITIAL_IN_APP
                 AdPlacement.INTERSTITIAL_HIDDEN_ITEMS -> AdUnitIds.Tapsell.INTERSTITIAL_HIDDEN_ITEMS
                 AdPlacement.INTERSTITIAL_HIDE_FILES -> AdUnitIds.Tapsell.INTERSTITIAL_HIDE_FILES
                 AdPlacement.INTERSTITIAL_CALL_BLOCKER -> AdUnitIds.Tapsell.INTERSTITIAL_CALL_BLOCKER
@@ -214,6 +219,7 @@ class AdManager(
                 AdPlacement.EXIT_NATIVE -> AdUnitIds.Adivery.EXIT_NATIVE
                 AdPlacement.INTERSTITIAL_BACKGROUND -> AdUnitIds.Adivery.INTERSTITIAL_BACKGROUND
                 AdPlacement.INTERSTITIAL_RAM_CLEANER -> AdUnitIds.Adivery.INTERSTITIAL_RAM_CLEANER
+                AdPlacement.INTERSTITIAL_IN_APP -> AdUnitIds.Adivery.INTERSTITIAL_IN_APP
                 AdPlacement.INTERSTITIAL_HIDDEN_ITEMS -> AdUnitIds.Adivery.INTERSTITIAL_HIDDEN_ITEMS
                 AdPlacement.INTERSTITIAL_HIDE_FILES -> AdUnitIds.Adivery.INTERSTITIAL_HIDE_FILES
                 AdPlacement.INTERSTITIAL_CALL_BLOCKER -> AdUnitIds.Adivery.INTERSTITIAL_CALL_BLOCKER
@@ -235,6 +241,7 @@ class AdManager(
                 AdPlacement.EXIT_NATIVE -> AdUnitIds.AdMob.EXIT_NATIVE
                 AdPlacement.INTERSTITIAL_BACKGROUND -> AdUnitIds.AdMob.INTERSTITIAL_BACKGROUND
                 AdPlacement.INTERSTITIAL_RAM_CLEANER -> AdUnitIds.AdMob.INTERSTITIAL_RAM_CLEANER
+                AdPlacement.INTERSTITIAL_IN_APP -> AdUnitIds.AdMob.INTERSTITIAL_IN_APP
                 AdPlacement.INTERSTITIAL_HIDDEN_ITEMS -> AdUnitIds.AdMob.INTERSTITIAL_HIDDEN_ITEMS
                 AdPlacement.INTERSTITIAL_HIDE_FILES -> AdUnitIds.AdMob.INTERSTITIAL_HIDE_FILES
                 AdPlacement.INTERSTITIAL_CALL_BLOCKER -> AdUnitIds.AdMob.INTERSTITIAL_CALL_BLOCKER
@@ -242,6 +249,12 @@ class AdManager(
                 AdPlacement.INTERSTITIAL_BACKUP_HOME -> AdUnitIds.AdMob.INTERSTITIAL_BACKUP_HOME
                 AdPlacement.INTERSTITIAL_BACKUP_APPS -> AdUnitIds.AdMob.INTERSTITIAL_BACKUP_APPS
                 AdPlacement.INTERSTITIAL_BACKUP_CATEGORY_DETAIL -> AdUnitIds.AdMob.INTERSTITIAL_BACKUP_CATEGORY_DETAIL
+                else -> ""
+            }
+            "magnet" -> when (placement) {
+                AdPlacement.INTERSTITIAL_BACKGROUND -> AdUnitIds.Magnet.INTERSTITIAL_BACKGROUND
+                AdPlacement.INTERSTITIAL_RAM_CLEANER -> AdUnitIds.Magnet.INTERSTITIAL_RAM_CLEANER
+                AdPlacement.INTERSTITIAL_IN_APP -> AdUnitIds.Magnet.INTERSTITIAL_IN_APP
                 else -> ""
             }
             else -> ""

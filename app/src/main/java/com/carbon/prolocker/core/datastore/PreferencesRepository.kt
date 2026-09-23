@@ -63,6 +63,30 @@ class PreferencesRepository(private val dataStore: DataStore<UserPreferences>) {
         }
     }
 
+    suspend fun updateRamCleanerInterstitialCounter(increment: Boolean) {
+        runCatching {
+            dataStore.updateData { prefs ->
+                if (increment) {
+                    prefs.copy(ramCleanerInterstitialCounter = prefs.ramCleanerInterstitialCounter + 1)
+                } else {
+                    prefs.copy(ramCleanerInterstitialCounter = 0)
+                }
+            }
+        }
+    }
+
+    suspend fun updateInAppInterstitialCounter(increment: Boolean) {
+        runCatching {
+            dataStore.updateData { prefs ->
+                if (increment) {
+                    prefs.copy(inAppInterstitialCounter = prefs.inAppInterstitialCounter + 1)
+                } else {
+                    prefs.copy(inAppInterstitialCounter = 0)
+                }
+            }
+        }
+    }
+
     /**
      * Safely reads current preferences, returning defaults on failure.
      */

@@ -105,6 +105,15 @@ class ProLockerApplication : Application(), Application.ActivityLifecycleCallbac
         }
     }
 
+    override fun onTrimMemory(level: Int) {
+        super.onTrimMemory(level)
+        try {
+            if (com.hasin.magnetad.MagnetAdManager.isInitialized()) {
+                com.hasin.magnetad.MagnetAdManager.onTrimMemory(level)
+            }
+        } catch (_: Throwable) {}
+    }
+
     /**
      * Detect if the app was just updated. If so, force-restart the monitoring service
      * to ensure a clean state. This prevents the issue where the service appears to be

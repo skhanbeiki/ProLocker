@@ -52,15 +52,39 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
+import androidx.activity.compose.LocalActivityResultRegistryOwner
+import androidx.activity.result.ActivityResultRegistry
+import androidx.activity.result.ActivityResultRegistryOwner
+import androidx.activity.result.contract.ActivityResultContract
+import androidx.core.app.ActivityOptionsCompat
 import java.net.URLDecoder
 import java.net.URLEncoder
 import java.util.Locale
 
-class LockService : Service(), OnBackPressedDispatcherOwner {
+class LockService : Service(), OnBackPressedDispatcherOwner, ActivityResultRegistryOwner {
 
     private val _backPressedDispatcher = OnBackPressedDispatcher()
 
     override val onBackPressedDispatcher: OnBackPressedDispatcher get() = _backPressedDispatcher
+
+    private val _activityResultRegistry = object : ActivityResultRegistry() {
+        override fun <I, O> onLaunch(
+            requestCode: Int,
+            contract: ActivityResultContract<I, O>,
+            input: I,
+            options: ActivityOptionsCompat?
+        ) {
+            try {
+                val intent = contract.createIntent(this@LockService, input)
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                this@LockService.startActivity(intent)
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to launch intent from LockService", e)
+            }
+        }
+    }
+
+    override val activityResultRegistry: ActivityResultRegistry get() = _activityResultRegistry
 
     override val lifecycle: Lifecycle get() = serviceLifecycleOwner.lifecycle
 
@@ -265,7 +289,8 @@ class LockService : Service(), OnBackPressedDispatcherOwner {
                     androidx.compose.ui.platform.LocalConfiguration provides localizedContext.resources.configuration,
                     LocalLayoutDirection provides layoutDirection,
                     LocalViewModelStoreOwner provides serviceLifecycleOwner,
-                    LocalOnBackPressedDispatcherOwner provides this@LockService
+                    LocalOnBackPressedDispatcherOwner provides this@LockService,
+                    LocalActivityResultRegistryOwner provides this@LockService
                 ) {
                     ProLockerTheme(useDarkTheme = isDarkMode) {
                         val stateHolder = LockOverlayState(packageName, forSettings)
@@ -333,8 +358,9 @@ class LockService : Service(), OnBackPressedDispatcherOwner {
                                     )
                                 }
 
-                                is LockNavScreen.Gallery -> {
+                                 is LockNavScreen.Gallery -> {
                                     BackgroundGalleryScreen(
+                                        isExternal = true,
                                         onBack = { currentScreen.value = LockNavScreen.Lock },
                                         onBackgroundClick = { url, id, fromDownloaded ->
                                             val encodedUrl = URLEncoder.encode(url, "UTF-8")
@@ -355,6 +381,7 @@ class LockService : Service(), OnBackPressedDispatcherOwner {
 
                                 is LockNavScreen.JunkCleaner -> {
                                     JunkCleanerScreen(
+                                        isExternal = true,
                                         onBack = { currentScreen.value = LockNavScreen.Lock }
                                     )
                                 }

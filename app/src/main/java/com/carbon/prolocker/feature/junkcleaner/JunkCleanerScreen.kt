@@ -125,13 +125,24 @@ enum class CleanerState {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun JunkCleanerScreen(onBack: () -> Unit) {
+fun JunkCleanerScreen(
+    isExternal: Boolean = false,
+    onBack: () -> Unit
+) {
     val context = LocalContext.current
     val adManager: AdManager = org.koin.compose.koinInject()
     val preferencesRepository: PreferencesRepository = org.koin.compose.koinInject()
     val remoteConfigRepository: RemoteConfigRepository = org.koin.compose.koinInject()
     val coroutineScope = rememberCoroutineScope()
     val engine = remember { JunkCleanerEngine() }
+
+    val handleExit = {
+        if (isExternal) {
+            handleJunkInterstitial(adManager, preferencesRepository, remoteConfigRepository, coroutineScope, context, onBack)
+        } else {
+            onBack()
+        }
+    }
 
     val lifecycleOwner = LocalLifecycleOwner.current
 
@@ -231,7 +242,7 @@ fun JunkCleanerScreen(onBack: () -> Unit) {
         } else if (cleanerState == CleanerState.CLEANING) {
             // Cannot interrupt while actively deleting
         } else {
-            handleJunkInterstitial(adManager, preferencesRepository, remoteConfigRepository, coroutineScope, context, onBack)
+            handleExit()
         }
     }
 
@@ -297,7 +308,7 @@ fun JunkCleanerScreen(onBack: () -> Unit) {
                         }
                     },
                     onBack = {
-                        handleJunkInterstitial(adManager, preferencesRepository, remoteConfigRepository, coroutineScope, context, onBack)
+                        handleExit()
                     }
                 )
             }
@@ -383,7 +394,7 @@ fun JunkCleanerScreen(onBack: () -> Unit) {
                     cleanerAdEnabled = cleanerAdEnabled,
                     adManager = adManager,
                     onDone = {
-                        handleJunkInterstitial(adManager, preferencesRepository, remoteConfigRepository, coroutineScope, context, onBack)
+                        handleExit()
                     }
                 )
             }
@@ -1703,12 +1714,12 @@ private fun handleJunkInterstitial(
     coroutineScope.launch {
         val prefs = preferencesRepository.userPreferencesFlow.first()
         val config = remoteConfigRepository.getConfig()
-        val limit = config.configs.interstitialAdThemeStep
+        val limit = config.configs.interstitialAdRamCleanerStep
 
-        if (limit > 0) {
-            val currentCount = prefs.themeInterstitialCounter + 1
+        if (limit > 0 && adManager.areAdsEnabled()) {
+            val currentCount = prefs.ramCleanerInterstitialCounter + 1
             if (currentCount >= limit) {
-                preferencesRepository.updateThemeInterstitialCounter(false)
+                preferencesRepository.updateRamCleanerInterstitialCounter(false)
                 adManager.showInterstitialAd(
                     activity = activity,
                     placement = AdPlacement.INTERSTITIAL_RAM_CLEANER,
@@ -1717,7 +1728,7 @@ private fun handleJunkInterstitial(
                 )
                 return@launch
             } else {
-                preferencesRepository.updateThemeInterstitialCounter(true)
+                preferencesRepository.updateRamCleanerInterstitialCounter(true)
             }
         }
         onBack()

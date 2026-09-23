@@ -132,3 +132,10 @@
 -dontwarn com.mbridge.**
 -dontwarn org.slf4j.**
 -dontwarn java.lang.management.**
+
+#################################################
+# MagnetAd SDK
+#################################################
+-keep class com.hasin.magnetad.** { *; }
+-dontwarn com.hasin.magnetad.**
+
