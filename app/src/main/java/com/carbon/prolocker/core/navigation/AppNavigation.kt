@@ -58,9 +58,9 @@ fun AppNavigation(
     val remoteConfigRepository: com.carbon.prolocker.network.repository.RemoteConfigRepository = org.koin.compose.koinInject()
     val coroutineScope = androidx.compose.runtime.rememberCoroutineScope()
 
-    fun navigateWithInAppAd(target: () -> Unit) {
+    fun navigateBackWithInAppAd(onBackAction: () -> Unit) {
         val activity = context.findActivity() ?: run {
-            target()
+            onBackAction()
             return
         }
         coroutineScope.launch {
@@ -72,11 +72,13 @@ fun AppNavigation(
                     val currentCount = prefs.inAppInterstitialCounter + 1
                     if (currentCount >= step) {
                         preferencesRepository.updateInAppInterstitialCounter(false)
+                        onBackAction()
+                        kotlinx.coroutines.delay(150L)
                         adManager.showInterstitialAd(
                             activity = activity,
                             placement = com.carbon.prolocker.ad.AdPlacement.INTERSTITIAL_IN_APP,
-                            onClosed = { target() },
-                            onError = { _ -> target() }
+                            onClosed = {},
+                            onError = { _ -> }
                         )
                         return@launch
                     } else {
@@ -84,10 +86,14 @@ fun AppNavigation(
                     }
                 }
             } catch (e: Exception) {
-                android.util.Log.e("AppNavigation", "Error in navigateWithInAppAd", e)
+                android.util.Log.e("AppNavigation", "Error in navigateBackWithInAppAd", e)
             }
-            target()
+            onBackAction()
         }
+    }
+
+    androidx.compose.runtime.LaunchedEffect(Unit) {
+        adManager.preloadInterstitialAd(context.applicationContext, com.carbon.prolocker.ad.AdPlacement.INTERSTITIAL_IN_APP)
     }
 
     val effectiveDeepLink = trustedLaunchDestination ?: deepLinkType
@@ -189,39 +195,39 @@ fun AppNavigation(
                     navController.navigate(AppSettingsRoute)
                 },
                 onNavigateToJunkCleaner = {
-                    navigateWithInAppAd { navController.navigate(JunkCleanerRoute) }
+                    navController.navigate(JunkCleanerRoute)
                 },
                 onNavigateToGallery = {
-                    navigateWithInAppAd { navController.navigate(BackgroundGalleryRoute) }
+                    navController.navigate(BackgroundGalleryRoute)
                 },
                 onNavigateToPermissions = { pkg ->
                     navController.navigate(PermissionsRoute(pendingPackage = pkg))
                 },
                 onNavigateToSecurity = {
-                    navigateWithInAppAd { navController.navigate(SecurityRoute) }
+                    navController.navigate(SecurityRoute)
                 },
                 onNavigateToHideFiles = {
-                    navigateWithInAppAd { navController.navigate(HideFilesRoute) }
+                    navController.navigate(HideFilesRoute)
                 },
                 onNavigateToAboutUs = {
                     navController.navigate(AboutUsRoute)
                 },
                 onNavigateToBackup = {
-                    navigateWithInAppAd { navController.navigate(BackupHomeRoute) }
+                    navController.navigate(BackupHomeRoute)
                 },
                 onNavigateToCallBlocker = {
-                    navigateWithInAppAd { navController.navigate(CallBlockerRoute) }
+                    navController.navigate(CallBlockerRoute)
                 }
             )
         }
         composable<CallBlockerRoute> {
             com.carbon.prolocker.feature.callblocker.ui.CallBlockerHomeScreen(
-                onBack = { navController.popBackStack() }
+                onBack = { navigateBackWithInAppAd { navController.popBackStack() } }
             )
         }
         composable<BackupHomeRoute> {
             com.carbon.prolocker.feature.backup.ui.BackupHomeScreen(
-                onBack = { navController.popBackStack() },
+                onBack = { navigateBackWithInAppAd { navController.popBackStack() } },
                 onOpenCategory = { category ->
                     if (category == com.carbon.prolocker.feature.backup.model.BackupCategory.APPLICATIONS) {
                         navController.navigate(BackupAppsRoute)
@@ -260,7 +266,7 @@ fun AppNavigation(
         composable<HideFilesRoute> {
             com.carbon.prolocker.feature.hidefile.ui.HideFilesScreen(
                 onBack = {
-                    navController.popBackStack()
+                    navigateBackWithInAppAd { navController.popBackStack() }
                 },
                 onOpenCategory = { category ->
                     navController.navigate(HiddenItemsRoute(category))
@@ -312,9 +318,14 @@ fun AppNavigation(
             )
         }
         composable<SecurityRoute> {
+            val isStandalone = trustedLaunchDestination == "security"
             com.carbon.prolocker.feature.security.SecurityScreen(
                 onBack = {
-                    navController.popBackStack()
+                    if (isStandalone) {
+                        context.findActivity()?.finishAffinity()
+                    } else {
+                        navigateBackWithInAppAd { navController.popBackStack() }
+                    }
                 },
                 onNavigateToGallery = {
                     navController.navigate(BackgroundGalleryRoute)
@@ -339,7 +350,7 @@ fun AppNavigation(
                     if (shouldFinishAffinity) {
                         context.findActivity()?.finishAffinity()
                     } else {
-                        navController.popBackStack()
+                        navigateBackWithInAppAd { navController.popBackStack() }
                     }
                 }
             )
@@ -352,7 +363,7 @@ fun AppNavigation(
                     if (isStandalone) {
                         context.findActivity()?.finishAffinity()
                     } else {
-                        navController.popBackStack()
+                        navigateBackWithInAppAd { navController.popBackStack() }
                     }
                 },
                 onBackgroundClick = { url, id, fromDownloaded ->

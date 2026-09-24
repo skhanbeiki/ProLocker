@@ -106,6 +106,10 @@ fun HideFilesScreen(
 
     BackHandler { handleExit() }
 
+    LaunchedEffect(Unit) {
+        adManager.preloadInterstitialAd(context.applicationContext, AdPlacement.INTERSTITIAL_IN_APP)
+    }
+
     val counts by viewModel.counts.collectAsState()
 
     StoragePermissionGate {

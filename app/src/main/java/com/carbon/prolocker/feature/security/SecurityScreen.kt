@@ -160,11 +160,18 @@ fun SecurityScreen(
         }
     }
 
+    androidx.activity.compose.BackHandler {
+        onBack()
+    }
+
     val analyticsManager =
         org.koin.compose.koinInject<com.carbon.prolocker.core.analytics.AnalyticsManager>()
+    val adManager =
+        org.koin.compose.koinInject<com.carbon.prolocker.ad.AdManager>()
     androidx.compose.runtime.LaunchedEffect(Unit) {
         if (!isInspection) {
             analyticsManager.trackScreenView("SecurityScreen")
+            adManager.preloadInterstitialAd(context.applicationContext, com.carbon.prolocker.ad.AdPlacement.INTERSTITIAL_IN_APP)
         }
     }
 
