@@ -100,6 +100,69 @@ class LockService : Service(), OnBackPressedDispatcherOwner, ActivityResultRegis
         var isShowing: Boolean = false
             private set
 
+        @Volatile
+        var isHidingForAd: Boolean = false
+            private set
+
+        @Volatile
+        var instance: LockService? = null
+            private set
+
+        @Volatile
+        var lastLockedPackageName: String? = null
+            private set
+
+        fun prepareForAd() {
+            Log.i(TAG, "prepareForAd: setting isHidingForAd = true")
+            isHidingForAd = true
+        }
+
+        fun hideOverlayForAd() {
+            isHidingForAd = true
+            val s = instance ?: return
+            val action = Runnable {
+                try {
+                    s.overlayManager.dismiss()
+                    isShowing = false
+                    Log.i(TAG, "hideOverlayForAd: overlay dismissed, isShowing=false, isHidingForAd=true")
+                } catch (e: Exception) {
+                    Log.e(TAG, "Error dismissing overlay for ad", e)
+                }
+            }
+            if (android.os.Looper.myLooper() == android.os.Looper.getMainLooper()) {
+                action.run()
+            } else {
+                android.os.Handler(android.os.Looper.getMainLooper()).post(action)
+            }
+        }
+
+        fun restoreLockScreen(context: Context? = null) {
+            isHidingForAd = false
+            val s = instance
+            val pkg = s?.currentPackageName ?: lastLockedPackageName
+            val forSettings = s?.currentForSettings ?: false
+            Log.i(TAG, "restoreLockScreen: isHidingForAd=false, pkg=$pkg, hasInstance=${s != null}")
+            if (s != null && pkg != null) {
+                val action = Runnable {
+                    try {
+                        s.currentScreen.value = LockNavScreen.Lock
+                        if (!isShowing) {
+                            s.showLockScreen(pkg, forSettings)
+                        }
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Error restoring lockscreen after ad", e)
+                    }
+                }
+                if (android.os.Looper.myLooper() == android.os.Looper.getMainLooper()) {
+                    action.run()
+                } else {
+                    android.os.Handler(android.os.Looper.getMainLooper()).post(action)
+                }
+            } else if (context != null && pkg != null) {
+                start(context, pkg, forSettings)
+            }
+        }
+
         fun start(context: Context, packageName: String, forSettings: Boolean = false) {
             val intent = Intent(context, LockService::class.java).apply {
                 action = ACTION_SHOW
@@ -178,6 +241,7 @@ class LockService : Service(), OnBackPressedDispatcherOwner, ActivityResultRegis
 
     override fun onCreate() {
         super.onCreate()
+        instance = this
         overlayManager = OverlayWindowManager(this)
     }
 
@@ -199,9 +263,13 @@ class LockService : Service(), OnBackPressedDispatcherOwner, ActivityResultRegis
     }
 
     private fun showLockScreen(packageName: String, forSettings: Boolean) {
-        if (isShowing) return
+        if (isShowing || isHidingForAd) {
+            Log.d(TAG, "showLockScreen ignored: isShowing=$isShowing, isHidingForAd=$isHidingForAd")
+            return
+        }
 
         currentPackageName = packageName
+        lastLockedPackageName = packageName
         currentForSettings = forSettings
         currentScreen.value = LockNavScreen.Lock
 
@@ -302,7 +370,7 @@ class LockService : Service(), OnBackPressedDispatcherOwner, ActivityResultRegis
                             }
                         }
 
-                        BackHandler {
+                        BackHandler(enabled = currentScreen.value is LockNavScreen.Lock || currentScreen.value is LockNavScreen.Preview) {
                             navigateBack()
                         }
 
@@ -413,6 +481,9 @@ class LockService : Service(), OnBackPressedDispatcherOwner, ActivityResultRegis
     }
 
     override fun onDestroy() {
+        if (instance === this) {
+            instance = null
+        }
         serviceLifecycleOwner.destroy()
         serviceScope.cancel()
         overlayManager.dismiss()

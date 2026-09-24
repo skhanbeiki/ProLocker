@@ -132,6 +132,13 @@
             android:launchMode="singleTop"
             android:theme="@style/Theme.Transparent" />
 
+        <activity
+            android:name="com.carbon.prolocker.ad.InterstitialAdActivity"
+            android:excludeFromRecents="true"
+            android:exported="false"
+            android:launchMode="singleTop"
+            android:theme="@style/Theme.ProLocker.AdActivity" />
+
         <receiver
             android:name="com.carbon.prolocker.core.service.BootReceiver"
             android:exported="true">

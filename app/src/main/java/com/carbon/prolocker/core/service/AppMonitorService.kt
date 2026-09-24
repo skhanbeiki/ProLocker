@@ -225,6 +225,12 @@ class AppMonitorService : Service() {
                     continue
                 }
 
+                // اگر تبلیغ در حال نمایش است، لاک اسکرین نباید ظاهر شود
+                if (LockService.isHidingForAd) {
+                    delay(250L)
+                    continue
+                }
+
                 if (currentApp != null && currentApp != lastForegroundApp) {
                     if (lastForegroundApp != null) {
                         sessionManager.markAppBackgrounded(lastForegroundApp!!)
@@ -238,7 +244,7 @@ class AppMonitorService : Service() {
                     val isLocked = lockedApps.any { it.packageName == currentApp && it.lockedState }
                     if (isLocked && !sessionManager.isAppUnlocked(currentApp)) {
                         // Relaunch if: different package OR lock screen is no longer visible
-                        if (currentlyLockingApp != currentApp || !LockService.isShowing) {
+                        if (!LockService.isHidingForAd && (currentlyLockingApp != currentApp || !LockService.isShowing)) {
                             launchLockScreen(currentApp)
                             currentlyLockingApp = currentApp
                             delay(500L)

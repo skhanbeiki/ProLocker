@@ -31,6 +31,8 @@ class AdManager(
 
     @Volatile
     private var isShowingInterstitial = false
+    @Volatile
+    private var lastInterstitialRequestTime: Long = 0L
 
     private data class CachedNativeAd(
         val container: FrameLayout,
@@ -305,9 +307,61 @@ class AdManager(
         onClosed: () -> Unit = {},
         onError: (String) -> Unit = {}
     ) {
+        showInterstitialAdDirect(activity, placement, onClosed, onError)
+    }
+
+    fun preloadInterstitialAd(
+        context: Context,
+        placement: String = AdPlacement.INTERSTITIAL_BACKGROUND
+    ) {
+        if (!areAdsEnabled()) return
+        val providerName = getInterstitialProviderName()
+        val provider = interstitialProviders[providerName] ?: return
+        val unitId = getUnitId(providerName, placement)
+        if (unitId.isBlank()) return
+        Log.i(TAG, "Preloading interstitial ad -> Provider: [$providerName] | Placement: [$placement]")
+        provider.preloadInterstitialAd(context, unitId)
+    }
+
+    fun isInterstitialAdReady(placement: String = AdPlacement.INTERSTITIAL_BACKGROUND): Boolean {
+        if (!areAdsEnabled()) return false
+        val providerName = getInterstitialProviderName()
+        val provider = interstitialProviders[providerName] ?: return false
+        val unitId = getUnitId(providerName, placement)
+        if (unitId.isBlank()) return false
+        return provider.isInterstitialAdReady(unitId)
+    }
+
+    fun showInterstitialAd(
+        context: Context,
+        placement: String = AdPlacement.INTERSTITIAL_BACKGROUND,
+        onClosed: () -> Unit = {},
+        onError: (String) -> Unit = {}
+    ) {
+        val activity = context.findActivity()
+        if (activity != null) {
+            showInterstitialAdDirect(activity, placement, onClosed, onError)
+        } else {
+            InterstitialAdActivity.start(context, placement, onClosed, onError)
+        }
+    }
+
+    fun showInterstitialAdDirect(
+        activity: Activity,
+        placement: String = AdPlacement.INTERSTITIAL_BACKGROUND,
+        onClosed: () -> Unit = {},
+        onError: (String) -> Unit = {}
+    ) {
+        val now = System.currentTimeMillis()
         if (isShowingInterstitial) {
-            onError("Ad already showing")
-            return
+            if (now - lastInterstitialRequestTime < 10000L) {
+                Log.w("AD_PROVIDER_DEBUG", "⚠️ Interstitial ad already in progress (requested ${now - lastInterstitialRequestTime}ms ago). Skipping duplicate request.")
+                onError("Ad already showing")
+                return
+            } else {
+                Log.w("AD_PROVIDER_DEBUG", "⚠️ Previous interstitial ad timed out without reset. Forcing reset.")
+                resetInterstitialShowingState()
+            }
         }
         if (!areAdsEnabled()) {
             Log.w("AD_PROVIDER_DEBUG", "⚠️ showInterstitialAd skipped: Ads disabled")
@@ -323,6 +377,7 @@ class AdManager(
         }
 
         isShowingInterstitial = true
+        lastInterstitialRequestTime = System.currentTimeMillis()
         val unitId = getUnitId(providerName, placement)
         Log.i("AD_PROVIDER_DEBUG", "🚀 REQUESTING INTERSTITIAL AD -> Provider: [$providerName] | Placement: [$placement] | ZoneId: [$unitId]")
 
@@ -342,6 +397,18 @@ class AdManager(
         )
     }
 
+    fun resetInterstitialShowingState() {
+        Log.i("AD_PROVIDER_DEBUG", "🔄 Resetting interstitial showing state in AdManager")
+        isShowingInterstitial = false
+        interstitialProviders.values.forEach { it.resetShowingState() }
+    }
+
     fun destroyNativeAd(activity: Activity, providerName: String) {
     }
+}
+
+private tailrec fun Context.findActivity(): Activity? = when (this) {
+    is Activity -> this
+    is android.content.ContextWrapper -> baseContext.findActivity()
+    else -> null
 }

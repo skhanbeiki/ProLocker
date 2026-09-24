@@ -135,13 +135,21 @@ fun JunkCleanerScreen(
     val remoteConfigRepository: RemoteConfigRepository = org.koin.compose.koinInject()
     val coroutineScope = rememberCoroutineScope()
     val engine = remember { JunkCleanerEngine() }
+    var isExiting by remember { mutableStateOf(false) }
 
     val handleExit = {
-        if (isExternal) {
-            handleJunkInterstitial(adManager, preferencesRepository, remoteConfigRepository, coroutineScope, context, onBack)
-        } else {
-            onBack()
+        if (!isExiting) {
+            isExiting = true
+            if (isExternal) {
+                handleJunkInterstitial(adManager, preferencesRepository, remoteConfigRepository, coroutineScope, context, onBack)
+            } else {
+                onBack()
+            }
         }
+    }
+
+    LaunchedEffect(Unit) {
+        adManager.preloadInterstitialAd(context.applicationContext, AdPlacement.INTERSTITIAL_RAM_CLEANER)
     }
 
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -236,7 +244,7 @@ fun JunkCleanerScreen(
 
     BackHandler {
         if (!hasStoragePermission) {
-            onBack()
+            handleExit()
         } else if (cleanerState == CleanerState.REVIEW) {
             cleanerState = CleanerState.IDLE
         } else if (cleanerState == CleanerState.CLEANING) {
@@ -249,6 +257,7 @@ fun JunkCleanerScreen(
     LaunchedEffect(Unit) {
         storageInfo = engine.getStorageInfo()
         hasStoragePermission = checkStoragePermission(context)
+        adManager.preloadInterstitialAd(context, AdPlacement.INTERSTITIAL_RAM_CLEANER)
     }
 
     if (!hasStoragePermission) {
@@ -263,7 +272,7 @@ fun JunkCleanerScreen(
                         )
                     },
                     navigationIcon = {
-                        IconButton(onClick = onBack) {
+                        IconButton(onClick = handleExit) {
                             Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                         }
                     },
@@ -1706,11 +1715,6 @@ private fun handleJunkInterstitial(
     context: Context,
     onBack: () -> Unit
 ) {
-    val activity = context.findActivity() ?: run {
-        onBack()
-        return
-    }
-
     coroutineScope.launch {
         val prefs = preferencesRepository.userPreferencesFlow.first()
         val config = remoteConfigRepository.getConfig()
@@ -1721,7 +1725,7 @@ private fun handleJunkInterstitial(
             if (currentCount >= limit) {
                 preferencesRepository.updateRamCleanerInterstitialCounter(false)
                 adManager.showInterstitialAd(
-                    activity = activity,
+                    context = context,
                     placement = AdPlacement.INTERSTITIAL_RAM_CLEANER,
                     onClosed = { onBack() },
                     onError = { _error -> onBack() }

@@ -30,6 +30,7 @@ class OverlayWindowManager(private val context: Context) {
 
     private val windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
     private var currentRoot: FrameLayout? = null
+    private var isOverlayAttached: Boolean = false
 
     private fun resolveOverlayType(): Int {
         if (Settings.canDrawOverlays(context)) {
@@ -108,22 +109,27 @@ class OverlayWindowManager(private val context: Context) {
         val layoutParams = createLayoutParams()
         try {
             windowManager.addView(root, layoutParams)
+            isOverlayAttached = true
         } catch (e: Exception) {
             Log.e(TAG, "Failed to add overlay", e)
             currentRoot = null
+            isOverlayAttached = false
         }
     }
 
     fun dismiss() {
         currentRoot?.let { root ->
-            try {
-                windowManager.removeViewImmediate(root)
-            } catch (e: Exception) {
-                Log.w(TAG, "Failed to remove overlay: ${e.message}")
+            if (isOverlayAttached) {
                 try {
-                    windowManager.removeView(root)
-                } catch (_: Exception) {
+                    windowManager.removeViewImmediate(root)
+                } catch (e: Exception) {
+                    Log.w(TAG, "Failed to remove overlay: ${e.message}")
+                    try {
+                        windowManager.removeView(root)
+                    } catch (_: Exception) {
+                    }
                 }
+                isOverlayAttached = false
             }
             for (i in 0 until root.childCount) {
                 val child = root.getChildAt(i)
@@ -136,6 +142,7 @@ class OverlayWindowManager(private val context: Context) {
             }
         }
         currentRoot = null
+        isOverlayAttached = false
     }
 
     fun isShowing(): Boolean = currentRoot != null

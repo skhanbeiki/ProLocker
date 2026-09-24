@@ -49,8 +49,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -111,12 +113,16 @@ fun BackgroundGalleryScreen(
     val analyticsManager: com.carbon.prolocker.core.analytics.AnalyticsManager = koinInject()
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
+    var isExiting by remember { mutableStateOf(false) }
 
     val handleExit = {
-        if (isExternal) {
-            handleThemeInterstitial(adManager, preferencesRepository, remoteConfigRepository, coroutineScope, context, onBack)
-        } else {
-            onBack()
+        if (!isExiting) {
+            isExiting = true
+            if (isExternal) {
+                handleThemeInterstitial(adManager, preferencesRepository, remoteConfigRepository, coroutineScope, context, onBack)
+            } else {
+                onBack()
+            }
         }
     }
 
@@ -127,6 +133,7 @@ fun BackgroundGalleryScreen(
     LaunchedEffect(Unit) {
         viewModel.loadInitialBackgrounds()
         analyticsManager.trackScreenView("BackgroundGalleryScreen")
+        adManager.preloadInterstitialAd(context.applicationContext, AdPlacement.INTERSTITIAL_BACKGROUND)
     }
 
     val onlineBackgrounds = when (val state = uiState) {
@@ -805,11 +812,6 @@ private fun handleThemeInterstitial(
     context: android.content.Context,
     onBack: () -> Unit
 ) {
-    val activity = context as? android.app.Activity ?: run {
-        onBack()
-        return
-    }
-
     coroutineScope.launch {
         val prefs = preferencesRepository.userPreferencesFlow.first()
         val config = remoteConfigRepository.getConfig()
@@ -820,7 +822,7 @@ private fun handleThemeInterstitial(
             if (currentCount >= limit) {
                 preferencesRepository.updateThemeInterstitialCounter(false)
                 adManager.showInterstitialAd(
-                    activity = activity,
+                    context = context,
                     placement = AdPlacement.INTERSTITIAL_BACKGROUND,
                     onClosed = { onBack() },
                     onError = { _ -> onBack() }

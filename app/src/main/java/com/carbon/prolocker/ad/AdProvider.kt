@@ -23,10 +23,13 @@ interface NativeAdProvider : AdProvider {
 }
 
 interface InterstitialAdProvider : AdProvider {
+    fun preloadInterstitialAd(context: Context, zoneId: String) {}
+    fun isInterstitialAdReady(zoneId: String): Boolean = false
     fun loadAndShowInterstitialAd(
         activity: Activity,
         zoneId: String,
         onClosed: () -> Unit = {},
         onError: (String) -> Unit = {}
     )
+    fun resetShowingState() {}
 }

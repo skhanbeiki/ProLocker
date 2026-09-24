@@ -23,6 +23,13 @@ class MagnetInterstitialAdProvider(override val providerName: String = "magnet")
     @Volatile
     private var isShowingAd = false
 
+    @Volatile
+    private var cachedAd: com.hasin.magnetad.InterstitialAd? = null
+    @Volatile
+    private var cachedAdId: String? = null
+    @Volatile
+    private var cachedZoneId: String? = null
+
     override fun initSdk(context: Context) {
         if (isInitialized) return
         val appId = AdUnitIds.Magnet.APP_ID
@@ -47,6 +54,44 @@ class MagnetInterstitialAdProvider(override val providerName: String = "magnet")
         } catch (e: Exception) {
             Log.e(TAG, "MagnetAdManager initialization error", e)
         }
+    }
+
+    override fun resetShowingState() {
+        Log.i(TAG, "Resetting Magnet isShowingAd state")
+        isShowingAd = false
+    }
+
+    override fun preloadInterstitialAd(context: Context, zoneId: String) {
+        if (zoneId.isBlank()) return
+        val appContext = context.applicationContext
+        initSdk(appContext)
+        if (!MagnetAdManager.isInitialized()) return
+        if (isInterstitialAdReady(zoneId)) return
+
+        try {
+            val interstitialAd = MagnetAdManager.getInterstitialAd(placementId = zoneId)
+            interstitialAd.requestAd(appContext) { result ->
+                when (result) {
+                    is AdLoadResult.Success -> {
+                        cachedAd = interstitialAd
+                        cachedAdId = result.adId
+                        cachedZoneId = zoneId
+                        Log.i(TAG, "Magnet interstitial ad preloaded successfully for zone: $zoneId")
+                    }
+                    is AdLoadResult.Failure -> {
+                        Log.w(TAG, "Magnet interstitial ad preload failed: ${result.error.code} - ${result.error.message}")
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error preloading Magnet interstitial ad", e)
+        }
+    }
+
+    override fun isInterstitialAdReady(zoneId: String): Boolean {
+        val ad = cachedAd ?: return false
+        val adId = cachedAdId ?: return false
+        return cachedZoneId == zoneId && ad.isAdReady()
     }
 
     override fun loadAndShowInterstitialAd(
@@ -80,6 +125,67 @@ class MagnetInterstitialAdProvider(override val providerName: String = "magnet")
                 onError("Magnet SDK not initialized")
                 return
             }
+        }
+
+        if (isInterstitialAdReady(zoneId)) {
+            val ad = cachedAd!!
+            val adId = cachedAdId!!
+            cachedAd = null
+            cachedAdId = null
+            cachedZoneId = null
+
+            isShowingAd = true
+            var isCallbackDone = false
+
+            fun finishWithClosed() {
+                if (!isCallbackDone) {
+                    isCallbackDone = true
+                    isShowingAd = false
+                    try {
+                        ad.destroy()
+                    } catch (_: Exception) {}
+                    onClosed()
+                }
+            }
+
+            fun finishWithError(err: String) {
+                if (!isCallbackDone) {
+                    isCallbackDone = true
+                    isShowingAd = false
+                    try {
+                        ad.destroy()
+                    } catch (_: Exception) {}
+                    onError(err)
+                }
+            }
+
+            ad.setAdListener(object : AdListener() {
+                override fun onAdShown() {
+                    Log.i(TAG, "Preloaded Magnet interstitial ad shown: $zoneId")
+                }
+
+                override fun onAdClicked() {
+                    Log.i(TAG, "Preloaded Magnet interstitial ad clicked: $zoneId")
+                }
+
+                override fun onAdDismissed() {
+                    Log.i(TAG, "Preloaded Magnet interstitial ad dismissed: $zoneId")
+                    finishWithClosed()
+                }
+
+                override fun onAdFailedToShow(error: AdError) {
+                    Log.e(TAG, "Preloaded Magnet interstitial ad failed to show: ${error.code} - ${error.message}")
+                    finishWithError(error.message)
+                }
+            })
+
+            try {
+                ad.show(activity, adId)
+            } catch (e: Exception) {
+                Log.e(TAG, "Exception showing preloaded Magnet interstitial ad", e)
+                finishWithError(e.message ?: "Failed to show Magnet ad")
+            }
+            return
         }
 
         isShowingAd = true
@@ -138,7 +244,12 @@ class MagnetInterstitialAdProvider(override val providerName: String = "magnet")
                             return@requestAd
                         }
                         Log.i(TAG, "Magnet interstitial ad loaded successfully. Showing adId: ${result.adId}")
-                        interstitialAd.show(activity, result.adId)
+                        try {
+                            interstitialAd.show(activity, result.adId)
+                        } catch (e: Exception) {
+                            Log.e(TAG, "Exception showing loaded Magnet interstitial ad", e)
+                            finishWithError(e.message ?: "Failed to show Magnet ad")
+                        }
                     }
                     is AdLoadResult.Failure -> {
                         Log.e(TAG, "Magnet interstitial ad load failed: ${result.error.code} - ${result.error.message}")
