@@ -8,7 +8,8 @@ data class RemoteConfigResponse(
     @SerialName("interval") val interval: Long = 360,
     @SerialName("configs") val configs: RemoteConfigs = RemoteConfigs(),
     @SerialName("defaultHomeTab") val defaultHomeTab: String = "tools",
-    @SerialName("surveyDisplay") val surveyDisplay: Int? = null
+    @SerialName("surveyDisplay") val surveyDisplay: Int? = null,
+    @SerialName("sugesstionButton") val sugesstionButton: SuggestionButtonConfig? = null
 ) {
     companion object {
         val DEFAULT = RemoteConfigResponse(
@@ -29,7 +30,8 @@ data class RemoteConfigResponse(
                 nativeAdRamCleanerPage = true,
                 limitInstallDisplayAdDays = 3,
                 ramCleanerNotifyTimes = listOf(22),
-                surveyDisplay = 1
+                surveyDisplay = 1,
+                sugesstionButton = null
             )
         )
     }
@@ -43,7 +45,16 @@ data class RemoteConfigResponse(
     }
 
     fun getEffectiveSurveyDisplay(): Int = surveyDisplay ?: configs.surveyDisplay
+    fun getEffectiveSuggestionButton(): SuggestionButtonConfig? = sugesstionButton ?: configs.sugesstionButton
 }
+
+@Serializable
+data class SuggestionButtonConfig(
+    @SerialName("isVisible") val isVisible: Boolean = false,
+    @SerialName("adType") val adType: String = "magnet",
+    @SerialName("captionList") val captionList: List<String> = emptyList(),
+    @SerialName("displayStep") val displayStep: Int = 1
+)
 
 @Serializable
 data class RemoteConfigs(
@@ -62,5 +73,6 @@ data class RemoteConfigs(
     @SerialName("interstitialAdRamCleanerStep") val interstitialAdRamCleanerStep: Int = 3,
     @SerialName("interstitialAdInAppStep") val interstitialAdInAppStep: Int = 3,
     @SerialName("limitInstallDisplayAdDays") val limitInstallDisplayAdDays: Int = 3,
-    @SerialName("surveyDisplay") val surveyDisplay: Int = 1
+    @SerialName("surveyDisplay") val surveyDisplay: Int = 1,
+    @SerialName("sugesstionButton") val sugesstionButton: SuggestionButtonConfig? = null
 )

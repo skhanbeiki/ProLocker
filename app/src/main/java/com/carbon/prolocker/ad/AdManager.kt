@@ -207,6 +207,7 @@ class AdManager(
                 AdPlacement.INTERSTITIAL_BACKUP_HOME -> AdUnitIds.Tapsell.INTERSTITIAL_BACKUP_HOME
                 AdPlacement.INTERSTITIAL_BACKUP_APPS -> AdUnitIds.Tapsell.INTERSTITIAL_BACKUP_APPS
                 AdPlacement.INTERSTITIAL_BACKUP_CATEGORY_DETAIL -> AdUnitIds.Tapsell.INTERSTITIAL_BACKUP_CATEGORY_DETAIL
+                AdPlacement.INTERSTITIAL_SUGGESTION -> AdUnitIds.Tapsell.INTERSTITIAL_SUGGESTION
                 else -> ""
             }
             "adivery" -> when (placement) {
@@ -229,6 +230,7 @@ class AdManager(
                 AdPlacement.INTERSTITIAL_BACKUP_HOME -> AdUnitIds.Adivery.INTERSTITIAL_BACKUP_HOME
                 AdPlacement.INTERSTITIAL_BACKUP_APPS -> AdUnitIds.Adivery.INTERSTITIAL_BACKUP_APPS
                 AdPlacement.INTERSTITIAL_BACKUP_CATEGORY_DETAIL -> AdUnitIds.Adivery.INTERSTITIAL_BACKUP_CATEGORY_DETAIL
+                AdPlacement.INTERSTITIAL_SUGGESTION -> AdUnitIds.Adivery.INTERSTITIAL_SUGGESTION
                 else -> ""
             }
             "admob" -> when (placement) {
@@ -251,12 +253,14 @@ class AdManager(
                 AdPlacement.INTERSTITIAL_BACKUP_HOME -> AdUnitIds.AdMob.INTERSTITIAL_BACKUP_HOME
                 AdPlacement.INTERSTITIAL_BACKUP_APPS -> AdUnitIds.AdMob.INTERSTITIAL_BACKUP_APPS
                 AdPlacement.INTERSTITIAL_BACKUP_CATEGORY_DETAIL -> AdUnitIds.AdMob.INTERSTITIAL_BACKUP_CATEGORY_DETAIL
+                AdPlacement.INTERSTITIAL_SUGGESTION -> AdUnitIds.AdMob.INTERSTITIAL_SUGGESTION
                 else -> ""
             }
             "magnet" -> when (placement) {
                 AdPlacement.INTERSTITIAL_BACKGROUND -> AdUnitIds.Magnet.INTERSTITIAL_BACKGROUND
                 AdPlacement.INTERSTITIAL_RAM_CLEANER -> AdUnitIds.Magnet.INTERSTITIAL_RAM_CLEANER
                 AdPlacement.INTERSTITIAL_IN_APP -> AdUnitIds.Magnet.INTERSTITIAL_IN_APP
+                AdPlacement.INTERSTITIAL_SUGGESTION -> AdUnitIds.Magnet.INTERSTITIAL_SUGGESTION
                 else -> ""
             }
             else -> ""
@@ -304,10 +308,11 @@ class AdManager(
     fun showInterstitialAd(
         activity: Activity,
         placement: String = AdPlacement.INTERSTITIAL_BACKGROUND,
+        providerNameOverride: String? = null,
         onClosed: () -> Unit = {},
         onError: (String) -> Unit = {}
     ) {
-        showInterstitialAdDirect(activity, placement, onClosed, onError)
+        showInterstitialAdDirect(activity, placement, providerNameOverride, onClosed, onError)
     }
 
     fun preloadInterstitialAd(
@@ -335,20 +340,22 @@ class AdManager(
     fun showInterstitialAd(
         context: Context,
         placement: String = AdPlacement.INTERSTITIAL_BACKGROUND,
+        providerNameOverride: String? = null,
         onClosed: () -> Unit = {},
         onError: (String) -> Unit = {}
     ) {
         val activity = context.findActivity()
         if (activity != null) {
-            showInterstitialAdDirect(activity, placement, onClosed, onError)
+            showInterstitialAdDirect(activity, placement, providerNameOverride, onClosed, onError)
         } else {
-            InterstitialAdActivity.start(context, placement, onClosed, onError)
+            InterstitialAdActivity.start(context, placement, providerNameOverride, onClosed, onError)
         }
     }
 
     fun showInterstitialAdDirect(
         activity: Activity,
         placement: String = AdPlacement.INTERSTITIAL_BACKGROUND,
+        providerNameOverride: String? = null,
         onClosed: () -> Unit = {},
         onError: (String) -> Unit = {}
     ) {
@@ -368,7 +375,11 @@ class AdManager(
             onError("Ads disabled")
             return
         }
-        val providerName = getInterstitialProviderName()
+        val providerName = if (!providerNameOverride.isNullOrBlank()) {
+            providerNameOverride.lowercase().trim()
+        } else {
+            getInterstitialProviderName()
+        }
         val provider = interstitialProviders[providerName]
         if (provider == null) {
             Log.e("AD_PROVIDER_DEBUG", "❌ INTERSTITIAL_FAILED: placement=$placement provider=$providerName (Unknown Provider)")

@@ -42,5 +42,7 @@ data class UserPreferences(
     val lastInstalledVersionCode: Int = 0,
     val fingerprintUnlockEnabled: Boolean = false,
     val ramCleanerInterstitialCounter: Int = 0,
-    val inAppInterstitialCounter: Int = 0
+    val inAppInterstitialCounter: Int = 0,
+    val suggestionButtonDisplayCounter: Int = 0,
+    val suggestionButtonLastClickedDate: String = ""
 )

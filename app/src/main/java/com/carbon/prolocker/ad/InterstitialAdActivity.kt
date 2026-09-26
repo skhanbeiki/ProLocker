@@ -22,6 +22,7 @@ class InterstitialAdActivity : AppCompatActivity() {
     companion object {
         private const val TAG = "InterstitialAdActivity"
         const val EXTRA_PLACEMENT = "extra_placement"
+        const val EXTRA_PROVIDER_NAME = "extra_provider_name"
 
         private var onClosedCallback: (() -> Unit)? = null
         private var onErrorCallback: ((String) -> Unit)? = null
@@ -29,6 +30,7 @@ class InterstitialAdActivity : AppCompatActivity() {
         fun start(
             context: Context,
             placement: String,
+            providerName: String? = null,
             onClosed: () -> Unit = {},
             onError: (String) -> Unit = {}
         ) {
@@ -37,6 +39,9 @@ class InterstitialAdActivity : AppCompatActivity() {
             onErrorCallback = onError
             val intent = Intent(context, InterstitialAdActivity::class.java).apply {
                 putExtra(EXTRA_PLACEMENT, placement)
+                if (!providerName.isNullOrBlank()) {
+                    putExtra(EXTRA_PROVIDER_NAME, providerName)
+                }
                 addFlags(
                     Intent.FLAG_ACTIVITY_NEW_TASK or
                     Intent.FLAG_ACTIVITY_NO_ANIMATION or
@@ -52,6 +57,7 @@ class InterstitialAdActivity : AppCompatActivity() {
     private var isAdFinished = false
     private var hasStartedAd = false
     private var placement: String = AdPlacement.INTERSTITIAL_BACKGROUND
+    private var providerName: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -95,6 +101,7 @@ class InterstitialAdActivity : AppCompatActivity() {
         })
 
         placement = intent.getStringExtra(EXTRA_PLACEMENT) ?: AdPlacement.INTERSTITIAL_BACKGROUND
+        providerName = intent.getStringExtra(EXTRA_PROVIDER_NAME)
     }
 
     override fun onResume() {
@@ -118,6 +125,7 @@ class InterstitialAdActivity : AppCompatActivity() {
             adManager.showInterstitialAdDirect(
                 activity = this,
                 placement = placement,
+                providerNameOverride = providerName,
                 onClosed = {
                     handleClose()
                 },

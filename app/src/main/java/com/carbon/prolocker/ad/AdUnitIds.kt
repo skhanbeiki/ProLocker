@@ -30,6 +30,7 @@ object AdUnitIds {
         const val INTERSTITIAL_BACKUP_HOME = "5f142222ff28740001b4ec4d"
         const val INTERSTITIAL_BACKUP_APPS = "5f14236eff28740001b4ec51"
         const val INTERSTITIAL_BACKUP_CATEGORY_DETAIL = "5f14227dff28740001b4ec4e"
+        const val INTERSTITIAL_SUGGESTION = "5f14227dff28740001b4ec4e"
     }
 
     object Adivery {
@@ -60,6 +61,7 @@ object AdUnitIds {
         const val INTERSTITIAL_BACKUP_HOME = "c1a36f39-d816-46e2-96bf-e65ddb166dff"
         const val INTERSTITIAL_BACKUP_APPS = "c1a36f39-d816-46e2-96bf-e65ddb166dff"
         const val INTERSTITIAL_BACKUP_CATEGORY_DETAIL = "c1a36f39-d816-46e2-96bf-e65ddb166dff"
+        const val INTERSTITIAL_SUGGESTION = "c1a36f39-d816-46e2-96bf-e65ddb166dff"
     }
 
     object AdMob {
@@ -81,7 +83,7 @@ object AdUnitIds {
 
         const val INTERSTITIAL_BACKGROUND = "ca-app-pub-3940256099942544/1033173712"
         const val INTERSTITIAL_RAM_CLEANER = "ca-app-pub-3940256099942544/1033173712"
-        const val INTERSTITIAL_IN_APP = ""
+        const val INTERSTITIAL_IN_APP = "ca-app-pub-3940256099942544/1033173712"
 
         const val INTERSTITIAL_HIDDEN_ITEMS = "ca-app-pub-3940256099942544/1033173712"
         const val INTERSTITIAL_HIDE_FILES = "ca-app-pub-3940256099942544/1033173712"
@@ -90,6 +92,7 @@ object AdUnitIds {
         const val INTERSTITIAL_BACKUP_HOME = "ca-app-pub-3940256099942544/1033173712"
         const val INTERSTITIAL_BACKUP_APPS = "ca-app-pub-3940256099942544/1033173712"
         const val INTERSTITIAL_BACKUP_CATEGORY_DETAIL = "ca-app-pub-3940256099942544/1033173712"
+        const val INTERSTITIAL_SUGGESTION = "ca-app-pub-3940256099942544/1033173712"
     }
 
     object Magnet {
@@ -97,5 +100,6 @@ object AdUnitIds {
         const val INTERSTITIAL_BACKGROUND = "53d041ff-795f-494a-a632-bf1356d90bb5"
         const val INTERSTITIAL_RAM_CLEANER = "d7c3b907-c5c5-42e0-a03e-518aaef04c5c"
         const val INTERSTITIAL_IN_APP = "9694ea0d-5ba5-4ed6-a5c9-c9b8710b52fd"
+        const val INTERSTITIAL_SUGGESTION = "976273b9-ac90-496d-8fd5-661a17be7e01"
     }
 }

@@ -513,4 +513,5 @@
     <string name="terms_of_use">Terms of Use</string>
     <string name="camera_permission_disclosure_title">Camera Permission Required</string>
     <string name="camera_permission_disclosure_message">To capture photos of intruders who enter an incorrect PIN or pattern, ProLocker requires access to your camera.\n\nPrivacy Commitment: Intruder photos are stored securely on your device only and are never shared or uploaded.</string>
+    <string name="special_suggestion">Special Offer</string>
 </resources>

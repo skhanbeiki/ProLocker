@@ -87,6 +87,25 @@ class PreferencesRepository(private val dataStore: DataStore<UserPreferences>) {
         }
     }
 
+    suspend fun incrementSuggestionButtonDisplayCounter(): Int {
+        var count = 0
+        runCatching {
+            dataStore.updateData { prefs ->
+                count = prefs.suggestionButtonDisplayCounter + 1
+                prefs.copy(suggestionButtonDisplayCounter = count)
+            }
+        }
+        return count
+    }
+
+    suspend fun recordSuggestionButtonClicked(todayDate: String) {
+        runCatching {
+            dataStore.updateData { prefs ->
+                prefs.copy(suggestionButtonLastClickedDate = todayDate)
+            }
+        }
+    }
+
     /**
      * Safely reads current preferences, returning defaults on failure.
      */

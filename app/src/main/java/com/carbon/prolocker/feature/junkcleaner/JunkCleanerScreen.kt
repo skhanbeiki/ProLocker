@@ -19,8 +19,10 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -435,7 +437,7 @@ private fun ScanningStateContent(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Brush.verticalGradient(listOf(Color(0xFFFE2C55), Color(0xFFFF5277))))
+            .background(MaterialTheme.colorScheme.background)
     ) {
         Column(
             modifier = Modifier
@@ -451,13 +453,13 @@ private fun ScanningStateContent(
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Back",
-                        tint = Color.White
+                        tint = MaterialTheme.colorScheme.onBackground
                     )
                 }
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
                     text = stringResource(R.string.junk_remover),
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.onBackground,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -477,14 +479,14 @@ private fun ScanningStateContent(
                         text = sizeValue,
                         fontSize = 44.sp,
                         fontWeight = FontWeight.Black,
-                        color = Color.White
+                        color = Color(0xFFFE2C55)
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
                         text = sizeUnit,
                         fontSize = 22.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color.White,
+                        color = Color(0xFFFE2C55),
                         modifier = Modifier.padding(bottom = 6.dp)
                     )
                 }
@@ -493,7 +495,7 @@ private fun ScanningStateContent(
 
                 Text(
                     text = stringResource(R.string.junk_files_detected),
-                    color = Color.White.copy(alpha = 0.9f),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontSize = 14.sp
                 )
 
@@ -503,16 +505,16 @@ private fun ScanningStateContent(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 24.dp)
-                        .height(5.dp)
+                        .height(6.dp)
                         .clip(RoundedCornerShape(3.dp))
-                        .background(Color.White.copy(alpha = 0.25f))
+                        .background(MaterialTheme.colorScheme.surfaceVariant)
                 ) {
                     Box(
                         modifier = Modifier
                             .fillMaxWidth(animatedProgress)
                             .fillMaxHeight()
                             .clip(RoundedCornerShape(3.dp))
-                            .background(Color.White)
+                            .background(Brush.horizontalGradient(listOf(Color(0xFFFE2C55), Color(0xFFFF5277))))
                     )
                 }
 
@@ -520,7 +522,7 @@ private fun ScanningStateContent(
 
                 Text(
                     text = scannedPath.ifEmpty { "..." },
-                    color = Color.White.copy(alpha = 0.9f),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontSize = 13.sp,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -536,7 +538,8 @@ private fun ScanningStateContent(
                 .fillMaxWidth()
                 .weight(1f),
             shape = RoundedCornerShape(topStart = 26.dp, topEnd = 26.dp),
-            colors = CardDefaults.cardColors(containerColor = Color(0xFF0F1422))
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f))
         ) {
             Column(
                 modifier = Modifier
@@ -559,7 +562,7 @@ private fun ScanningStateContent(
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Text(
                                     text = stringResource(cat.titleRes),
-                                    color = Color.White,
+                                    color = MaterialTheme.colorScheme.onSurface,
                                     fontSize = 16.sp,
                                     fontWeight = FontWeight.SemiBold
                                 )
@@ -568,7 +571,7 @@ private fun ScanningStateContent(
                                     Icon(
                                         imageVector = Icons.Default.HelpOutline,
                                         contentDescription = null,
-                                        tint = Color.White.copy(alpha = 0.7f),
+                                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
                                         modifier = Modifier.size(16.dp)
                                     )
                                 } else if (cat == JunkCategory.RESIDUAL_JUNK) {
@@ -576,7 +579,7 @@ private fun ScanningStateContent(
                                     Icon(
                                         imageVector = Icons.Default.KeyboardArrowDown,
                                         contentDescription = null,
-                                        tint = Color.White.copy(alpha = 0.7f),
+                                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
                                         modifier = Modifier.size(20.dp)
                                     )
                                 }
@@ -632,7 +635,7 @@ private fun ReviewStateContent(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Brush.verticalGradient(listOf(Color(0xFFFE2C55), Color(0xFFFF5277))))
+            .background(MaterialTheme.colorScheme.background)
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
             Column(
@@ -649,13 +652,13 @@ private fun ReviewStateContent(
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back",
-                            tint = Color.White
+                            tint = MaterialTheme.colorScheme.onBackground
                         )
                     }
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
                         text = stringResource(R.string.junk_remover),
-                        color = Color.White,
+                        color = MaterialTheme.colorScheme.onBackground,
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold
                     )
@@ -675,14 +678,14 @@ private fun ReviewStateContent(
                             text = sizeValue,
                             fontSize = 44.sp,
                             fontWeight = FontWeight.Black,
-                            color = Color.White
+                            color = Color(0xFFFE2C55)
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
                             text = sizeUnit,
                             fontSize = 22.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color.White,
+                            color = Color(0xFFFE2C55),
                             modifier = Modifier.padding(bottom = 6.dp)
                         )
                     }
@@ -691,7 +694,7 @@ private fun ReviewStateContent(
 
                     Text(
                         text = stringResource(R.string.junk_files_detected),
-                        color = Color.White.copy(alpha = 0.9f),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         fontSize = 14.sp
                     )
 
@@ -701,7 +704,7 @@ private fun ReviewStateContent(
                         text = stringResource(R.string.scanning_completed),
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color.White
+                        color = MaterialTheme.colorScheme.onBackground
                     )
 
                     Spacer(modifier = Modifier.height(4.dp))
@@ -709,7 +712,7 @@ private fun ReviewStateContent(
                     Text(
                         text = stringResource(R.string.private_data_safe),
                         fontSize = 13.sp,
-                        color = Color.White.copy(alpha = 0.85f),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         textAlign = TextAlign.Center
                     )
 
@@ -722,7 +725,8 @@ private fun ReviewStateContent(
                     .fillMaxWidth()
                     .weight(1f),
                 shape = RoundedCornerShape(topStart = 26.dp, topEnd = 26.dp),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFF0F1422))
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f))
             ) {
                 LazyColumn(
                     modifier = Modifier
@@ -756,7 +760,7 @@ private fun ReviewStateContent(
                                 ) {
                                     Text(
                                         text = stringResource(group.titleRes),
-                                        color = Color.White,
+                                        color = MaterialTheme.colorScheme.onSurface,
                                         fontSize = 16.sp,
                                         fontWeight = FontWeight.SemiBold
                                     )
@@ -765,7 +769,7 @@ private fun ReviewStateContent(
                                         Icon(
                                             imageVector = Icons.Default.HelpOutline,
                                             contentDescription = null,
-                                            tint = Color.White.copy(alpha = 0.7f),
+                                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
                                             modifier = Modifier.size(16.dp)
                                         )
                                     }
@@ -773,7 +777,7 @@ private fun ReviewStateContent(
                                     Icon(
                                         imageVector = if (isExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
                                         contentDescription = null,
-                                        tint = Color.White.copy(alpha = 0.7f),
+                                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
                                         modifier = Modifier.size(20.dp)
                                     )
                                 }
@@ -781,7 +785,7 @@ private fun ReviewStateContent(
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     Text(
                                         text = formatSize(group.totalSize),
-                                        color = Color.White.copy(alpha = 0.85f),
+                                        color = MaterialTheme.colorScheme.primary,
                                         fontSize = 15.sp,
                                         fontWeight = FontWeight.Bold
                                     )
@@ -814,13 +818,13 @@ private fun ReviewStateContent(
                                             Icon(
                                                 imageVector = Icons.Default.Folder,
                                                 contentDescription = null,
-                                                tint = Color(0xFF8A99AD),
+                                                tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.7f),
                                                 modifier = Modifier.size(20.dp)
                                             )
                                             Spacer(modifier = Modifier.width(10.dp))
                                             Text(
                                                 text = item.name,
-                                                color = Color.White,
+                                                color = MaterialTheme.colorScheme.onSurface,
                                                 fontSize = 14.sp,
                                                 maxLines = 1,
                                                 overflow = TextOverflow.Ellipsis,
@@ -829,7 +833,7 @@ private fun ReviewStateContent(
                                             Spacer(modifier = Modifier.width(8.dp))
                                             Text(
                                                 text = formatSize(item.size),
-                                                color = Color(0xFF8A99AD),
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                                                 fontSize = 13.sp
                                             )
                                             Spacer(modifier = Modifier.width(12.dp))
@@ -877,11 +881,15 @@ private fun ReviewStateContent(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(54.dp)
-                    .shadow(elevation = 10.dp, shape = RoundedCornerShape(27.dp), spotColor = Color(0xFF00B0FF)),
+                    .shadow(
+                        elevation = if (selectedItems.isNotEmpty()) 8.dp else 0.dp,
+                        shape = RoundedCornerShape(27.dp),
+                        spotColor = MaterialTheme.colorScheme.primary
+                    ),
                 shape = RoundedCornerShape(27.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color.Transparent,
-                    disabledContainerColor = Color(0xFF1E3A5F)
+                    disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant
                 ),
                 contentPadding = PaddingValues()
             ) {
@@ -892,14 +900,14 @@ private fun ReviewStateContent(
                             brush = if (selectedItems.isNotEmpty()) {
                                 Brush.horizontalGradient(listOf(Color(0xFF2962FF), Color(0xFF00B0FF)))
                             } else {
-                                Brush.horizontalGradient(listOf(Color(0xFF1E3A5F), Color(0xFF1E3A5F)))
+                                Brush.horizontalGradient(listOf(MaterialTheme.colorScheme.surfaceVariant, MaterialTheme.colorScheme.surfaceVariant))
                             }
                         ),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
                         text = stringResource(R.string.remove_junk_btn, formatSize(selectedBytes)),
-                        color = Color.White,
+                        color = if (selectedItems.isNotEmpty()) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold
                     )
@@ -933,7 +941,7 @@ private fun CleaningStateContent(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Brush.verticalGradient(listOf(Color(0xFF1E6BFF), Color(0xFF2979FF))))
+            .background(MaterialTheme.colorScheme.background)
     ) {
         Column(
             modifier = Modifier
@@ -949,13 +957,13 @@ private fun CleaningStateContent(
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Back",
-                        tint = Color.White
+                        tint = MaterialTheme.colorScheme.onBackground
                     )
                 }
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
                     text = stringResource(R.string.junk_remover),
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.onBackground,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -975,14 +983,14 @@ private fun CleaningStateContent(
                         text = sizeValue,
                         fontSize = 44.sp,
                         fontWeight = FontWeight.Black,
-                        color = Color.White
+                        color = MaterialTheme.colorScheme.primary
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
                         text = sizeUnit,
                         fontSize = 22.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color.White,
+                        color = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.padding(bottom = 6.dp)
                     )
                 }
@@ -991,7 +999,7 @@ private fun CleaningStateContent(
 
                 Text(
                     text = stringResource(R.string.junk_files_detected),
-                    color = Color.White.copy(alpha = 0.9f),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontSize = 14.sp
                 )
 
@@ -1001,16 +1009,16 @@ private fun CleaningStateContent(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 24.dp)
-                        .height(5.dp)
+                        .height(6.dp)
                         .clip(RoundedCornerShape(3.dp))
-                        .background(Color.White.copy(alpha = 0.25f))
+                        .background(MaterialTheme.colorScheme.surfaceVariant)
                 ) {
                     Box(
                         modifier = Modifier
                             .fillMaxWidth(animatedProgress)
                             .fillMaxHeight()
                             .clip(RoundedCornerShape(3.dp))
-                            .background(Color.White)
+                            .background(Brush.horizontalGradient(listOf(Color(0xFF1E6BFF), Color(0xFF2979FF))))
                     )
                 }
 
@@ -1018,7 +1026,7 @@ private fun CleaningStateContent(
 
                 Text(
                     text = currentPath.ifEmpty { "..." },
-                    color = Color.White.copy(alpha = 0.9f),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontSize = 13.sp,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -1034,7 +1042,8 @@ private fun CleaningStateContent(
                 .fillMaxWidth()
                 .weight(1f),
             shape = RoundedCornerShape(topStart = 26.dp, topEnd = 26.dp),
-            colors = CardDefaults.cardColors(containerColor = Color(0xFF0F1422))
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f))
         ) {
             Column(
                 modifier = Modifier
@@ -1057,7 +1066,7 @@ private fun CleaningStateContent(
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Text(
                                     text = stringResource(cat.titleRes),
-                                    color = Color.White,
+                                    color = MaterialTheme.colorScheme.onSurface,
                                     fontSize = 16.sp,
                                     fontWeight = FontWeight.SemiBold
                                 )
@@ -1066,7 +1075,7 @@ private fun CleaningStateContent(
                                     Icon(
                                         imageVector = Icons.Default.HelpOutline,
                                         contentDescription = null,
-                                        tint = Color.White.copy(alpha = 0.7f),
+                                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
                                         modifier = Modifier.size(16.dp)
                                     )
                                 }
@@ -1111,7 +1120,7 @@ private fun IdleStateContent(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Brush.verticalGradient(listOf(Color(0xFFFE2C55), Color(0xFFFF5277))))
+            .background(MaterialTheme.colorScheme.background)
     ) {
         Column(
             modifier = Modifier
@@ -1127,13 +1136,13 @@ private fun IdleStateContent(
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Back",
-                        tint = Color.White
+                        tint = MaterialTheme.colorScheme.onBackground
                     )
                 }
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
                     text = stringResource(R.string.junk_remover),
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.onBackground,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -1149,18 +1158,18 @@ private fun IdleStateContent(
                     text = "${storageInfo.usagePercentage}%",
                     fontSize = 52.sp,
                     fontWeight = FontWeight.Black,
-                    color = Color.White
+                    color = if (storageInfo.usagePercentage > 80) Color(0xFFFE2C55) else MaterialTheme.colorScheme.primary
                 )
                 Text(
                     text = stringResource(R.string.storage_usage),
-                    color = Color.White.copy(alpha = 0.9f),
+                    color = MaterialTheme.colorScheme.onBackground,
                     fontSize = 15.sp,
                     fontWeight = FontWeight.SemiBold
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = "${formatSize(storageInfo.usedBytes)} / ${formatSize(storageInfo.totalBytes)}",
-                    color = Color.White.copy(alpha = 0.85f),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontSize = 13.sp
                 )
                 Spacer(modifier = Modifier.height(20.dp))
@@ -1172,7 +1181,8 @@ private fun IdleStateContent(
                 .fillMaxWidth()
                 .weight(1f),
             shape = RoundedCornerShape(topStart = 26.dp, topEnd = 26.dp),
-            colors = CardDefaults.cardColors(containerColor = Color(0xFF0F1422))
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f))
         ) {
             Column(
                 modifier = Modifier
@@ -1188,7 +1198,7 @@ private fun IdleStateContent(
                     Card(
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(16.dp),
-                        colors = CardDefaults.cardColors(containerColor = Color(0xFF161E30))
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
                     ) {
                         Row(
                             modifier = Modifier
@@ -1209,14 +1219,14 @@ private fun IdleStateContent(
                             StorageDetailItem(
                                 label = stringResource(R.string.total_storage),
                                 value = formatSize(storageInfo.totalBytes),
-                                color = Color.White
+                                color = MaterialTheme.colorScheme.onSurface
                             )
                         }
                     }
 
                     Text(
                         text = stringResource(R.string.junk_cleaner_desc),
-                        color = Color(0xFF8A99AD),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         fontSize = 14.sp,
                         textAlign = TextAlign.Center,
                         modifier = Modifier
@@ -1294,7 +1304,7 @@ private fun CompletedStateContent(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF0F1422))
+            .background(MaterialTheme.colorScheme.background)
             .statusBarsPadding()
             .navigationBarsPadding()
             .padding(20.dp),
@@ -1313,13 +1323,13 @@ private fun CompletedStateContent(
                 modifier = Modifier
                     .size(96.dp)
                     .clip(CircleShape)
-                    .background(Color(0xFF00E676).copy(alpha = 0.15f)),
+                    .background(Color(0xFF00A896).copy(alpha = 0.12f)),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = Icons.Default.CheckCircle,
                     contentDescription = null,
-                    tint = Color(0xFF00E676),
+                    tint = Color(0xFF00A896),
                     modifier = Modifier.size(60.dp)
                 )
             }
@@ -1330,7 +1340,7 @@ private fun CompletedStateContent(
                 text = stringResource(R.string.clean_complete),
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.White
+                color = MaterialTheme.colorScheme.onBackground
             )
 
             Spacer(modifier = Modifier.height(6.dp))
@@ -1338,7 +1348,7 @@ private fun CompletedStateContent(
             Text(
                 text = stringResource(R.string.junk_cleaned_successfully),
                 fontSize = 14.sp,
-                color = Color(0xFF8A99AD)
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
             Spacer(modifier = Modifier.height(28.dp))
@@ -1346,7 +1356,8 @@ private fun CompletedStateContent(
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(20.dp),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFF161E30))
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.surfaceVariant)
             ) {
                 Column(
                     modifier = Modifier
@@ -1357,17 +1368,17 @@ private fun CompletedStateContent(
                     Text(
                         text = stringResource(R.string.freed_storage),
                         fontSize = 13.sp,
-                        color = Color(0xFF8A99AD)
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         text = formatSize(freedBytes),
                         fontSize = 36.sp,
                         fontWeight = FontWeight.Black,
-                        color = Color(0xFF00E676)
+                        color = Color(0xFF00A896)
                     )
                     Spacer(modifier = Modifier.height(14.dp))
-                    HorizontalDivider(color = Color(0xFF253046))
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.35f))
                     Spacer(modifier = Modifier.height(14.dp))
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -1376,13 +1387,13 @@ private fun CompletedStateContent(
                         Text(
                             text = stringResource(R.string.free_storage),
                             fontSize = 14.sp,
-                            color = Color(0xFF8A99AD)
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Text(
                             text = formatSize(storageInfo.freeBytes),
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color.White
+                            color = MaterialTheme.colorScheme.onSurface
                         )
                     }
                 }
@@ -1411,7 +1422,7 @@ private fun CompletedStateContent(
                     .fillMaxWidth()
                     .height(52.dp),
                 shape = RoundedCornerShape(26.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2979FF))
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
             ) {
                 Text(
                     text = stringResource(R.string.done_button),
@@ -1639,7 +1650,7 @@ private fun PermissionFeatureRow(
 @Composable
 private fun StorageDetailItem(label: String, value: String, color: Color) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(text = label, fontSize = 12.sp, color = Color(0xFF8A99AD))
+        Text(text = label, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
         Spacer(modifier = Modifier.height(4.dp))
         Text(text = value, fontSize = 15.sp, fontWeight = FontWeight.Bold, color = color)
     }
@@ -1655,7 +1666,16 @@ private fun CustomBlueCheckbox(
         modifier = modifier
             .size(22.dp)
             .clip(RoundedCornerShape(6.dp))
-            .background(if (checked) Color(0xFF2979FF) else Color(0xFF21283B))
+            .background(
+                if (checked) MaterialTheme.colorScheme.primary
+                else MaterialTheme.colorScheme.surfaceVariant
+            )
+            .border(
+                width = 1.dp,
+                color = if (checked) MaterialTheme.colorScheme.primary
+                else MaterialTheme.colorScheme.outline.copy(alpha = 0.4f),
+                shape = RoundedCornerShape(6.dp)
+            )
             .then(
                 if (onCheckedChange != null) Modifier.clickable { onCheckedChange(!checked) } else Modifier
             ),
@@ -1684,10 +1704,11 @@ private fun CategoryProgressSpinner(modifier: Modifier = Modifier) {
         ),
         label = "spinAngle"
     )
+    val spinnerColor = MaterialTheme.colorScheme.primary
 
     Canvas(modifier = modifier.size(20.dp)) {
         drawArc(
-            color = Color(0xFF2979FF),
+            color = spinnerColor,
             startAngle = angle,
             sweepAngle = 260f,
             useCenter = false,

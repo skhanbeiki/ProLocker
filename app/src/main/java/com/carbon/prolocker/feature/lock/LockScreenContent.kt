@@ -50,6 +50,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.AbsoluteAlignment
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -838,5 +839,11 @@ fun LockScreenContent(
                 }
             }
         }
+
+        LockScreenSuggestionButton(
+            modifier = Modifier
+                .align(AbsoluteAlignment.CenterRight)
+                .offset(y = (-60).dp)
+        )
     }
 }

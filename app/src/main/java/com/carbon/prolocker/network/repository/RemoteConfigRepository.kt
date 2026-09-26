@@ -57,6 +57,9 @@ class RemoteConfigRepository(
 
     suspend fun getLockScreenAdPlace(): String = getConfig().configs.nativeAdPlaceLockScreen
 
+    suspend fun getSuggestionButtonConfig(): com.carbon.prolocker.network.model.SuggestionButtonConfig? =
+        getConfig().getEffectiveSuggestionButton()
+
     suspend fun getLastSyncTime(): Long {
         return preferencesRepository.userPreferencesFlow.map { it.lastRemoteConfigSync }.first()
     }
