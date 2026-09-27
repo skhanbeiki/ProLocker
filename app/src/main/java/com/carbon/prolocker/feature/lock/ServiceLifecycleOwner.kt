@@ -19,26 +19,41 @@ class ServiceLifecycleOwner : LifecycleOwner, SavedStateRegistryOwner, ViewModel
 
     init {
         savedStateRegistryController.performRestore(null)
-    }
-
-    fun start() {
-        lifecycleRegistry.currentState = Lifecycle.State.STARTED
-    }
-
-    fun resume() {
-        lifecycleRegistry.currentState = Lifecycle.State.RESUMED
-    }
-
-    fun pause() {
-        lifecycleRegistry.currentState = Lifecycle.State.STARTED
-    }
-
-    fun stop() {
         lifecycleRegistry.currentState = Lifecycle.State.CREATED
     }
 
+    fun start() {
+        if (!lifecycleRegistry.currentState.isAtLeast(Lifecycle.State.STARTED)) {
+            lifecycleRegistry.currentState = Lifecycle.State.STARTED
+        }
+    }
+
+    fun resume() {
+        if (!lifecycleRegistry.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
+            lifecycleRegistry.currentState = Lifecycle.State.RESUMED
+        }
+    }
+
+    fun pause() {
+        if (lifecycleRegistry.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
+            lifecycleRegistry.currentState = Lifecycle.State.STARTED
+        }
+    }
+
+    fun stop() {
+        if (lifecycleRegistry.currentState.isAtLeast(Lifecycle.State.STARTED)) {
+            lifecycleRegistry.currentState = Lifecycle.State.CREATED
+        }
+    }
+
     fun destroy() {
-        lifecycleRegistry.currentState = Lifecycle.State.DESTROYED
+        try {
+            if (lifecycleRegistry.currentState == Lifecycle.State.INITIALIZED) {
+                lifecycleRegistry.currentState = Lifecycle.State.CREATED
+            }
+            lifecycleRegistry.currentState = Lifecycle.State.DESTROYED
+        } catch (_: Exception) {
+        }
         viewModelStore.clear()
     }
 }

@@ -658,7 +658,14 @@ fun LockScreenContent(
                                     }
                                 }
                             }
-                            Spacer(modifier = Modifier.weight(1f))
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .weight(1f),
+                                contentAlignment = AbsoluteAlignment.CenterRight
+                            ) {
+                                LockScreenSuggestionButton()
+                            }
                             Box(
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -839,11 +846,5 @@ fun LockScreenContent(
                 }
             }
         }
-
-        LockScreenSuggestionButton(
-            modifier = Modifier
-                .align(AbsoluteAlignment.CenterRight)
-                .offset(y = (10).dp)
-        )
     }
 }

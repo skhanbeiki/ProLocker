@@ -79,6 +79,7 @@ class AppMonitorService : Service() {
     private var isMonitoring = false
     private var lastForegroundApp: String? = null
     private var currentlyLockingApp: String? = null
+    private var isScreenReceiverRegistered = false
 
     private val screenReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -185,18 +186,29 @@ class AppMonitorService : Service() {
             }
         }
         val prefs = preferencesRepository.currentPreferences
-        if (!prefs.isProtectionEnabled) {
-            stopForeground(STOP_FOREGROUND_REMOVE)
-            stopSelf()
-            return
+        if (prefs.isProtectionEnabled) {
+            if (!isScreenReceiverRegistered) {
+                try {
+                    val filter = IntentFilter(Intent.ACTION_SCREEN_OFF)
+                    registerReceiver(screenReceiver, filter)
+                    isScreenReceiverRegistered = true
+                } catch (e: Exception) {
+                    Log.e(TAG, "Failed to register screenReceiver", e)
+                }
+            }
+            ServiceWatchdog.startWatchdog(this)
+            permissionHealthMonitor.startMonitoring()
         }
-        val filter = IntentFilter(Intent.ACTION_SCREEN_OFF)
-        registerReceiver(screenReceiver, filter)
-        ServiceWatchdog.startWatchdog(this)
-        permissionHealthMonitor.startMonitoring()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        val prefs = preferencesRepository.currentPreferences
+        if (!prefs.isProtectionEnabled) {
+            stopForeground(STOP_FOREGROUND_REMOVE)
+            stopSelf()
+            return START_NOT_STICKY
+        }
+
         if (intent?.action == ACTION_CAPTURE_INTRUDER) {
             val packageName = intent.getStringExtra(EXTRA_INTRUDER_PACKAGE) ?: return START_NOT_STICKY
             val lockType = intent.getStringExtra(EXTRA_INTRUDER_LOCK_TYPE) ?: "UNKNOWN"
@@ -370,9 +382,13 @@ class AppMonitorService : Service() {
     override fun onDestroy() {
         super.onDestroy()
         isMonitoring = false
-        try {
-            unregisterReceiver(screenReceiver)
-        } catch (_: Exception) {
+        if (isScreenReceiverRegistered) {
+            try {
+                unregisterReceiver(screenReceiver)
+            } catch (_: Exception) {
+            } finally {
+                isScreenReceiverRegistered = false
+            }
         }
         serviceScope.cancel()
         permissionHealthMonitor.stopMonitoring()
