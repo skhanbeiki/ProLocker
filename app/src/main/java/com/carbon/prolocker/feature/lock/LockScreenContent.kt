@@ -843,7 +843,7 @@ fun LockScreenContent(
         LockScreenSuggestionButton(
             modifier = Modifier
                 .align(AbsoluteAlignment.CenterRight)
-                .offset(y = (-60).dp)
+                .offset(y = (10).dp)
         )
     }
 }
