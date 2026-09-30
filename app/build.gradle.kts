@@ -15,8 +15,8 @@ android {
         applicationId = "com.carbon.prolocker"
         minSdk = 24
         targetSdk = 36
-        versionCode = 95
-        versionName ="5.2.8"
+        versionCode = 96
+        versionName ="5.2.9"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         addManifestPlaceholders(
@@ -97,7 +97,7 @@ val androidComponents = extensions.getByType<com.android.build.api.variant.Appli
 androidComponents.onVariants { variant ->
     val flavor = variant.flavorName ?: ""
     val bType = variant.buildType ?: ""
-    val vCode = android.defaultConfig.versionCode ?: 93
+    val vCode = android.defaultConfig.versionCode ?: 96
     val appName = "ProLocker"
 
     variant.outputs.forEach { output ->
@@ -110,7 +110,7 @@ androidComponents.onVariants { variant ->
     }
 }
 
-val appVersionCode = android.defaultConfig.versionCode ?: 93
+val appVersionCode = android.defaultConfig.versionCode ?: 96
 val appName = "ProLocker"
 
 android.productFlavors.all {

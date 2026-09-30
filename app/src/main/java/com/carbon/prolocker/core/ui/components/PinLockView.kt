@@ -184,12 +184,12 @@ fun PinLockView(
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(if (isLandscape) 12.dp else 20.dp)
+            verticalArrangement = Arrangement.spacedBy(if (isLandscape) 8.dp else 14.dp)
         ) {
             // PIN dot indicators
             Row(
                 modifier = Modifier.graphicsLayer { translationX = shakeOffset.value },
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                horizontalArrangement = Arrangement.spacedBy(if (isLandscape) 10.dp else 12.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 for (i in 0 until pinLength) {
@@ -198,7 +198,7 @@ fun PinLockView(
                     val dotColor = if (isError) Color(0xFFFF5252) else Color.White
                     Box(
                         modifier = Modifier
-                            .size(if (isLandscape) 16.dp else 24.dp)
+                            .size(if (isLandscape) 14.dp else 18.dp)
                             .graphicsLayer {
                                 scaleX = scale
                                 scaleY = scale
@@ -210,14 +210,16 @@ fun PinLockView(
                 }
             }
 
+            val buttonSize = if (isLandscape) 52.dp else 62.dp
+
             // Numeric keypad
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = if (isLandscape) 4.dp else 8.dp)
+                    .padding(bottom = if (isLandscape) 4.dp else 4.dp)
                     .graphicsLayer { alpha = keypadAlpha },
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(if (isLandscape) 6.dp else 12.dp)
+                verticalArrangement = Arrangement.spacedBy(if (isLandscape) 6.dp else 10.dp)
             ) {
                 // Rows 1-3 (1-9)
                 for (row in 0..2) {
@@ -234,7 +236,7 @@ fun PinLockView(
 
                 // Row 4: empty, 0, delete
                 Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                    Spacer(modifier = Modifier.size(74.dp))
+                    Spacer(modifier = Modifier.size(buttonSize))
                     PinKeypadButton(
                         text = "0",
                         onClick = onDigit
@@ -263,10 +265,13 @@ fun PinKeypadButton(text: String, onClick: (String) -> Unit) {
         label = "keypadButtonPress"
     )
     val handleClick = remember(text, onClick) { { onClick(text) } }
+    val configuration = LocalContext.current.resources.configuration
+    val isLandscape = configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
+    val buttonSize = if (isLandscape) 52.dp else 62.dp
 
     Box(
         modifier = Modifier
-            .size(74.dp)
+            .size(buttonSize)
             .graphicsLayer {
                 scaleX = scale
                 scaleY = scale
@@ -282,7 +287,7 @@ fun PinKeypadButton(text: String, onClick: (String) -> Unit) {
     ) {
         Text(
             text = text,
-            fontSize = 30.sp,
+            fontSize = if (isLandscape) 22.sp else 26.sp,
             color = Color.White
         )
     }
@@ -301,10 +306,13 @@ fun PinKeypadDeleteButton(onClick: () -> Unit) {
         animationSpec = spring(stiffness = Spring.StiffnessHigh),
         label = "deleteButtonPress"
     )
+    val configuration = LocalContext.current.resources.configuration
+    val isLandscape = configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
+    val buttonSize = if (isLandscape) 52.dp else 62.dp
 
     Box(
         modifier = Modifier
-            .size(74.dp)
+            .size(buttonSize)
             .graphicsLayer {
                 scaleX = scale
                 scaleY = scale
@@ -321,7 +329,7 @@ fun PinKeypadDeleteButton(onClick: () -> Unit) {
             Icons.Default.Clear,
             contentDescription = "Delete",
             tint = Color.White,
-            modifier = Modifier.size(28.dp)
+            modifier = Modifier.size(if (isLandscape) 22.dp else 26.dp)
         )
     }
 }

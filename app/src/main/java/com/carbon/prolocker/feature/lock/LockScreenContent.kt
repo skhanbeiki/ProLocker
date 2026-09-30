@@ -8,6 +8,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -54,6 +55,7 @@ import androidx.compose.ui.AbsoluteAlignment
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.ContentScale
@@ -440,321 +442,301 @@ fun LockScreenContent(
                     }
                 }
             } else {
+                // ── PORTRAIT — unified layout for Pattern, PIN & Fingerprint ──
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(padding),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.SpaceBetween
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
+                    // ════ TOP AREA — Top Ad centered vertically in remaining upper space ════
+                    if (lockScreenAdPlace == "top" || lockScreenAdPlace == "topBanner") {
+                        Spacer(modifier = Modifier.weight(1f))
 
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(if (isFingerprintMode) 0.38f else 0.3f),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                    ) {
                         when (lockScreenAdPlace) {
                             "top" -> {
-                                if (adManager != null) {
-                                    Column(
-                                        modifier = Modifier
-                                            .fillMaxSize(),
-                                        verticalArrangement = Arrangement.Bottom,
-                                        horizontalAlignment = Alignment.CenterHorizontally
-
-                                    ) {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(148.dp)
+                                        .padding(horizontal = 20.dp, vertical = 4.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    if (preloadedAdView != null) {
+                                        NativeAdContainer(
+                                            preloadedAd = preloadedAdView,
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .clip(RoundedCornerShape(16.dp))
+                                        )
+                                    } else if (adManager != null) {
                                         NativeAdContainer(
                                             adManager = adManager,
                                             placement = AdPlacement.LOCKSCREEN_TOP,
                                             adType = NativeAdType.TYPE_2,
                                             modifier = Modifier
                                                 .fillMaxWidth()
-                                                .padding(horizontal = 24.dp)
                                                 .clip(RoundedCornerShape(16.dp))
                                         )
-                                        if (isFingerprintMode) {
-                                            Spacer(modifier = Modifier.height(16.dp))
-                                        }
                                     }
                                 }
                             }
 
                             "topBanner" -> {
-                                if (adManager != null) {
-                                    Column(
-                                        modifier = Modifier
-                                            .fillMaxSize(),
-                                        verticalArrangement = Arrangement.Bottom,
-                                        horizontalAlignment = Alignment.CenterHorizontally
-                                    ) {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(212.dp)
+                                        .padding(horizontal = 20.dp, vertical = 4.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    if (preloadedAdView != null) {
+                                        NativeAdContainer(
+                                            preloadedAd = preloadedAdView,
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .clip(RoundedCornerShape(16.dp))
+                                        )
+                                    } else if (adManager != null) {
                                         NativeAdContainer(
                                             adManager = adManager,
                                             placement = AdPlacement.LOCKSCREEN_TOP,
                                             adType = NativeAdType.TYPE_4,
                                             modifier = Modifier
                                                 .fillMaxWidth()
-                                                .padding(horizontal = 24.dp)
                                                 .clip(RoundedCornerShape(16.dp))
                                         )
-                                        if (isFingerprintMode) {
-                                            Spacer(modifier = Modifier.height(16.dp))
-                                        }
                                     }
                                 }
                             }
+                        }
 
-                            else -> {
-                                Spacer(modifier = Modifier.fillMaxSize())
+                        Spacer(modifier = Modifier.weight(1f))
+                    } else {
+                        // When no top ad, flexible spacer pushes content toward bottom
+                        Spacer(modifier = Modifier.weight(1f))
+                    }
+
+                    // ════ CONTENT AREA ════
+                    if (isFingerprintMode) {
+                        // ── Fingerprint unlock ──
+                        Surface(
+                            onClick = onFingerprintClick,
+                            shape = CircleShape,
+                            color = Color.White.copy(alpha = 0.15f),
+                            border = BorderStroke(1.5.dp, Color.White.copy(alpha = 0.4f)),
+                            modifier = Modifier.size(88.dp)
+                        ) {
+                            Box(contentAlignment = Alignment.Center) {
+                                Icon(
+                                    imageVector = Icons.Default.Fingerprint,
+                                    contentDescription = stringResource(R.string.fingerprint_unlock),
+                                    tint = Color.White,
+                                    modifier = Modifier.size(52.dp)
+                                )
                             }
+                        }
+
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        Text(
+                            text = stringResource(R.string.touch_to_unlock),
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = Color.White.copy(alpha = 0.9f),
+                            textAlign = TextAlign.Center
+                        )
+
+                        Spacer(modifier = Modifier.height(40.dp))
+
+                        OutlinedButton(
+                            onClick = { isFingerprintMode = false },
+                            shape = RoundedCornerShape(50),
+                            border = BorderStroke(1.dp, Color.White.copy(alpha = 0.6f)),
+                            colors = ButtonDefaults.outlinedButtonColors(
+                                containerColor = Color.Transparent,
+                                contentColor = Color.White
+                            ),
+                            modifier = Modifier
+                                .height(36.dp)
+                                .padding(horizontal = 24.dp)
+                        ) {
+                            val switchText = if (lockType == "PIN") stringResource(R.string.use_pin) else stringResource(R.string.use_pattern)
+                            Text(
+                                text = switchText,
+                                style = AppTypography.labelMedium,
+                                color = Color.White
+                            )
+                        }
+
+                        // Second weight spacer → centers fingerprint between top ad & bottom
+                        Spacer(modifier = Modifier.weight(1f))
+                    } else {
+                        // ── Pattern / PIN unlock ──
+                        val currentLockTypeRaw = lockType?.lowercase() ?: "pattern"
+                        val credentialStr = if (currentLockTypeRaw == "pattern") {
+                            stringResource(R.string.pattern_text)
+                        } else {
+                            stringResource(R.string.pin_text)
+                        }
+                        Text(
+                            text = if (isError) stringResource(
+                                R.string.incorrect_credential_prefix,
+                                credentialStr
+                            ) else stringResource(
+                                R.string.enter_credential_prefix,
+                                credentialStr
+                            ),
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = if (isError) Color.Red else Color.White.copy(alpha = 0.85f),
+                            textAlign = TextAlign.Center
+                        )
+
+                        LaunchedEffect(isError) {
+                            if (isError) {
+                                if (vibrationEnabled) {
+                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                }
+                                for (i in 0..5) {
+                                    offsetX.animateTo(
+                                        targetValue = if (i % 2 == 0) 15f else -15f,
+                                        animationSpec = tween(
+                                            durationMillis = 50,
+                                            easing = LinearEasing
+                                        )
+                                    )
+                                }
+                                offsetX.animateTo(0f)
+                                delay(1000)
+                                onErrorReset()
+                            }
+                        }
+
+                        if (failedAttemptsCount >= threshold) {
+                            Spacer(modifier = Modifier.height(4.dp))
+                            TextButton(onClick = { showForgotDialog = true }) {
+                                Text(
+                                    stringResource(R.string.forgot_password),
+                                    color = Color.White
+                                )
+                            }
+                        }
+
+                        // 8dp gap pushes helper text 8dp higher relative to suggestion view
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(44.dp),
+                            contentAlignment = AbsoluteAlignment.CenterRight
+                        ) {
+                            LockScreenSuggestionButton()
+                        }
+
+                        // In PIN mode, buttons move 16dp higher
+                        val isPattern = lockType == "PATTERN"
+                        val inputOffset = if (isPattern) 0.dp else (-16).dp
+
+                        // Lock input with shake animation
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp)
+                                .offset(x = offsetX.value.dp, y = inputOffset),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            when (lockType) {
+                                "PATTERN" -> {
+                                    PatternLockView(
+                                        onPatternDrawn = onPatternComplete,
+                                        onInteractionStarted = { },
+                                        isError = isError,
+                                        vibrationEnabled = vibrationEnabled,
+                                        hidePatternPath = hidePatternPath
+                                    )
+                                }
+
+                                else -> {
+                                    PinLockView(
+                                        isError = isError,
+                                        onPinComplete = onPinComplete,
+                                        vibrationEnabled = vibrationEnabled
+                                    )
+                                }
+                            }
+                        }
+
+                        if (fingerprintUnlockEnabled) {
+                            Spacer(modifier = Modifier.height(8.dp))
+                            OutlinedButton(
+                                onClick = { isFingerprintMode = true },
+                                shape = RoundedCornerShape(50),
+                                border = BorderStroke(1.dp, Color.White.copy(alpha = 0.6f)),
+                                colors = ButtonDefaults.outlinedButtonColors(
+                                    containerColor = Color.Transparent,
+                                    contentColor = Color.White
+                                ),
+                                modifier = Modifier
+                                    .height(36.dp)
+                                    .padding(horizontal = 24.dp)
+                            ) {
+                                Text(
+                                    text = stringResource(R.string.use_fingerprint),
+                                    style = AppTypography.labelMedium,
+                                    color = Color.White
+                                )
+                            }
+                        }
+
+                        // Compensate the -16dp offset so bottom section stays in place
+                        if (!isPattern) {
+                            Spacer(modifier = Modifier.height(16.dp))
                         }
                     }
 
-                    if (isFingerprintMode) {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .weight(0.62f),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center
-                        ) {
-                            Spacer(modifier = Modifier.weight(1f))
-
-                            Surface(
-                                onClick = onFingerprintClick,
-                                shape = CircleShape,
-                                color = ProLockerPrimary.copy(alpha = 0.15f),
-                                border = BorderStroke(1.5.dp, ProLockerPrimary),
-                                modifier = Modifier.size(88.dp)
-                            ) {
-                                Box(contentAlignment = Alignment.Center) {
-                                    Icon(
-                                        imageVector = Icons.Default.Fingerprint,
-                                        contentDescription = stringResource(R.string.fingerprint_unlock),
-                                        tint = ProLockerPrimary,
-                                        modifier = Modifier.size(52.dp)
-                                    )
-                                }
-                            }
-
-                            Spacer(modifier = Modifier.height(12.dp))
-
-                            Text(
-                                text = stringResource(R.string.touch_to_unlock),
-                                style = MaterialTheme.typography.bodyLarge,
-                                fontWeight = FontWeight.Medium,
-                                color = ProLockerOnBackground.copy(alpha = 0.9f),
-                                textAlign = TextAlign.Center
-                            )
-
-                            Spacer(modifier = Modifier.height(40.dp))
-
-                            OutlinedButton(
-                                onClick = { isFingerprintMode = false },
-                                shape = RoundedCornerShape(50),
-                                border = BorderStroke(1.5.dp, ProLockerPrimary.copy(alpha = 0.7f)),
-                                colors = ButtonDefaults.outlinedButtonColors(
-                                    containerColor = Color.Transparent,
-                                    contentColor = ProLockerPrimary
-                                ),
-                                modifier = Modifier.height(36.dp).padding(horizontal = 24.dp)
-                            ) {
-                                val switchText = if (lockType == "PIN") stringResource(R.string.use_pin) else stringResource(R.string.use_pattern)
-                                Text(
-                                    text = switchText,
-                                    style = AppTypography.labelMedium,
-                                    color = ProLockerPrimary
-                                )
-                            }
-
-                            Spacer(modifier = Modifier.weight(1f))
-
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(64.dp)
-                                    .padding(bottom = 8.dp),
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.Center
-                            ) {
-                                if (failedAttemptsCount >= threshold) {
-                                    Card(
-                                        shape = RoundedCornerShape(24.dp),
-                                        colors = CardDefaults.cardColors(
-                                            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
-                                        ),
-                                        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
-                                    ) {
-                                        TextButton(onClick = { showForgotDialog = true }) {
-                                            Text(
-                                                stringResource(R.string.forgot_password),
-                                                color = Color.White,
-                                                fontWeight = FontWeight.Medium
-                                            )
-                                        }
-                                    }
-                                } else {
-                                    if (lockScreenAdPlace == "bottom" && adManager != null) {
-                                        NativeAdContainer(
-                                            adManager = adManager,
-                                            placement = AdPlacement.LOCKSCREEN_BOTTOM,
-                                            adType = NativeAdType.TYPE_3,
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .padding(horizontal = 24.dp)
-                                                .clip(RoundedCornerShape(16.dp))
-                                        )
-                                    }
-                                }
-                            }
-                        }
-                    } else {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .weight(0.7f),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Bottom,
-                        ) {
-                            Spacer(modifier = Modifier.weight(1f))
-                            Column(
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                val currentLockTypeRaw = lockType?.lowercase() ?: "pin"
-                                val credentialStr =
-                                    if (currentLockTypeRaw == "pattern") stringResource(R.string.pattern_text) else stringResource(R.string.pin_text)
-                                Text(
-                                    text = if (isError) stringResource(
-                                        R.string.incorrect_credential_prefix,
-                                        credentialStr
-                                    ) else stringResource(
-                                        R.string.enter_credential_prefix,
-                                        credentialStr
-                                    ),
-                                    style = MaterialTheme.typography.bodyLarge,
-                                    fontWeight = FontWeight.Medium,
-                                    color = if (isError) ProLockerError else Color.White.copy(
-                                        alpha = 0.7f
-                                    ),
-                                    textAlign = TextAlign.Center
-                                )
-                                LaunchedEffect(isError) {
-                                    if (isError) {
-                                        if (vibrationEnabled) {
-                                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                        }
-                                        for (i in 0..5) {
-                                            offsetX.animateTo(
-                                                targetValue = if (i % 2 == 0) 15f else -15f,
-                                                animationSpec = tween(
-                                                    durationMillis = 50,
-                                                    easing = LinearEasing
-                                                )
-                                            )
-                                        }
-                                        offsetX.animateTo(0f)
-                                        delay(1000)
-                                        onErrorReset()
-                                    }
-                                }
-                            }
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .weight(1f),
-                                contentAlignment = AbsoluteAlignment.CenterRight
-                            ) {
-                                LockScreenSuggestionButton()
-                            }
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 16.dp)
-                                    .offset(x = offsetX.value.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                when (lockType) {
-                                    "PATTERN" -> {
-                                        PatternLockView(
-                                            onPatternDrawn = onPatternComplete,
-                                            onInteractionStarted = { },
-                                            isError = isError,
-                                            vibrationEnabled = vibrationEnabled,
-                                            hidePatternPath = hidePatternPath
-                                        )
-                                    }
-
-                                    else -> {
-                                        PinLockView(
-                                            isError = isError,
-                                            onPinComplete = onPinComplete,
-                                            vibrationEnabled = vibrationEnabled
-                                        )
-                                    }
-                                }
-                            }
-
-                            if (fingerprintUnlockEnabled) {
-                                Spacer(modifier = Modifier.height(8.dp))
-                                OutlinedButton(
-                                    onClick = { isFingerprintMode = true },
-                                    shape = RoundedCornerShape(50),
-                                    border = BorderStroke(1.5.dp, ProLockerPrimary.copy(alpha = 0.7f)),
-                                    colors = ButtonDefaults.outlinedButtonColors(
-                                        containerColor = Color.Transparent,
-                                        contentColor = ProLockerPrimary
-                                    ),
-                                    modifier = Modifier.height(36.dp).padding(horizontal = 24.dp)
-                                ) {
+                    // ════ BOTTOM SECTION — forgot password OR bottom ad ════
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(72.dp)
+                            .padding(horizontal = 24.dp)
+                            .padding(bottom = 8.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        if (failedAttemptsCount >= threshold) {
+                            if (isFingerprintMode) {
+                                TextButton(onClick = { showForgotDialog = true }) {
                                     Text(
-                                        text = stringResource(R.string.use_fingerprint),
-                                        style = AppTypography.labelMedium,
-                                        color = ProLockerPrimary
+                                        stringResource(R.string.forgot_password),
+                                        color = Color.White
                                     )
                                 }
                             }
-
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(64.dp)
-                                    .padding(bottom = 8.dp),
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.Center
-                            ) {
-                                if (failedAttemptsCount >= threshold) {
-                                    Card(
-                                        shape = RoundedCornerShape(24.dp),
-                                        colors = CardDefaults.cardColors(
-                                            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
-                                        ),
-                                        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
-                                    ) {
-                                        TextButton(onClick = { showForgotDialog = true }) {
-                                            Text(
-                                                stringResource(R.string.forgot_password),
-                                                color = Color.White,
-                                                fontWeight = FontWeight.Medium
-                                            )
-                                        }
-                                    }
-                                } else {
-                                    if (lockScreenAdPlace == "bottom" && adManager != null) {
-                                        NativeAdContainer(
-                                            adManager = adManager,
-                                            placement = AdPlacement.LOCKSCREEN_BOTTOM,
-                                            adType = NativeAdType.TYPE_3,
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .padding(horizontal = 24.dp)
-                                                .clip(RoundedCornerShape(16.dp))
-                                        )
-                                    }
-                                }
+                        } else if (lockScreenAdPlace == "bottom") {
+                            if (preloadedAdView != null) {
+                                NativeAdContainer(
+                                    preloadedAd = preloadedAdView,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clip(RoundedCornerShape(16.dp))
+                                )
+                            } else if (adManager != null) {
+                                NativeAdContainer(
+                                    adManager = adManager,
+                                    placement = AdPlacement.LOCKSCREEN_BOTTOM,
+                                    adType = NativeAdType.TYPE_3,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clip(RoundedCornerShape(16.dp))
+                                )
                             }
                         }
                     }
                 }
+
+
+
             }
         }
         if (showForgotDialog) {

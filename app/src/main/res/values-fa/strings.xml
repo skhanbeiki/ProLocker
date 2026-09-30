@@ -293,8 +293,8 @@
     <string name="display_over_apps_reason">بدون این، صفحه قفل نمی‌تواند روی برنامه راه‌اندازی شده ظاهر شود.</string>
 
     <string name="battery_opt_title">بهینه‌سازی باتری</string>
-    <string name="battery_opt_desc">به ProLocker اجازه می‌دهد بدون اینکه توسط سیستم کشته شود، در پس‌زمینه با اطمینان اجرا شود.</string>
-    <string name="battery_opt_reason">اگر توسط سیستم کشته شود، برنامه‌های شما محافظت نشده باقی می‌مانند.</string>
+    <string name="battery_opt_desc">به ProLocker اجازه می‌دهد بدون اینکه توسط سیستم حذف شود، در پس‌زمینه با اطمینان اجرا شود.</string>
+    <string name="battery_opt_reason">اگر توسط سیستم حذف شود، برنامه‌های شما محافظت نشده باقی می‌مانند.</string>
     <string name="setup_permissions">تنظیم مجوزها</string>
     <string name="notification_permission_title">مجوز اعلان</string>
     <string name="notification_permission_desc">قفل‌کننده برنامه برای اطمینان از اجرای قابل اعتماد سرویس قفل در پس‌زمینه بدون از کار افتادن توسط سیستم، به اعلان‌های مداوم نیاز دارد.</string>

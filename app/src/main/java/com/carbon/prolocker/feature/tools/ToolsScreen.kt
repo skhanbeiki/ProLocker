@@ -290,7 +290,7 @@ fun JunkCleanerCard(
                                                     colors = listOf(Color(0xFFFF6200), Color(0xFFFF1B28))
                                                 )
                                             )
-                                            .padding(horizontal = 7.dp, vertical = 2.5.dp),
+                                            .padding(horizontal = 7.dp),
                                         verticalAlignment = Alignment.CenterVertically,
                                         horizontalArrangement = Arrangement.Center
                                     ) {
@@ -298,7 +298,7 @@ fun JunkCleanerCard(
                                             imageVector = Icons.Filled.Bolt,
                                             contentDescription = null,
                                             tint = Color.White,
-                                            modifier = Modifier.size(13.dp)
+                                            modifier = Modifier.size(12.dp)
                                         )
                                         Spacer(modifier = Modifier.width(2.dp))
                                         Text(

@@ -22,10 +22,17 @@ import com.carbon.prolocker.core.language.findActivity
 @Composable
 fun NativeAdContainer(
     preloadedAd: View,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    transparentNativeBackground: Boolean = false
 ) {
     AndroidView(
-        factory = { preloadedAd },
+        factory = {
+            (preloadedAd.parent as? android.view.ViewGroup)?.removeView(preloadedAd)
+            if (transparentNativeBackground) {
+                makeBackgroundsTransparent(preloadedAd)
+            }
+            preloadedAd
+        },
         modifier = modifier
     )
 }
@@ -38,6 +45,7 @@ fun NativeAdContainer(
     placement: String,
     adType: NativeAdType,
     modifier: Modifier = Modifier,
+    transparentNativeBackground: Boolean = false,
     onShown: () -> Unit = {},
     onError: (String) -> Unit = {}
 ) {
@@ -47,6 +55,7 @@ fun NativeAdContainer(
         placement = placement,
         layoutRes = layoutRes,
         modifier = modifier,
+        transparentNativeBackground = transparentNativeBackground,
         onShown = onShown,
         onError = onError
     )
@@ -60,6 +69,7 @@ fun NativeAdContainer(
     placement: String,
     @LayoutRes layoutRes: Int,
     modifier: Modifier = Modifier,
+    transparentNativeBackground: Boolean = false,
     onShown: () -> Unit = {},
     onError: (String) -> Unit = {}
 ) {
@@ -68,6 +78,7 @@ fun NativeAdContainer(
         placement = placement,
         layoutRes = layoutRes,
         modifier = modifier,
+        transparentNativeBackground = transparentNativeBackground,
         onShown = onShown,
         onError = onError
     )
@@ -81,6 +92,7 @@ private fun NativeAdContainerInternal(
     placement: String,
     @LayoutRes layoutRes: Int,
     modifier: Modifier,
+    transparentNativeBackground: Boolean = false,
     onShown: () -> Unit,
     onError: (String) -> Unit
 ) {
@@ -91,6 +103,9 @@ private fun NativeAdContainerInternal(
     val container = remember {
         FrameLayout(adContext).apply {
             layoutDirection = View.LAYOUT_DIRECTION_RTL
+            if (transparentNativeBackground) {
+                setBackgroundColor(android.graphics.Color.TRANSPARENT)
+            }
         }
     }
 
@@ -113,6 +128,9 @@ private fun NativeAdContainerInternal(
             container = container,
             layoutRes = layoutRes,
             onRendered = {
+                if (transparentNativeBackground) {
+                    makeBackgroundsTransparent(container)
+                }
                 isAdLoaded = true
                 onShown()
             },
@@ -133,4 +151,17 @@ private fun NativeAdContainerInternal(
         factory = { container },
         modifier = if (isAdLoaded) modifier else modifier.alpha(0f)
     )
+}
+
+private fun makeBackgroundsTransparent(view: View) {
+    view.setBackgroundColor(android.graphics.Color.TRANSPARENT)
+    if (view is android.view.ViewGroup) {
+        for (i in 0 until view.childCount) {
+            val child = view.getChildAt(i)
+            child.setBackgroundColor(android.graphics.Color.TRANSPARENT)
+            if (child is android.view.ViewGroup) {
+                makeBackgroundsTransparent(child)
+            }
+        }
+    }
 }

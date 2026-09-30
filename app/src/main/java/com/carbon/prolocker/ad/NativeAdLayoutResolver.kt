@@ -4,7 +4,7 @@ import androidx.annotation.LayoutRes
 import com.carbon.prolocker.R
 
 enum class NativeAdType {
-    TYPE_1, TYPE_2, TYPE_3, TYPE_4, TYPE_5, TYPE_6
+    TYPE_1, TYPE_2, TYPE_3, TYPE_4, TYPE_5, TYPE_6, TYPE_7
 }
 
 object NativeAdLayoutResolver {
@@ -15,7 +15,8 @@ object NativeAdLayoutResolver {
         NativeAdType.TYPE_3 to R.layout.ads_native_adivery_type3,
         NativeAdType.TYPE_4 to R.layout.ads_native_adivery_type4,
         NativeAdType.TYPE_5 to R.layout.ads_native_adivery_type5,
-        NativeAdType.TYPE_6 to R.layout.ads_native_adivery_type6
+        NativeAdType.TYPE_6 to R.layout.ads_native_adivery_type6,
+        NativeAdType.TYPE_7 to R.layout.ads_native_adivery_type7
     )
 
     private val tapsellLayouts = mapOf(
@@ -24,7 +25,8 @@ object NativeAdLayoutResolver {
         NativeAdType.TYPE_3 to R.layout.ads_native_tapsell_type3,
         NativeAdType.TYPE_4 to R.layout.ads_native_tapsell_type4,
         NativeAdType.TYPE_5 to R.layout.ads_native_tapsell_type5,
-        NativeAdType.TYPE_6 to R.layout.ads_native_tapsell_type6
+        NativeAdType.TYPE_6 to R.layout.ads_native_tapsell_type6,
+        NativeAdType.TYPE_7 to R.layout.ads_native_tapsell_type7
     )
 
     @LayoutRes

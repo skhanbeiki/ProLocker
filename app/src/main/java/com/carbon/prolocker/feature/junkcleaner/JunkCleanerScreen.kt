@@ -115,6 +115,7 @@ import com.carbon.prolocker.network.repository.RemoteConfigRepository
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import androidx.core.view.WindowCompat
 import java.util.Locale
 
 enum class CleanerState {
@@ -236,6 +237,20 @@ fun JunkCleanerScreen(
         }
     }
 
+    val window = context.findActivity()?.window
+    if (window != null) {
+        DisposableEffect(cleanerState, hasStoragePermission) {
+            val insetsController = WindowCompat.getInsetsController(window, window.decorView)
+            val oldLightStatusBars = insetsController.isAppearanceLightStatusBars
+            if (hasStoragePermission && cleanerState != CleanerState.COMPLETED) {
+                insetsController.isAppearanceLightStatusBars = false
+            }
+            onDispose {
+                insetsController.isAppearanceLightStatusBars = oldLightStatusBars
+            }
+        }
+    }
+
     val cleanerAdEnabled = remember {
         try {
             runBlocking { remoteConfigRepository.getConfig().configs.nativeAdRamCleanerPage }
@@ -289,8 +304,6 @@ fun JunkCleanerScreen(
                     .padding(padding)
             ) {
                 JunkPermissionFullScreenContent(
-                    cleanerAdEnabled = cleanerAdEnabled,
-                    adManager = adManager,
                     onGrantPermission = requestStoragePermission
                 )
             }
@@ -437,7 +450,7 @@ private fun ScanningStateContent(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
+            .background(Color(0xFFFE2C55))
     ) {
         Column(
             modifier = Modifier
@@ -453,13 +466,13 @@ private fun ScanningStateContent(
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Back",
-                        tint = MaterialTheme.colorScheme.onBackground
+                        tint = Color.White
                     )
                 }
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
                     text = stringResource(R.string.junk_remover),
-                    color = MaterialTheme.colorScheme.onBackground,
+                    color = Color.White,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -476,18 +489,18 @@ private fun ScanningStateContent(
                     horizontalArrangement = Arrangement.Center
                 ) {
                     Text(
-                        text = sizeValue,
-                        fontSize = 44.sp,
-                        fontWeight = FontWeight.Black,
-                        color = Color(0xFFFE2C55)
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
                         text = sizeUnit,
                         fontSize = 22.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFFFE2C55),
+                        color = Color.White,
                         modifier = Modifier.padding(bottom = 6.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = sizeValue,
+                        fontSize = 44.sp,
+                        fontWeight = FontWeight.Black,
+                        color = Color.White
                     )
                 }
 
@@ -495,7 +508,7 @@ private fun ScanningStateContent(
 
                 Text(
                     text = stringResource(R.string.junk_files_detected),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = Color.White.copy(alpha = 0.85f),
                     fontSize = 14.sp
                 )
 
@@ -507,14 +520,14 @@ private fun ScanningStateContent(
                         .padding(horizontal = 24.dp)
                         .height(6.dp)
                         .clip(RoundedCornerShape(3.dp))
-                        .background(MaterialTheme.colorScheme.surfaceVariant)
+                        .background(Color.White.copy(alpha = 0.3f))
                 ) {
                     Box(
                         modifier = Modifier
                             .fillMaxWidth(animatedProgress)
                             .fillMaxHeight()
                             .clip(RoundedCornerShape(3.dp))
-                            .background(Brush.horizontalGradient(listOf(Color(0xFFFE2C55), Color(0xFFFF5277))))
+                            .background(Color.White)
                     )
                 }
 
@@ -522,7 +535,7 @@ private fun ScanningStateContent(
 
                 Text(
                     text = scannedPath.ifEmpty { "..." },
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = Color.White.copy(alpha = 0.85f),
                     fontSize = 13.sp,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -635,7 +648,7 @@ private fun ReviewStateContent(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
+            .background(Color(0xFFFE2C55))
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
             Column(
@@ -652,13 +665,13 @@ private fun ReviewStateContent(
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back",
-                            tint = MaterialTheme.colorScheme.onBackground
+                            tint = Color.White
                         )
                     }
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
                         text = stringResource(R.string.junk_remover),
-                        color = MaterialTheme.colorScheme.onBackground,
+                        color = Color.White,
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold
                     )
@@ -675,18 +688,18 @@ private fun ReviewStateContent(
                         horizontalArrangement = Arrangement.Center
                     ) {
                         Text(
-                            text = sizeValue,
-                            fontSize = 44.sp,
-                            fontWeight = FontWeight.Black,
-                            color = Color(0xFFFE2C55)
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
                             text = sizeUnit,
                             fontSize = 22.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color(0xFFFE2C55),
+                            color = Color.White,
                             modifier = Modifier.padding(bottom = 6.dp)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = sizeValue,
+                            fontSize = 44.sp,
+                            fontWeight = FontWeight.Black,
+                            color = Color.White
                         )
                     }
 
@@ -694,7 +707,7 @@ private fun ReviewStateContent(
 
                     Text(
                         text = stringResource(R.string.junk_files_detected),
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        color = Color.White.copy(alpha = 0.85f),
                         fontSize = 14.sp
                     )
 
@@ -704,7 +717,7 @@ private fun ReviewStateContent(
                         text = stringResource(R.string.scanning_completed),
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onBackground
+                        color = Color.White
                     )
 
                     Spacer(modifier = Modifier.height(4.dp))
@@ -712,7 +725,7 @@ private fun ReviewStateContent(
                     Text(
                         text = stringResource(R.string.private_data_safe),
                         fontSize = 13.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        color = Color.White.copy(alpha = 0.85f),
                         textAlign = TextAlign.Center
                     )
 
@@ -941,7 +954,7 @@ private fun CleaningStateContent(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
+            .background(Color(0xFF377AFF))
     ) {
         Column(
             modifier = Modifier
@@ -957,13 +970,13 @@ private fun CleaningStateContent(
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Back",
-                        tint = MaterialTheme.colorScheme.onBackground
+                        tint = Color.White
                     )
                 }
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
                     text = stringResource(R.string.junk_remover),
-                    color = MaterialTheme.colorScheme.onBackground,
+                    color = Color.White,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -980,18 +993,18 @@ private fun CleaningStateContent(
                     horizontalArrangement = Arrangement.Center
                 ) {
                     Text(
-                        text = sizeValue,
-                        fontSize = 44.sp,
-                        fontWeight = FontWeight.Black,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
                         text = sizeUnit,
                         fontSize = 22.sp,
                         fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.primary,
+                        color = Color.White,
                         modifier = Modifier.padding(bottom = 6.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = sizeValue,
+                        fontSize = 44.sp,
+                        fontWeight = FontWeight.Black,
+                        color = Color.White
                     )
                 }
 
@@ -999,7 +1012,7 @@ private fun CleaningStateContent(
 
                 Text(
                     text = stringResource(R.string.junk_files_detected),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = Color.White.copy(alpha = 0.85f),
                     fontSize = 14.sp
                 )
 
@@ -1011,14 +1024,14 @@ private fun CleaningStateContent(
                         .padding(horizontal = 24.dp)
                         .height(6.dp)
                         .clip(RoundedCornerShape(3.dp))
-                        .background(MaterialTheme.colorScheme.surfaceVariant)
+                        .background(Color.White.copy(alpha = 0.3f))
                 ) {
                     Box(
                         modifier = Modifier
                             .fillMaxWidth(animatedProgress)
                             .fillMaxHeight()
                             .clip(RoundedCornerShape(3.dp))
-                            .background(Brush.horizontalGradient(listOf(Color(0xFF1E6BFF), Color(0xFF2979FF))))
+                            .background(Color.White)
                     )
                 }
 
@@ -1026,7 +1039,7 @@ private fun CleaningStateContent(
 
                 Text(
                     text = currentPath.ifEmpty { "..." },
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = Color.White.copy(alpha = 0.85f),
                     fontSize = 13.sp,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -1097,7 +1110,7 @@ private fun CleaningStateContent(
                             .padding(top = 8.dp)
                             .clip(RoundedCornerShape(16.dp)),
                         placement = AdPlacement.RAM_CLEANER_NATIVE,
-                        adType = NativeAdType.TYPE_1,
+                        adType = NativeAdType.TYPE_7,
                         adManager = adManager
                     )
                 }
@@ -1117,10 +1130,12 @@ private fun IdleStateContent(
     onStartScan: () -> Unit,
     onBack: () -> Unit
 ) {
+    val topHeaderColor = if (storageInfo.usagePercentage > 80) Color(0xFFFE2C55) else Color(0xFF377AFF)
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
+            .background(topHeaderColor)
     ) {
         Column(
             modifier = Modifier
@@ -1136,13 +1151,13 @@ private fun IdleStateContent(
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Back",
-                        tint = MaterialTheme.colorScheme.onBackground
+                        tint = Color.White
                     )
                 }
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
                     text = stringResource(R.string.junk_remover),
-                    color = MaterialTheme.colorScheme.onBackground,
+                    color = Color.White,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -1158,18 +1173,18 @@ private fun IdleStateContent(
                     text = "${storageInfo.usagePercentage}%",
                     fontSize = 52.sp,
                     fontWeight = FontWeight.Black,
-                    color = if (storageInfo.usagePercentage > 80) Color(0xFFFE2C55) else MaterialTheme.colorScheme.primary
+                    color = Color.White
                 )
                 Text(
                     text = stringResource(R.string.storage_usage),
-                    color = MaterialTheme.colorScheme.onBackground,
+                    color = Color.White,
                     fontSize = 15.sp,
                     fontWeight = FontWeight.SemiBold
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = "${formatSize(storageInfo.usedBytes)} / ${formatSize(storageInfo.totalBytes)}",
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = Color.White.copy(alpha = 0.85f),
                     fontSize = 13.sp
                 )
                 Spacer(modifier = Modifier.height(20.dp))
@@ -1246,7 +1261,7 @@ private fun IdleStateContent(
                                 .padding(bottom = 12.dp)
                                 .clip(RoundedCornerShape(16.dp)),
                             placement = AdPlacement.RAM_CLEANER_NATIVE,
-                            adType = NativeAdType.TYPE_1,
+                            adType = NativeAdType.TYPE_7,
                             adManager = adManager
                         )
                     }
@@ -1411,7 +1426,7 @@ private fun CompletedStateContent(
                         .padding(bottom = 12.dp)
                         .clip(RoundedCornerShape(16.dp)),
                     placement = AdPlacement.RAM_CLEANER_NATIVE,
-                    adType = NativeAdType.TYPE_1,
+                    adType = NativeAdType.TYPE_7,
                     adManager = adManager
                 )
             }
@@ -1440,8 +1455,6 @@ private fun CompletedStateContent(
 // -------------------------------------------------------------
 @Composable
 private fun JunkPermissionFullScreenContent(
-    cleanerAdEnabled: Boolean,
-    adManager: AdManager,
     onGrantPermission: () -> Unit
 ) {
     Column(
@@ -1562,18 +1575,6 @@ private fun JunkPermissionFullScreenContent(
                 .padding(vertical = 12.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            if (cleanerAdEnabled) {
-                NativeAdContainer(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 12.dp)
-                        .clip(RoundedCornerShape(16.dp)),
-                    placement = AdPlacement.RAM_CLEANER_NATIVE,
-                    adType = NativeAdType.TYPE_1,
-                    adManager = adManager
-                )
-            }
-
             Button(
                 onClick = onGrantPermission,
                 modifier = Modifier

@@ -259,7 +259,9 @@ class MainActivity : AppCompatActivity() {
 
             // Preload lock screen ads so they're ready when LockService needs them
             try {
-                adManager.preloadNativeAd(this@MainActivity, AdPlacement.LOCKSCREEN_TOP, NativeAdType.TYPE_2)
+                val lockPlace = remoteConfigRepository.getLockScreenAdPlace()
+                val topAdType = if (lockPlace == "topBanner") NativeAdType.TYPE_4 else NativeAdType.TYPE_2
+                adManager.preloadNativeAd(this@MainActivity, AdPlacement.LOCKSCREEN_TOP, topAdType)
                 adManager.preloadNativeAd(this@MainActivity, AdPlacement.LOCKSCREEN_BOTTOM, NativeAdType.TYPE_3)
             } catch (_: Exception) {
                 // Ad preloading is best-effort
