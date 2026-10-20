@@ -114,19 +114,17 @@ fun LockScreenContent(
     onNavigateToBackgrounds: () -> Unit = {},
     onNavigateToMemory: () -> Unit = {}
 ) {
-    val pm = LocalContext.current.packageManager
-    var appName by remember { mutableStateOf("") }
-    var appIcon by remember { mutableStateOf<Drawable?>(null) }
+    val iconContext = LocalContext.current
+    var appEntry by remember(packageName) { mutableStateOf(AppIconCache.peek(packageName)) }
+    val appName = appEntry?.label.orEmpty()
+    val appIcon = appEntry?.icon
     var showForgotDialog by remember { mutableStateOf(false) }
     var isFingerprintMode by remember(fingerprintUnlockEnabled) { mutableStateOf(fingerprintUnlockEnabled) }
     val offsetX = remember { Animatable(0f) }
     val haptic = LocalHapticFeedback.current
     LaunchedEffect(packageName) {
-        try {
-            val appInfo = pm.getApplicationInfo(packageName, 0)
-            appName = pm.getApplicationLabel(appInfo).toString()
-            appIcon = pm.getApplicationIcon(appInfo)
-        } catch (_e: PackageManager.NameNotFoundException) {
+        if (appEntry == null) {
+            appEntry = AppIconCache.load(iconContext, packageName)
         }
     }
     Box(modifier = Modifier.fillMaxSize()) {
@@ -159,14 +157,11 @@ fun LockScreenContent(
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             appIcon?.let { icon ->
-                                val safeBitmap = icon.toSafeBitmap(48)
-                                if (safeBitmap != null) {
-                                    Image(
-                                        bitmap = safeBitmap,
-                                        contentDescription = null,
-                                        modifier = Modifier.size(24.dp)
-                                    )
-                                }
+                                Image(
+                                    bitmap = icon,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(24.dp)
+                                )
                                 Spacer(modifier = Modifier.width(8.dp))
                             }
                             Text(

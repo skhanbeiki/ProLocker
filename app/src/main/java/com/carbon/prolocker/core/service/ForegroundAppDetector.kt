@@ -14,11 +14,16 @@ class ForegroundAppDetector(private val context: Context) {
     @Volatile
     var lockServiceLaunchedAt: Long = 0L
 
+    // Wall-clock timestamp of the RESUMED event behind the latest non-null result (debug latency logging).
+    @Volatile
+    var lastForegroundEventTime: Long = 0L
+
     fun getForegroundApp(): String? {
         val time = System.currentTimeMillis()
         val events = usageStatsManager.queryEvents(time - 1000 * 10, time)
         var foregroundApp: String? = null
         var lastEventTime: Long = 0
+        var resumedEventTime: Long = 0
         val event = UsageEvents.Event()
         while (events.hasNextEvent()) {
             events.getNextEvent(event)
@@ -33,6 +38,7 @@ class ForegroundAppDetector(private val context: Context) {
                 if (event.timeStamp > lastEventTime) {
                     foregroundApp = event.packageName
                     lastEventTime = event.timeStamp
+                    resumedEventTime = event.timeStamp
                 }
             } else if (event.eventType == UsageEvents.Event.ACTIVITY_PAUSED ||
                 event.eventType == UsageEvents.Event.MOVE_TO_BACKGROUND
@@ -43,6 +49,7 @@ class ForegroundAppDetector(private val context: Context) {
                 }
             }
         }
+        if (foregroundApp != null) lastForegroundEventTime = resumedEventTime
         return foregroundApp
     }
 }

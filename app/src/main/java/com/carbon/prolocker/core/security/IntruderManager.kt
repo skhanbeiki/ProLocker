@@ -71,27 +71,37 @@ class IntruderManager(
     private fun playAlarm() {
         if (mediaPlayer?.isPlaying == true) return
         stopAlarm()
+        var player: MediaPlayer? = null
         try {
-            mediaPlayer = MediaPlayer.create(
-                context,
-                R.raw.warring_alarm
-            )?.apply {
+            // Audio attributes only take effect before prepare(), so the player is built manually
+            // instead of MediaPlayer.create() (which returns an already prepared player).
+            player = MediaPlayer().apply {
                 setAudioAttributes(
                     android.media.AudioAttributes.Builder()
                         .setUsage(android.media.AudioAttributes.USAGE_ALARM)
                         .setContentType(android.media.AudioAttributes.CONTENT_TYPE_SONIFICATION)
                         .build()
                 )
+                context.resources.openRawResourceFd(R.raw.warring_alarm).use { afd ->
+                    setDataSource(afd.fileDescriptor, afd.startOffset, afd.length)
+                }
                 isLooping = false
 
                 setOnCompletionListener {
                     stopAlarm()
                 }
 
+                prepare()
                 start()
             }
+            mediaPlayer = player
         } catch (e: Exception) {
             e.printStackTrace()
+            try {
+                player?.release()
+            } catch (_: Exception) {
+            }
+            mediaPlayer = null
         }
     }
 

@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
@@ -7,6 +9,17 @@ plugins {
     alias(libs.plugins.secrets)
     alias(libs.plugins.google.services)
 }
+
+// Release signing secrets live in the git-ignored local.properties (or the environment), never in source.
+val localProperties = Properties().apply {
+    val file = rootProject.file("local.properties")
+    if (file.exists()) file.inputStream().use { load(it) }
+}
+
+fun releaseSecret(name: String): String? =
+    localProperties.getProperty(name)?.takeIf { it.isNotBlank() }
+        ?: System.getenv(name)?.takeIf { it.isNotBlank() }
+
 android {
     namespace = "com.carbon.prolocker"
     compileSdk { version = release(36) { minorApiLevel = 1 } }
@@ -57,9 +70,9 @@ android {
     signingConfigs {
         create("release") {
             storeFile = if (rootProject.file("keystore.jks").exists()) rootProject.file("keystore.jks") else rootProject.file("keystore")
-            storePassword = "-Prolocker$^carbon>siamak<reza>mahmoud<mehdi!"
+            storePassword = releaseSecret("RELEASE_STORE_PASSWORD")
             keyAlias = "prolocker"
-            keyPassword = "-Prolocker$^carbon>siamak<reza>mahmoud<mehdi!"
+            keyPassword = releaseSecret("RELEASE_KEY_PASSWORD")
         }
     }
 
@@ -140,6 +153,23 @@ android.productFlavors.all {
 secrets {
     propertiesFileName = ".env"
     defaultPropertiesFileName = ".env.example"
+}
+
+ksp {
+    arg("room.schemaLocation", "$projectDir/schemas")
+}
+
+// Every flavor's KSP task exports the same Room schema file; with org.gradle.parallel they would
+// read each other's half-written JSON, so the KSP tasks take turns.
+abstract class RoomSchemaExportLock : BuildService<BuildServiceParameters.None>
+
+val roomSchemaExportLock = gradle.sharedServices.registerIfAbsent(
+    "roomSchemaExportLock",
+    RoomSchemaExportLock::class
+) { maxParallelUsages.set(1) }
+
+tasks.matching { it.name.startsWith("ksp") && it.name.endsWith("Kotlin") }.configureEach {
+    usesService(roomSchemaExportLock)
 }
 dependencies {
     implementation(platform(libs.androidx.compose.bom))

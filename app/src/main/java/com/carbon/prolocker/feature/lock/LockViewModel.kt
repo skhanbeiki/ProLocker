@@ -157,6 +157,11 @@ class LockViewModel(
         _isError.value = false
     }
 
+    fun resetForNewSession() {
+        _unlocked.value = false
+        _isError.value = false
+    }
+
     fun stopAlarm() {
         intruderManager.stopAlarm()
     }

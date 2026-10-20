@@ -8,6 +8,7 @@ import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import com.carbon.prolocker.ad.AdManager
+import com.carbon.prolocker.core.config.MarketConfig
 import com.carbon.prolocker.core.database.CrashRepository
 import com.carbon.prolocker.core.database.LockedAppsRepository
 import com.carbon.prolocker.core.datastore.PreferencesRepository
@@ -16,6 +17,7 @@ import com.carbon.prolocker.core.service.AppMonitorService
 import com.carbon.prolocker.di.appModule
 import com.carbon.prolocker.feature.entrylock.AppEntryLockActivity
 import com.carbon.prolocker.worker.JunkCleanerNotificationWorker
+import com.google.android.ump.UserMessagingPlatform
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -67,8 +69,12 @@ class ProLockerApplication : Application(), Application.ActivityLifecycleCallbac
         uploadPendingCrashes()
         JunkCleanerNotificationWorker.schedule(this)
 
-        applicationScope.launch {
-            adManager.initSdk()
+        // On Google Play the ad SDKs may only start once consent allows it; otherwise
+        // MainActivity's requestConsentAndInit initialises them after the consent flow.
+        if (!MarketConfig.isGooglePlay || canRequestAdsAfterConsent()) {
+            applicationScope.launch {
+                adManager.initSdk()
+            }
         }
 
         applicationScope.launch {
@@ -76,6 +82,15 @@ class ProLockerApplication : Application(), Application.ActivityLifecycleCallbac
         }
 
         detectUpdateAndRecoverService()
+    }
+
+    private fun canRequestAdsAfterConsent(): Boolean {
+        return try {
+            UserMessagingPlatform.getConsentInformation(this).canRequestAds()
+        } catch (e: Throwable) {
+            Log.w(TAG, "Consent state unavailable, deferring ad SDK init", e)
+            false
+        }
     }
 
     override fun onActivityStarted(activity: Activity) {

@@ -15,7 +15,7 @@ class HybridDetectionEngine(
     var isLockVerificationActive: Boolean = false
 
     fun updateFromAccessibility(packageName: String) {
-        if (isLockVerificationActive && packageName == "com.carbon.prolocker") return
+        if (isLockVerificationActive && packageName == context.packageName) return
         lastAccessibilityUpdate = System.currentTimeMillis()
         _currentForegroundApp.value = packageName
     }
@@ -28,7 +28,7 @@ class HybridDetectionEngine(
         }
 
         val app = foregroundAppDetector.getForegroundApp()
-        if (isLockVerificationActive && app == "com.carbon.prolocker") {
+        if (isLockVerificationActive && app == context.packageName) {
             return _currentForegroundApp.value
         }
         

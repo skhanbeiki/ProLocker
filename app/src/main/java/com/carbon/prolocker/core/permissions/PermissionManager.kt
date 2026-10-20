@@ -27,6 +27,11 @@ object PermissionManager {
                 context.packageName
             )
         }
+        if (mode == AppOpsManager.MODE_DEFAULT) {
+            // Some devices keep reporting MODE_DEFAULT after the user granted usage access.
+            return context.checkCallingOrSelfPermission(android.Manifest.permission.PACKAGE_USAGE_STATS) ==
+                android.content.pm.PackageManager.PERMISSION_GRANTED
+        }
         return mode == AppOpsManager.MODE_ALLOWED
     }
 

@@ -12,7 +12,7 @@ import androidx.core.app.NotificationCompat
 import com.carbon.prolocker.MainActivity
 import com.carbon.prolocker.R
 import com.carbon.prolocker.core.datastore.PreferencesRepository
-import com.carbon.prolocker.core.security.TrustedInternalLaunchManager
+import com.carbon.prolocker.core.security.NotificationLaunchToken
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.koin.java.KoinJavaComponent
@@ -78,11 +78,10 @@ class JunkCleanerNotificationManager(private val context: Context) {
 
         val (title, body) = if (isPersian) getRandomPersianText() else getRandomEnglishText()
 
-        TrustedInternalLaunchManager.arm("memory")
-
         val intent = Intent(context, MainActivity::class.java).apply {
             putExtra("navigation_type", "memory")
             putExtra(EXTRA_FROM_NOTIFICATION, true)
+            putExtra(NotificationLaunchToken.EXTRA_TOKEN, NotificationLaunchToken.issue(context))
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
         }
 

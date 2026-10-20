@@ -61,7 +61,9 @@ val databaseModule = module {
             androidContext(),
             AppDatabase::class.java,
             "app_locker_db"
-        ).fallbackToDestructiveMigration().build()
+        ).addMigrations(*com.carbon.prolocker.core.database.DatabaseMigrations.ALL)
+            .fallbackToDestructiveMigration()
+            .build()
     }
     single { get<AppDatabase>().lockedAppDao() }
     single { get<AppDatabase>().intruderEventDao() }

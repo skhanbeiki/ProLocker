@@ -17,7 +17,7 @@ import com.carbon.prolocker.feature.callblocker.data.CallBlockerDao
         DownloadedBackgroundEntity::class
     ],
     version = 6,
-    exportSchema = false
+    exportSchema = true
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun lockedAppDao(): LockedAppDao

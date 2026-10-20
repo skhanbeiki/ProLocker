@@ -73,6 +73,42 @@ class HideFileStorage(val context: Context) {
         return primary
     }
 
+    // ---------------------------------------------------------------- unique names
+
+    private fun knownHiddenDirs(): List<File> = listOfNotNull(
+        hiddenDir,
+        File(storageRoot, HIDE_FILE_DIR),
+        context.getExternalFilesDir(null)?.let { File(it, HIDE_FILE_DIR) },
+        File(storageRoot, "AppLocker/.hideFile"),
+        File(storageRoot, "ProLocker/.hideFile"),
+        File(context.filesDir, HIDE_FILE_DIR)
+    ).distinct()
+
+    private fun hiddenNameTaken(name: String, dirs: List<File>): Boolean =
+        dirs.any { File(it, ".$name").exists() }
+
+    /** Returns [name], or `base (n).ext` when a hidden file with that name already exists anywhere. */
+    private fun uniqueHiddenName(name: String): String {
+        val dirs = knownHiddenDirs()
+        return uniqueName(name) { hiddenNameTaken(it, dirs) }
+    }
+
+    /** Returns [name], or `base (n).ext` when [dir] already contains it. Never touches existing files. */
+    private fun uniqueNameIn(dir: File, name: String): String =
+        uniqueName(name) { File(dir, it).exists() }
+
+    private inline fun uniqueName(name: String, taken: (String) -> Boolean): String {
+        if (!taken(name)) return name
+        val dot = name.lastIndexOf('.')
+        val base = if (dot > 0) name.substring(0, dot) else name
+        val ext = if (dot > 0) name.substring(dot) else ""
+        for (n in 1..9999) {
+            val candidate = "$base ($n)$ext"
+            if (!taken(candidate)) return candidate
+        }
+        return "$base (${System.currentTimeMillis()})$ext"
+    }
+
     // ---------------------------------------------------------------- sidecar metadata helpers
 
     fun writeSidecarMeta(item: HideItem) {
@@ -144,7 +180,9 @@ class HideFileStorage(val context: Context) {
         val dir = hiddenDir
         if (!dir.exists() && !dir.mkdirs()) return null
 
-        val target = File(dir, ".$name")
+        // A same-named file may already be hidden (also by the sibling app sharing this folder).
+        val hiddenName = uniqueHiddenName(name)
+        val target = File(dir, ".$hiddenName")
         var moved = from.renameTo(target)
         if (!moved) {
             moved = try {
@@ -163,7 +201,7 @@ class HideFileStorage(val context: Context) {
         if (!moved) return null
 
         val item = HideItem(
-            name = name,
+            name = hiddenName,
             path = computeRelDir(path),
             type = type,
             date = Date(lastModified).toString(),
@@ -200,7 +238,8 @@ class HideFileStorage(val context: Context) {
 
         val dir = hiddenDir
         if (!dir.exists() && !dir.mkdirs()) return null
-        val target = File(dir, ".$fileName")
+        val hiddenName = uniqueHiddenName(fileName)
+        val target = File(dir, ".$hiddenName")
 
         try {
             resolver.openInputStream(uri)?.use { input ->
@@ -218,7 +257,7 @@ class HideFileStorage(val context: Context) {
         }
 
         val item = HideItem(
-            name = fileName,
+            name = hiddenName,
             path = defaultRelPath(type),
             type = type,
             date = Date().toString(),
@@ -253,10 +292,8 @@ class HideFileStorage(val context: Context) {
         try {
             val targetDir = File(storageRoot, relDir)
             if (!targetDir.exists()) targetDir.mkdirs()
-            val to = File(targetDir, item.name)
-            if (to.exists()) {
-                to.delete()
-            }
+            // Never overwrite or delete a file that already sits at the destination.
+            val to = File(targetDir, uniqueNameIn(targetDir, item.name))
             var restored = from.renameTo(to)
             if (!restored) {
                 FileInputStream(from).use { input ->
@@ -287,8 +324,9 @@ class HideFileStorage(val context: Context) {
                     item.type == HideItem.TYPE_AUDIO -> Environment.DIRECTORY_MUSIC + "/Restored"
                     else -> Environment.DIRECTORY_DOWNLOADS + "/Restored"
                 }
+                val displayName = uniqueNameIn(File(storageRoot, relPath), item.name)
                 val values = ContentValues().apply {
-                    put(MediaStore.MediaColumns.DISPLAY_NAME, item.name)
+                    put(MediaStore.MediaColumns.DISPLAY_NAME, displayName)
                     put(MediaStore.MediaColumns.MIME_TYPE, mimeForItem(item))
                     put(MediaStore.MediaColumns.RELATIVE_PATH, relPath)
                     put(MediaStore.MediaColumns.IS_PENDING, 1)

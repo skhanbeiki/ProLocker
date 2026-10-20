@@ -23,14 +23,18 @@ import com.carbon.prolocker.ad.NativeAdType
 import com.carbon.prolocker.core.datastore.PreferencesRepository
 import com.carbon.prolocker.core.language.LanguageManager
 import com.carbon.prolocker.core.navigation.AppNavigation
+import com.carbon.prolocker.core.security.NotificationLaunchToken
 import com.carbon.prolocker.core.security.StealthModeManager
 import com.carbon.prolocker.core.security.TrustedInternalLaunchManager
 import com.carbon.prolocker.core.security.TrustedReturnManager
 import com.carbon.prolocker.core.service.LockSessionManager
 import com.carbon.prolocker.core.theme.ProLockerTheme
 import com.carbon.prolocker.feature.entrylock.AppEntryLockActivity
+import com.carbon.prolocker.feature.lock.LockOverlayEvent
+import com.carbon.prolocker.feature.lock.LockOverlayEvents
 import com.carbon.prolocker.network.repository.RemoteConfigRepository
 import com.carbon.prolocker.worker.RemoteConfigWorker
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -51,7 +55,11 @@ class MainActivity : AppCompatActivity() {
     private var trustedInternalDestination: String? = null
     private var storedLockedPackage: String? = null
     private var isContentShown = false
+    private var hasSetContent = false
     private var isNotificationReturn = false
+    private var notificationLaunchVerified = false
+    private var awaitingEntryUnlock = false
+    private var overlayEventsJob: Job? = null
 
     private val entryLockLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -96,6 +104,7 @@ class MainActivity : AppCompatActivity() {
         trustedInternalDestination = intent?.getStringExtra(com.carbon.prolocker.feature.lock.LockService.EXTRA_OPEN_DESTINATION)
         storedLockedPackage = intent?.getStringExtra(com.carbon.prolocker.feature.lock.LockService.EXTRA_PACKAGE_NAME)
         isNotificationReturn = false
+        verifyNotificationLaunch(intent)
         val navType = pendingNavType
         if (navType != null) {
             analyticsManager.trackNotificationOpened(navType)
@@ -111,6 +120,7 @@ class MainActivity : AppCompatActivity() {
         isNotificationReturn = intent.getBooleanExtra(
             com.carbon.prolocker.worker.JunkCleanerNotificationManager.EXTRA_FROM_NOTIFICATION, false
         )
+        verifyNotificationLaunch(intent)
         val navType = pendingNavType
         if (navType != null) {
             analyticsManager.trackNotificationOpened(navType)
@@ -127,16 +137,9 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
 
-        // Handle trusted internal navigation from LockService
-        if (trustedInternalDestination != null) {
-            AppEntryLockActivity.markAuthenticated()
-            showMainContent()
-            return
-        }
-
-        val isFromNotification = intent?.getBooleanExtra(
-            com.carbon.prolocker.worker.JunkCleanerNotificationManager.EXTRA_FROM_NOTIFICATION, false
-        ) == true
+        // One-shot: only the delivery of the intent that carried a valid token may skip the entry lock.
+        val isFromNotification = notificationLaunchVerified
+        notificationLaunchVerified = false
 
         val isRecoveryLaunch = intent?.component?.className ==
             "com.carbon.prolocker.launcher.RecoveryLauncherAlias"
@@ -146,13 +149,13 @@ class MainActivity : AppCompatActivity() {
         val isOnboardingCompleted = prefs.onboardingCompleted && prefs.lockType != "NONE"
 
         if (isRecoveryLaunch || isStealthEnabled) {
-            // Do state cleanup that recoveryUnlockLauncher used to handle on RESULT_OK
-            lifecycleScope.launch {
-                stealthModeManager.setStealthMode(false, this@MainActivity)
-                AppEntryLockActivity.markAuthenticated()
+            // Stealth is only lifted and the entry lock only released once the overlay reports a
+            // successful unlock (see observeEntryLockOverlay).
+            awaitingEntryUnlock = true
+            observeEntryLockOverlay()
+            if (com.carbon.prolocker.feature.lock.LockService.showingPackageName != packageName) {
+                com.carbon.prolocker.feature.lock.LockService.start(this, packageName, forSettings = true)
             }
-            // Show lock screen via LockService (dismisses itself on unlock)
-            com.carbon.prolocker.feature.lock.LockService.start(this, packageName, forSettings = true)
             return
         }
 
@@ -173,6 +176,8 @@ class MainActivity : AppCompatActivity() {
             }
             if (TrustedReturnManager.consumeTrustedReturn()) {
                 AppEntryLockActivity.markAuthenticated()
+                // A recreated activity (e.g. config change while in system settings) has no content yet.
+                if (!hasSetContent) showMainContent()
                 return
             }
             val lockIntent = Intent(this, AppEntryLockActivity::class.java)
@@ -193,9 +198,49 @@ class MainActivity : AppCompatActivity() {
         sessionManager.markAppBackgrounded(packageName)
     }
 
+    /**
+     * MainActivity is exported, so the notification extra alone proves nothing: the launch only skips
+     * the entry lock when it carries the secret token issued with our own notification. The token is
+     * checked once per delivered intent and then removed from it.
+     */
+    private fun verifyNotificationLaunch(launchIntent: Intent?) {
+        notificationLaunchVerified = try {
+            val token = launchIntent?.getStringExtra(NotificationLaunchToken.EXTRA_TOKEN)
+            NotificationLaunchToken.consume(applicationContext, token)
+        } catch (_: Exception) {
+            false
+        }
+        try {
+            launchIntent?.removeExtra(NotificationLaunchToken.EXTRA_TOKEN)
+        } catch (_: Exception) {
+        }
+    }
+
+    private fun observeEntryLockOverlay() {
+        if (overlayEventsJob?.isActive == true) return
+        overlayEventsJob = lifecycleScope.launch {
+            LockOverlayEvents.events.collect { event ->
+                if (event.packageName != packageName || !awaitingEntryUnlock) return@collect
+                when (event) {
+                    is LockOverlayEvent.Unlocked -> {
+                        awaitingEntryUnlock = false
+                        stealthModeManager.setStealthMode(false, this@MainActivity)
+                        AppEntryLockActivity.markAuthenticated()
+                        showMainContent()
+                    }
+                    is LockOverlayEvent.Cancelled -> {
+                        awaitingEntryUnlock = false
+                        finish()
+                    }
+                }
+            }
+        }
+    }
+
     private fun showMainContent() {
         if (isContentShown) return
         isContentShown = true
+        hasSetContent = true
 
         // Store locked package from LockService for re-locking on exit
         if (storedLockedPackage == null) {
