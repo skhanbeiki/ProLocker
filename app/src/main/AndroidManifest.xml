@@ -132,6 +132,7 @@
             android:excludeFromRecents="true"
             android:exported="false"
             android:launchMode="singleTop"
+            android:taskAffinity=""
             android:theme="@style/Theme.Transparent" />
 
         <activity
@@ -139,6 +140,7 @@
             android:excludeFromRecents="true"
             android:exported="false"
             android:launchMode="singleTop"
+            android:taskAffinity=""
             android:theme="@style/Theme.ProLocker.AdActivity" />
 
         <receiver
@@ -146,6 +148,7 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
             </intent-filter>
         </receiver>
 

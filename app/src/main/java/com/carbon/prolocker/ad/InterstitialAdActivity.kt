@@ -56,6 +56,7 @@ class InterstitialAdActivity : AppCompatActivity() {
     private val handler = Handler(Looper.getMainLooper())
     private var isAdFinished = false
     private var hasStartedAd = false
+    private var wasCoveredByAd = false
     private var placement: String = AdPlacement.INTERSTITIAL_BACKGROUND
     private var providerName: String? = null
 
@@ -133,6 +134,19 @@ class InterstitialAdActivity : AppCompatActivity() {
                     handleError(error)
                 }
             )
+        } else if (wasCoveredByAd) {
+            // The ad's own activity is gone but it never called back.
+            Log.i(TAG, "Resumed again after the ad activity closed without a callback")
+            handleClose()
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        if (hasStartedAd && !isAdFinished && !isFinishing) {
+            // An ad activity opened on top of us: the safety timeout must not restore the lock screen over a playing ad.
+            wasCoveredByAd = true
+            handler.removeCallbacksAndMessages(null)
         }
     }
 

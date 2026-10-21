@@ -24,11 +24,15 @@ class BootReceiver : BroadcastReceiver() {
     private val preferencesRepository: PreferencesRepository by inject(PreferencesRepository::class.java)
 
     override fun onReceive(context: Context, intent: Intent) {
-        if (intent.action == Intent.ACTION_BOOT_COMPLETED) {
-            Log.d(TAG, "Boot completed, checking if service should start")
+        if (intent.action == Intent.ACTION_BOOT_COMPLETED ||
+            intent.action == Intent.ACTION_MY_PACKAGE_REPLACED
+        ) {
+            Log.d(TAG, "${intent.action}, checking if service should start")
             val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
                 Log.e(TAG, "Error in BootReceiver", throwable)
             }
+            // Keep the process alive until the service start was requested.
+            val pendingResult = goAsync()
             CoroutineScope(Dispatchers.IO + exceptionHandler).launch {
                 try {
                     val prefs = preferencesRepository.userPreferencesFlow.first()
@@ -56,6 +60,8 @@ class BootReceiver : BroadcastReceiver() {
                     }
                 } catch (e: Exception) {
                     Log.e(TAG, "Failed to start service from boot", e)
+                } finally {
+                    pendingResult.finish()
                 }
             }
         }

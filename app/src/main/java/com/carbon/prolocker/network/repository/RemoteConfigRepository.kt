@@ -53,6 +53,29 @@ class RemoteConfigRepository(
         }
     }
 
+    // (json string, parsed) of the last cachedConfig() call; swapped as one immutable pair.
+    @Volatile
+    private var cachedParse: Pair<String, RemoteConfigResponse>? = null
+
+    /**
+     * Non-suspending read of the stored config for hot paths (e.g. showing the lock screen).
+     * Parsing is memoised by the stored JSON string; same fallbacks as [configFlow].
+     */
+    fun cachedConfig(): RemoteConfigResponse {
+        val raw = preferencesRepository.currentPreferences.remoteConfigJson
+        if (raw.isEmpty()) return RemoteConfigResponse.DEFAULT
+        cachedParse?.let { if (it.first == raw) return it.second }
+        val parsed = try {
+            json.decodeFromString<RemoteConfigResponse>(raw)
+        } catch (e: Exception) {
+            RemoteConfigResponse.DEFAULT
+        }
+        cachedParse = raw to parsed
+        return parsed
+    }
+
+    fun cachedLockScreenAdPlace(): String = cachedConfig().configs.nativeAdPlaceLockScreen
+
     suspend fun getConfig(): RemoteConfigResponse = configFlow.first()
 
     suspend fun getLockScreenAdPlace(): String = getConfig().configs.nativeAdPlaceLockScreen
