@@ -37,13 +37,15 @@
         android:name="android.permission.BROADCAST_CLOSE_SYSTEM_DIALOGS"
         tools:ignore="ProtectedPermissions" />
 
-    <!-- Backup Feature Permissions -->
+    <!-- Backup Feature Permissions (Disabled)
     <uses-permission android:name="android.permission.READ_CONTACTS" />
     <uses-permission android:name="android.permission.WRITE_CONTACTS" />
+    -->
 
-    <!-- Call Blocking Feature Permissions -->
+    <!-- Call Blocking Feature Permissions (Disabled)
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.ANSWER_PHONE_CALLS" />
+    -->
     <uses-feature
         android:name="android.hardware.camera"
         android:required="false" />
@@ -221,7 +223,7 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
-        <!-- Call Screening Service (Android 10+) -->
+        <!-- Call Screening Service (Android 10+) (Disabled)
         <service
             android:name=".feature.callblocker.service.ProLockerCallScreeningService"
             android:permission="android.permission.BIND_SCREENING_SERVICE"
@@ -230,8 +232,9 @@
                 <action android:name="android.telecom.CallScreeningService" />
             </intent-filter>
         </service>
+        -->
 
-        <!-- Call Phone State Receiver (Android 9 and lower fallback) -->
+        <!-- Call Phone State Receiver (Android 9 and lower fallback) (Disabled)
         <receiver
             android:name=".feature.callblocker.service.ProLockerCallReceiver"
             android:exported="true">
@@ -239,6 +242,7 @@
                 <action android:name="android.intent.action.PHONE_STATE" />
             </intent-filter>
         </receiver>
+        -->
     </application>
 
 </manifest>

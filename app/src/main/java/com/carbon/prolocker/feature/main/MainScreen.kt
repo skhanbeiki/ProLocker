@@ -406,10 +406,10 @@ fun MainScreen(
                     paddingValues = PaddingValues(0.dp),
                     onNavigateToSecurity = onNavigateToSecurity,
                     onNavigateToHideFiles = onNavigateToHideFiles,
-                    onNavigateToBackup = onNavigateToBackup,
+                    // onNavigateToBackup = onNavigateToBackup,
                     onNavigateToAppLock = { viewModel.setSelectedTab(MainTab.HOME) },
                     onNavigateToJunkCleaner = onNavigateToJunkCleaner,
-                    onNavigateToCallBlocker = onNavigateToCallBlocker,
+                    // onNavigateToCallBlocker = onNavigateToCallBlocker,
                     onNavigateToAudit = onNavigateToAudit
                 )
 

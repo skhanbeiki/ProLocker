@@ -13,6 +13,7 @@ import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
+/*
 @RequiresApi(Build.VERSION_CODES.Q)
 class ProLockerCallScreeningService : CallScreeningService(), KoinComponent {
 
@@ -51,4 +52,9 @@ class ProLockerCallScreeningService : CallScreeningService(), KoinComponent {
             }
         }
     }
+}
+*/
+@RequiresApi(Build.VERSION_CODES.Q)
+class ProLockerCallScreeningService : CallScreeningService() {
+    override fun onScreenCall(callDetails: Call.Details) {}
 }

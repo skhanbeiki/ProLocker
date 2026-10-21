@@ -560,6 +560,7 @@ fun ToolsScreen(
             gradient = listOf(Color(0xFF00D1B2), Color(0xFF00A896)),
             available = true
         ),
+        /*
         ToolsFeatureItem(
             id = FeatureId.BACKUP,
             title = stringResource(R.string.tools_backup),
@@ -576,6 +577,7 @@ fun ToolsScreen(
             gradient = listOf(Color(0xFFFF6B6B), Color(0xFFFF8E53)),
             available = true
         ),
+        */
         ToolsFeatureItem(
             id = FeatureId.JUNK_CLEANER,
             title = stringResource(R.string.junk_cleaner),
@@ -669,8 +671,8 @@ fun ToolsScreen(
                 when (item.id) {
                     FeatureId.HIDE_FILES -> onNavigateToHideFiles()
                     FeatureId.INTRUDER -> onNavigateToSecurity()
-                    FeatureId.BACKUP -> onNavigateToBackup()
-                    FeatureId.CALL_BLOCKER -> onNavigateToCallBlocker()
+                    FeatureId.BACKUP -> { /* onNavigateToBackup() */ }
+                    FeatureId.CALL_BLOCKER -> { /* onNavigateToCallBlocker() */ }
                     FeatureId.JUNK_CLEANER -> onNavigateToJunkCleaner()
                     FeatureId.PRIVACY_AUDITOR -> onNavigateToAudit()
                 }

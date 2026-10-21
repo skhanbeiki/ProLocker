@@ -15,6 +15,7 @@ import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
+/*
 class ProLockerCallReceiver : BroadcastReceiver(), KoinComponent {
 
     private val repository: CallBlockerRepository by inject()
@@ -62,4 +63,8 @@ class ProLockerCallReceiver : BroadcastReceiver(), KoinComponent {
             e.printStackTrace()
         }
     }
+}
+*/
+class ProLockerCallReceiver : BroadcastReceiver() {
+    override fun onReceive(context: Context, intent: Intent) {}
 }

@@ -211,15 +211,18 @@ fun AppNavigation(
                 },
                 onNavigateToAboutUs = {
                     navController.navigate(AboutUsRoute)
-                },
+                }
+                /*
                 onNavigateToBackup = {
                     navController.navigate(BackupHomeRoute)
                 },
                 onNavigateToCallBlocker = {
                     navController.navigate(CallBlockerRoute)
                 }
+                */
             )
         }
+        /*
         composable<CallBlockerRoute> {
             com.carbon.prolocker.feature.callblocker.ui.CallBlockerHomeScreen(
                 onBack = { navigateBackWithInAppAd { navController.popBackStack() } }
@@ -263,6 +266,7 @@ fun AppNavigation(
                 viewModel = viewModel
             )
         }
+        */
         composable<HideFilesRoute> {
             com.carbon.prolocker.feature.hidefile.ui.HideFilesScreen(
                 onBack = {
