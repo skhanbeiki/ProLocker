@@ -45,6 +45,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import com.carbon.prolocker.ad.NativeAdType
+import com.carbon.prolocker.ad.NativeAdContainer
+import com.carbon.prolocker.ad.AdPlacement
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
@@ -72,6 +76,8 @@ class AppEntryLockActivity : FragmentActivity() {
     private val viewModel: EntryLockViewModel by viewModel()
     private val preferencesRepository: com.carbon.prolocker.core.datastore.PreferencesRepository by inject()
     private val languageManager: com.carbon.prolocker.core.language.LanguageManager by inject()
+    private val adManager: com.carbon.prolocker.ad.AdManager by inject()
+    private val remoteConfigRepository: com.carbon.prolocker.network.repository.RemoteConfigRepository by inject()
 
     companion object {
         @Volatile
@@ -145,8 +151,18 @@ class AppEntryLockActivity : FragmentActivity() {
                         }
                     }
 
+                    // Same ad place as the lock shown over other apps (remote config: top / topBanner / bottom).
+                    val lockScreenAdPlace = remember {
+                        try {
+                            remoteConfigRepository.cachedLockScreenAdPlace()
+                        } catch (_: Exception) {
+                            "bottom"
+                        }
+                    }
                     EntryLockContent(
                         lockType = lockType,
+                        lockScreenAdPlace = lockScreenAdPlace,
+                        adManager = adManager,
                         isError = isError,
                         failedAttempts = failedAttempts,
                         threshold = threshold,
@@ -194,8 +210,12 @@ fun EntryLockContent(
     onPinComplete: (String) -> Unit,
     onErrorReset: () -> Unit,
     onVerifyRecoveryAnswer: (String, (Boolean) -> Unit) -> Unit,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    lockScreenAdPlace: String = "none",
+    adManager: com.carbon.prolocker.ad.AdManager? = null
 ) {
+    val showTopAd = adManager != null && (lockScreenAdPlace == "top" || lockScreenAdPlace == "topBanner")
+    val showBottomAd = adManager != null && lockScreenAdPlace == "bottom"
     var showForgotDialog by remember { mutableStateOf(false) }
     var isFingerprintMode by remember(fingerprintUnlockEnabled) { mutableStateOf(fingerprintUnlockEnabled) }
     val offsetX = remember { Animatable(0f) }
@@ -218,7 +238,8 @@ fun EntryLockContent(
                     .fillMaxWidth()
                     .weight(0.3f),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
+                // With a top ad, the guide text sits at the bottom of this area, right above the ad.
+                verticalArrangement = if (showTopAd) Arrangement.Bottom else Arrangement.Center
             ) {
                 Icon(
                     painterResource(id = R.drawable.ic_notifi),
@@ -261,6 +282,27 @@ fun EntryLockContent(
                         delay(1000)
                         onErrorReset()
                     }
+                }
+            }
+
+            // Top ad: placed under the guide text, above the pattern / PIN.
+            if (showTopAd && adManager != null) {
+                val isBanner = lockScreenAdPlace == "topBanner"
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(if (isBanner) 220.dp else 156.dp)
+                        .padding(start = 20.dp, end = 20.dp, top = 12.dp, bottom = 4.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    NativeAdContainer(
+                        adManager = adManager,
+                        placement = AdPlacement.LOCKSCREEN_TOP,
+                        adType = if (isBanner) NativeAdType.TYPE_4 else NativeAdType.TYPE_2,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(16.dp))
+                    )
                 }
             }
 
@@ -374,7 +416,7 @@ fun EntryLockContent(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 32.dp),
+                    .padding(bottom = if (showBottomAd) 12.dp else 32.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 if (failedAttempts >= threshold && recoveryQuestion != null) {
@@ -382,6 +424,23 @@ fun EntryLockContent(
                         Text(
                             stringResource(R.string.forgot_password),
                             color = Color.White
+                        )
+                    }
+                } else if (showBottomAd && adManager != null) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(72.dp)
+                            .padding(horizontal = 24.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        NativeAdContainer(
+                            adManager = adManager,
+                            placement = AdPlacement.LOCKSCREEN_BOTTOM,
+                            adType = NativeAdType.TYPE_3,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(16.dp))
                         )
                     }
                 }
