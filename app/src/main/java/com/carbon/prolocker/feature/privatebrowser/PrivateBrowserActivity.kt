@@ -286,7 +286,8 @@ class PrivateBrowserActivity : ComponentActivity() {
     }
 
     private fun applySecureFlag(secure: Boolean) {
-        if (secure) {
+        // Screenshots stay blocked in release builds only, so debug builds can be captured for testing.
+        if (secure && !com.carbon.prolocker.BuildConfig.DEBUG) {
             window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
         } else {
             window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)

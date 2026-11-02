@@ -568,7 +568,9 @@ fun ToolsScreen(
     val analyticsManager: com.carbon.prolocker.core.analytics.AnalyticsManager = org.koin.compose.koinInject()
     val notificationHiderRepository: com.carbon.prolocker.feature.notificationmanager.data.NotificationHiderRepository =
         org.koin.compose.koinInject()
-    val hiddenAppsCount by notificationHiderRepository.hiddenApps.collectAsState()
+    // Badge = saved hidden notifications not read yet (read = seen in that app's list).
+    val savedNotifications by notificationHiderRepository.notifications.collectAsState()
+    val unreadNotificationCount = remember(savedNotifications) { savedNotifications.count { !it.read } }
     val snackbarHostState = remember { SnackbarHostState() }
     val appLockTitle = stringResource(R.string.tools_app_lock)
 
@@ -604,7 +606,7 @@ fun ToolsScreen(
             icon = Icons.Outlined.NotificationsOff,
             gradient = com.carbon.prolocker.feature.notificationmanager.NotificationManagerGradient,
             available = true,
-            badgeCount = hiddenAppsCount.size
+            badgeCount = unreadNotificationCount
         ),
         /*
         ToolsFeatureItem(

@@ -12,6 +12,8 @@ import android.service.notification.StatusBarNotification
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.carbon.prolocker.R
+import com.carbon.prolocker.core.datastore.PreferencesRepository
+import com.carbon.prolocker.core.language.LanguageManager
 import com.carbon.prolocker.feature.notificationmanager.data.HiddenNotification
 import com.carbon.prolocker.feature.notificationmanager.data.NotificationHiderRepository
 import kotlinx.coroutines.CoroutineScope
@@ -33,6 +35,7 @@ import java.util.UUID
 class NotificationHiderService : NotificationListenerService() {
 
     private val repository: NotificationHiderRepository by inject()
+    private val preferencesRepository: PreferencesRepository by inject()
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
 
     override fun onListenerConnected() {
@@ -149,7 +152,8 @@ class NotificationHiderService : NotificationListenerService() {
         if (count <= 0) return
         val manager = NotificationManagerCompat.from(this)
         if (!manager.areNotificationsEnabled()) return
-        createChannel(this)
+        val localized = localizedContext()
+        createChannel(localized)
         val open = PendingIntent.getActivity(
             this,
             SUMMARY_ID,
@@ -157,11 +161,11 @@ class NotificationHiderService : NotificationListenerService() {
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP),
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
-        val title = resources.getQuantityString(R.plurals.nm_summary_title, count, count)
+        val title = localized.resources.getQuantityString(R.plurals.nm_summary_title, count, count)
         val notification = NotificationCompat.Builder(this, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_notifi)
             .setContentTitle(title)
-            .setContentText(getString(R.string.nm_summary_text))
+            .setContentText(localized.getString(R.string.nm_summary_text))
             .setNumber(count)
             .setContentIntent(open)
             .setAutoCancel(true)
@@ -173,6 +177,18 @@ class NotificationHiderService : NotificationListenerService() {
             manager.notify(SUMMARY_ID, notification)
         } catch (_: SecurityException) {
         }
+    }
+
+    /**
+     * A service does not get the in-app language the way activities do (they wrap their context
+     * in attachBaseContext), so texts here came out in the system language. Resolve the app's
+     * language for every notification, so a language change applies without restarting the service.
+     */
+    private fun localizedContext(): Context = try {
+        val language = LanguageManager.resolveEffectiveLanguage(preferencesRepository, this)
+        LanguageManager.createLocalizedContextStatic(this, language)
+    } catch (_: Exception) {
+        this
     }
 
     companion object {
@@ -189,7 +205,8 @@ class NotificationHiderService : NotificationListenerService() {
         private fun createChannel(context: Context) {
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
             val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            if (manager.getNotificationChannel(CHANNEL_ID) != null) return
+            // Creating an existing channel again only updates its name and description,
+            // so the name in system settings follows the app language as well.
             val channel = NotificationChannel(
                 CHANNEL_ID,
                 context.getString(R.string.nm_channel_name),

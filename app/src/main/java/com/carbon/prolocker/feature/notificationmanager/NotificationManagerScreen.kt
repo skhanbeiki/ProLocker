@@ -181,7 +181,8 @@ fun NotificationManagerScreen(onBack: () -> Unit) {
                     onBack = backFromApp,
                     onOpen = { openNotification(context, repository, it) },
                     onDelete = { repository.delete(it.id) },
-                    onClearApp = { repository.clearApp(pkg) }
+                    onClearApp = { repository.clearApp(pkg) },
+                    onMarkRead = { repository.markAppRead(pkg) }
                 )
             }
         }

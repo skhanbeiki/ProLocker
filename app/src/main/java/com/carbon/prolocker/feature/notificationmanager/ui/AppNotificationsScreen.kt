@@ -1,7 +1,10 @@
 package com.carbon.prolocker.feature.notificationmanager.ui
 
 import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -27,8 +30,10 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -49,11 +54,18 @@ fun AppNotificationsScreen(
     onBack: () -> Unit,
     onOpen: (HiddenNotification) -> Unit,
     onDelete: (HiddenNotification) -> Unit,
-    onClearApp: () -> Unit
+    onClearApp: () -> Unit,
+    onMarkRead: () -> Unit = {}
 ) {
     val label = rememberAppLabel(packageName)
     val formatTime = rememberTimeFormatter()
     var confirmClear by rememberSaveable { mutableStateOf(false) }
+
+    // New items keep their highlight while the user is on this screen; leaving it marks them read.
+    val currentOnMarkRead by rememberUpdatedState(onMarkRead)
+    DisposableEffect(packageName) {
+        onDispose { currentOnMarkRead() }
+    }
 
     Scaffold(
         topBar = {
@@ -117,7 +129,7 @@ private fun NotificationCard(
     onDelete: () -> Unit
 ) {
     var expanded by rememberSaveable(item.id) { mutableStateOf(false) }
-    NmCard {
+    NmCard(highlighted = !item.read) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -126,6 +138,14 @@ private fun NotificationCard(
                 .padding(start = 14.dp, end = 4.dp, top = 10.dp, bottom = 12.dp)
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
+                if (!item.read) {
+                    Box(
+                        modifier = Modifier
+                            .size(8.dp)
+                            .background(NotificationManagerGradient.first(), CircleShape)
+                    )
+                    Spacer(Modifier.width(6.dp))
+                }
                 AppIcon(item.packageName, size = 20.dp)
                 Spacer(Modifier.width(8.dp))
                 Text(
@@ -157,7 +177,7 @@ private fun NotificationCard(
                 Text(
                     text = item.title,
                     style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.Bold,
+                    fontWeight = if (item.read) FontWeight.SemiBold else FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface,
                     maxLines = if (expanded) Int.MAX_VALUE else 1,
                     overflow = TextOverflow.Ellipsis,

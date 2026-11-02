@@ -32,12 +32,12 @@ object AdUnitIds {
         const val INTERSTITIAL_BACKUP_CATEGORY_DETAIL = "5f14227dff28740001b4ec4e"
         const val INTERSTITIAL_SUGGESTION = "5f14227dff28740001b4ec4e"
 
-        // New placements: these reuse existing zones until dedicated ones are created in the panel.
-        const val BROWSER_HOME_NATIVE = HOME_TAB_APPS
-        const val BROWSER_CLEANUP_NATIVE = RAM_CLEANER_NATIVE
-        const val NOTIFICATIONS_NATIVE = HOME_TAB_APPS
-        const val INTERSTITIAL_BROWSER_EXIT = INTERSTITIAL_IN_APP
-        const val INTERSTITIAL_NOTIFICATIONS = INTERSTITIAL_IN_APP
+        // Private browser & notification hider
+        const val BROWSER_HOME_NATIVE = "6ae88c84b5b3695c20edc729"
+        const val BROWSER_CLEANUP_NATIVE = "6ae88c8fb5b3695c20edc72a"
+        const val NOTIFICATIONS_NATIVE = "6ae88c9bb5b3695c20edc72b"
+        const val INTERSTITIAL_BROWSER_EXIT = "6ae88e7376df8661d1cade84"
+        const val INTERSTITIAL_NOTIFICATIONS = "6ae88cad27085c43d0b0bc04"
     }
 
     object Adivery {
@@ -70,12 +70,12 @@ object AdUnitIds {
         const val INTERSTITIAL_BACKUP_CATEGORY_DETAIL = "c1a36f39-d816-46e2-96bf-e65ddb166dff"
         const val INTERSTITIAL_SUGGESTION = "c1a36f39-d816-46e2-96bf-e65ddb166dff"
 
-        // New placements: these reuse existing zones until dedicated ones are created in the panel.
-        const val BROWSER_HOME_NATIVE = HOME_TAB_APPS
-        const val BROWSER_CLEANUP_NATIVE = RAM_CLEANER_NATIVE
-        const val NOTIFICATIONS_NATIVE = HOME_TAB_APPS
-        const val INTERSTITIAL_BROWSER_EXIT = INTERSTITIAL_IN_APP
-        const val INTERSTITIAL_NOTIFICATIONS = INTERSTITIAL_IN_APP
+        // Private browser & notification hider
+        const val BROWSER_HOME_NATIVE = "933b58b0-411f-42be-aabf-e9a92deb77cd"
+        const val BROWSER_CLEANUP_NATIVE = "7bb148ce-6c63-47fd-b74a-fcf31eddb0f3"
+        const val NOTIFICATIONS_NATIVE = "05e6f706-2611-442b-a322-c4fd023b3b46"
+        const val INTERSTITIAL_BROWSER_EXIT = "f7493d07-c49f-4df2-9f57-90005a8bc453"
+        const val INTERSTITIAL_NOTIFICATIONS = "8a00739b-d8ef-4ce3-b9b4-c3a4b5a943a6"
     }
 
     object AdMob {
@@ -123,8 +123,8 @@ object AdUnitIds {
         const val INTERSTITIAL_IN_APP = "9694ea0d-5ba5-4ed6-a5c9-c9b8710b52fd"
         const val INTERSTITIAL_SUGGESTION = "976273b9-ac90-496d-8fd5-661a17be7e01"
 
-        // New placements: these reuse existing zones until dedicated ones are created in the panel.
-        const val INTERSTITIAL_BROWSER_EXIT = INTERSTITIAL_IN_APP
-        const val INTERSTITIAL_NOTIFICATIONS = INTERSTITIAL_IN_APP
+        // Private browser & notification hider
+        const val INTERSTITIAL_BROWSER_EXIT = "c148a4f5-dd72-4d49-a376-7e3571dae4df"
+        const val INTERSTITIAL_NOTIFICATIONS = "82f918f4-ccb4-4393-a621-b66e14bf8f08"
     }
 }

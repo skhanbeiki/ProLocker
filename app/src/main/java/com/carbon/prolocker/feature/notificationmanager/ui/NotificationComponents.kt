@@ -45,6 +45,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.compositeOver
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -202,14 +204,28 @@ fun NmTopBar(
     )
 }
 
+/**
+ * Card of the notification hider screens, styled like the settings cards (surfaceVariant
+ * fill, 20dp corners, no outline or shadow). [highlighted] adds a light tint of the
+ * feature's pink (used for unread notifications).
+ */
 @Composable
-fun NmCard(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
+fun NmCard(
+    modifier: Modifier = Modifier,
+    highlighted: Boolean = false,
+    content: @Composable () -> Unit
+) {
+    val base = MaterialTheme.colorScheme.surfaceVariant
+    val isDark = MaterialTheme.colorScheme.background.luminance() < 0.5f
+    val container = if (highlighted) {
+        NotificationManagerGradient.first().copy(alpha = if (isDark) 0.14f else 0.07f).compositeOver(base)
+    } else {
+        base
+    }
     Surface(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
-        color = MaterialTheme.colorScheme.surface,
-        tonalElevation = 1.dp,
-        shadowElevation = 0.dp
+        color = container
     ) {
         content()
     }

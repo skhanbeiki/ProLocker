@@ -66,7 +66,10 @@ class HiddenNotificationsActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
-        window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
+        // Screenshots stay blocked in release builds only, so debug builds can be captured for testing.
+        if (!com.carbon.prolocker.BuildConfig.DEBUG) {
+            window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
+        }
 
         setContent {
             val prefs by preferencesRepository.userPreferencesFlow.collectAsState(initial = null)

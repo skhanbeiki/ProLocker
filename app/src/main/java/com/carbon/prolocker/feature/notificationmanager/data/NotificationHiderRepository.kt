@@ -24,7 +24,9 @@ data class HiddenNotification(
     val title: String,
     val text: String,
     val postedAt: Long,
-    val sbnKey: String = ""
+    val sbnKey: String = "",
+    /** Set once the user has looked at it in the app's list. */
+    val read: Boolean = false
 )
 
 /** One row of the main screen: an app and its kept notifications. */
@@ -132,6 +134,18 @@ class NotificationHiderRepository(context: Context) {
         if (_unseenCount.value == 0) return
         _unseenCount.value = 0
         prefs.edit().putInt(KEY_UNSEEN, 0).apply()
+    }
+
+    /** Marks every kept notification of [packageName] as read. */
+    fun markAppRead(packageName: String) {
+        synchronized(lock) {
+            val current = _notifications.value
+            if (current.none { it.packageName == packageName && !it.read }) return
+            _notifications.value = current.map {
+                if (it.packageName == packageName && !it.read) it.copy(read = true) else it
+            }
+        }
+        persist()
     }
 
     private fun load(): List<HiddenNotification> = try {
