@@ -15,6 +15,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import com.carbon.prolocker.core.language.findActivity
 
 // ─── Overload: pre-loaded ad view ──────────────────────────────────────────
@@ -112,13 +114,18 @@ private fun NativeAdContainerInternal(
     // isAdLoaded controls visibility: container stays alpha=0 until ad renders
     var isAdLoaded by remember { mutableStateOf(false) }
 
-    // Collect config exactly as the original did — ensures ad reloads
-    // when the real remote config arrives (e.g., limitInstallDisplayAdDays → enabled)
-    val config by adManager.configFlow.collectAsState(
-        initial = com.carbon.prolocker.network.model.RemoteConfigResponse.DEFAULT
+    // Reload only when something that decides the ad changes (ads switched on, or a different
+    // provider). Keying on the whole config reloaded every slot twice on open (default config,
+    // then the stored one) and again on any unrelated preference write.
+    val adSourceKey by remember(placement) {
+        adManager.configFlow
+            .map { "${adManager.areAdsEnabled()}|${adManager.getNativeProviderName(placement)}" }
+            .distinctUntilChanged()
+    }.collectAsState(
+        initial = remember(placement) { "${adManager.areAdsEnabled()}|${adManager.getNativeProviderName(placement)}" }
     )
 
-    DisposableEffect(config) {
+    DisposableEffect(adSourceKey) {
         // Reset visibility whenever a new load starts
         isAdLoaded = false
 

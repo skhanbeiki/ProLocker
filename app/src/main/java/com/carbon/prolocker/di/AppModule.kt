@@ -99,6 +99,8 @@ val repositoryModule = module {
     single { com.carbon.prolocker.core.repository.BackgroundRepository(get()) }
     single { com.carbon.prolocker.core.repository.BackgroundDownloadManager(androidContext(), get(), get(), get(), get()) }
     single { com.carbon.prolocker.core.analytics.AnalyticsManager(androidContext()) }
+    single { com.carbon.prolocker.feature.privatebrowser.data.BrowserRepository(androidContext()) }
+    single { com.carbon.prolocker.feature.notificationmanager.data.NotificationHiderRepository(androidContext()) }
     single { com.carbon.prolocker.feature.privacyauditor.PrivacyAuditorRepository(androidContext()) }
 }
 

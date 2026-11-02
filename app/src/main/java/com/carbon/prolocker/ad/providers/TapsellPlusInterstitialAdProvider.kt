@@ -19,12 +19,15 @@ class TapsellPlusInterstitialAdProvider(override val providerName: String = "tap
     companion object {
         private const val TAG = "TapsellInterstitial"
         private var isInitialized = false
+        private const val MAX_CACHE_AGE_MS = 45 * 60 * 1000L
     }
 
     @Volatile
     private var cachedAdId: String? = null
     @Volatile
     private var cachedZoneId: String? = null
+    @Volatile
+    private var cachedAt: Long = 0L
 
     override fun initSdk(context: Context) {
         try {
@@ -35,11 +38,8 @@ class TapsellPlusInterstitialAdProvider(override val providerName: String = "tap
         }
     }
 
-    override fun resetShowingState() {
-        Log.i(TAG, "Resetting Tapsell cache state")
-        cachedAdId = null
-        cachedZoneId = null
-    }
+    // A preloaded ad stays valid across shows; only the in-flight state would need resetting.
+    override fun resetShowingState() {}
 
     override fun preloadInterstitialAd(context: Context, zoneId: String) {
         if (zoneId.isBlank()) return
@@ -52,6 +52,7 @@ class TapsellPlusInterstitialAdProvider(override val providerName: String = "tap
                 override fun onSuccess(adId: String) {
                     cachedAdId = adId
                     cachedZoneId = zoneId
+                    cachedAt = System.currentTimeMillis()
                     Log.i(TAG, "Tapsell interstitial ad preloaded: $adId")
                 }
 
@@ -67,6 +68,10 @@ class TapsellPlusInterstitialAdProvider(override val providerName: String = "tap
     }
 
     override fun isInterstitialAdReady(zoneId: String): Boolean {
+        if (cachedAdId != null && System.currentTimeMillis() - cachedAt > MAX_CACHE_AGE_MS) {
+            cachedAdId = null
+            cachedZoneId = null
+        }
         return cachedZoneId == zoneId && cachedAdId != null
     }
 

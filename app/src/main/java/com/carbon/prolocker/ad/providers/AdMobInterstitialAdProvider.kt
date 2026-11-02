@@ -16,18 +16,20 @@ class AdMobInterstitialAdProvider(override val providerName: String = "admob") :
     companion object {
         private const val TAG = "AdMobInterstitialAd"
         private var isInitialized = false
+        private const val MAX_CACHE_AGE_MS = 50 * 60 * 1000L
     }
 
     @Volatile
     private var cachedAd: InterstitialAd? = null
     @Volatile
     private var cachedZoneId: String? = null
+    @Volatile
+    private var cachedAt: Long = 0L
+    @Volatile
+    private var isPreloading = false
 
-    override fun resetShowingState() {
-        Log.i(TAG, "Resetting AdMob cache state")
-        cachedAd = null
-        cachedZoneId = null
-    }
+    // A preloaded ad stays valid across shows (until it expires), so nothing is dropped here.
+    override fun resetShowingState() {}
 
     override fun initSdk(context: Context) {
         if (isInitialized) return
@@ -44,7 +46,8 @@ class AdMobInterstitialAdProvider(override val providerName: String = "admob") :
     override fun preloadInterstitialAd(context: Context, zoneId: String) {
         if (zoneId.isBlank()) return
         initSdk(context)
-        if (isInterstitialAdReady(zoneId)) return
+        if (isInterstitialAdReady(zoneId) || isPreloading) return
+        isPreloading = true
 
         InterstitialAd.load(
             context,
@@ -52,12 +55,15 @@ class AdMobInterstitialAdProvider(override val providerName: String = "admob") :
             AdRequest.Builder().build(),
             object : InterstitialAdLoadCallback() {
                 override fun onAdLoaded(ad: InterstitialAd) {
+                    isPreloading = false
                     cachedAd = ad
                     cachedZoneId = zoneId
+                    cachedAt = System.currentTimeMillis()
                     Log.d(TAG, "AdMob interstitial preloaded successfully for zone: $zoneId")
                 }
 
                 override fun onAdFailedToLoad(error: LoadAdError) {
+                    isPreloading = false
                     Log.w(TAG, "AdMob interstitial preload failed: ${error.message}")
                 }
             }
@@ -65,6 +71,11 @@ class AdMobInterstitialAdProvider(override val providerName: String = "admob") :
     }
 
     override fun isInterstitialAdReady(zoneId: String): Boolean {
+        // AdMob interstitials expire after an hour; showing an expired one fails silently.
+        if (cachedAd != null && System.currentTimeMillis() - cachedAt > MAX_CACHE_AGE_MS) {
+            cachedAd = null
+            cachedZoneId = null
+        }
         return cachedZoneId == zoneId && cachedAd != null
     }
 
@@ -85,17 +96,48 @@ class AdMobInterstitialAdProvider(override val providerName: String = "admob") :
 
         Log.d(TAG, "INTERSTITIAL_REQUEST_START zoneId=$zoneId provider=$providerName")
 
+        // Without a timeout a slow load would pop the ad up seconds later, over another screen.
+        val handler = android.os.Handler(android.os.Looper.getMainLooper())
+        var isCompleted = false
+        val timeoutRunnable = Runnable {
+            if (!isCompleted) {
+                isCompleted = true
+                Log.w(TAG, "AdMob interstitial request timed out after 4s")
+                onError("AdMob ad request timeout")
+            }
+        }
+        handler.postDelayed(timeoutRunnable, 4000)
+
         InterstitialAd.load(
             activity,
             zoneId,
             AdRequest.Builder().build(),
             object : InterstitialAdLoadCallback() {
                 override fun onAdLoaded(ad: InterstitialAd) {
+                    if (isCompleted) {
+                        // Too late to show now: keep it for the next opportunity.
+                        cachedAd = ad
+                        cachedZoneId = zoneId
+                        cachedAt = System.currentTimeMillis()
+                        return
+                    }
+                    isCompleted = true
+                    handler.removeCallbacks(timeoutRunnable)
                     Log.d(TAG, "INTERSTITIAL_REQUEST_SUCCESS provider=$providerName")
+                    if (activity.isFinishing || activity.isDestroyed) {
+                        cachedAd = ad
+                        cachedZoneId = zoneId
+                        cachedAt = System.currentTimeMillis()
+                        onError("Activity destroyed before showing AdMob ad")
+                        return
+                    }
                     showAdMobAd(activity, ad, onClosed, onError)
                 }
 
                 override fun onAdFailedToLoad(error: LoadAdError) {
+                    if (isCompleted) return
+                    isCompleted = true
+                    handler.removeCallbacks(timeoutRunnable)
                     Log.e(TAG, "INTERSTITIAL_REQUEST_FAILED provider=$providerName error=${error.message}")
                     onError(error.message ?: "Unknown AdMob error")
                 }

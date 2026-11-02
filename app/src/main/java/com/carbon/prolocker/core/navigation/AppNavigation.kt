@@ -211,6 +211,12 @@ fun AppNavigation(
                 },
                 onNavigateToAboutUs = {
                     navController.navigate(AboutUsRoute)
+                },
+                onNavigateToPrivateBrowser = {
+                    com.carbon.prolocker.feature.privatebrowser.PrivateBrowserActivity.start(context)
+                },
+                onNavigateToNotificationManager = {
+                    navController.navigate(NotificationManagerRoute)
                 }
                 /*
                 onNavigateToBackup = {
@@ -408,6 +414,11 @@ fun AppNavigation(
                 onBack = {
                     navController.popBackStack()
                 }
+            )
+        }
+        composable<NotificationManagerRoute> {
+            com.carbon.prolocker.feature.notificationmanager.NotificationManagerScreen(
+                onBack = { navController.popBackStack() }
             )
         }
         composable<PrivacyAuditorRoute> {

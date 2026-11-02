@@ -11,8 +11,10 @@ import com.carbon.prolocker.core.config.MarketConfig
 import com.carbon.prolocker.core.datastore.PreferencesRepository
 import com.carbon.prolocker.network.model.RemoteConfigResponse
 import com.carbon.prolocker.network.repository.RemoteConfigRepository
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 
 class AdManager(
     private val context: Context,
@@ -28,6 +30,8 @@ class AdManager(
         private const val TAG = "AdManager"
         private const val NATIVE_AD_TTL_MS = 5 * 60 * 1000L
     }
+
+    private val ioScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     @Volatile
     private var isShowingInterstitial = false
@@ -124,35 +128,38 @@ class AdManager(
         }
     }
 
-    fun areAdsEnabled(): Boolean = runBlocking {
-        try {
-            val prefs = preferencesRepository.userPreferencesFlow.first()
-            val config = getConfig()
-            val limitDays = config.configs.limitInstallDisplayAdDays
-            if (limitDays <= 0) return@runBlocking true
+    /**
+     * Called on the main thread before every ad request, so it must be cheap: it reads the
+     * in-memory preferences and the memoised remote config instead of blocking on flows.
+     */
+    fun areAdsEnabled(): Boolean {
+        return try {
+            val prefs = preferencesRepository.currentPreferences
+            val limitDays = getConfig().configs.limitInstallDisplayAdDays
+            if (limitDays <= 0) return true
 
-            if (prefs.remoteConfigInstallDate == 0L) {
-                val installDate = try {
+            var installDate = prefs.remoteConfigInstallDate
+            if (installDate == 0L) {
+                installDate = try {
                     context.packageManager.getPackageInfo(context.packageName, 0).firstInstallTime
                 } catch (e: Exception) {
                     System.currentTimeMillis()
                 }
-                preferencesRepository.updatePreferences { it.copy(remoteConfigInstallDate = installDate) }
-                false
-            } else {
-                val daysSinceInstall = (System.currentTimeMillis() - prefs.remoteConfigInstallDate) / (1000 * 60 * 60 * 24)
-                daysSinceInstall >= limitDays
+                val toStore = installDate
+                ioScope.launch {
+                    preferencesRepository.updatePreferences { it.copy(remoteConfigInstallDate = toStore) }
+                }
             }
+            val daysSinceInstall = (System.currentTimeMillis() - installDate) / (1000L * 60 * 60 * 24)
+            daysSinceInstall >= limitDays
         } catch (e: Exception) {
             false
         }
     }
 
-    private suspend fun getConfig(): RemoteConfigResponse {
-        return remoteConfigRepository.configFlow.first()
-    }
+    private fun getConfig(): RemoteConfigResponse = remoteConfigRepository.cachedConfig()
 
-    fun getNativeProviderName(placement: String): String = runBlocking {
+    fun getNativeProviderName(placement: String): String {
         val config = getConfig()
         val isLockscreen = placement == AdPlacement.LOCKSCREEN_TOP || placement == AdPlacement.LOCKSCREEN_BOTTOM
         val provider = if (isLockscreen) {
@@ -168,10 +175,10 @@ class AdManager(
                 else -> config.configs.displayAdTypeGooglePlayApp
             }
         }.lowercase()
-        provider
+        return provider
     }
 
-    fun getInterstitialProviderName(): String = runBlocking {
+    fun getInterstitialProviderName(): String {
         val config = getConfig()
         val provider = if (!config.configs.interstitialAdType.isNullOrBlank()) {
             config.configs.interstitialAdType.lowercase().trim()
@@ -182,7 +189,7 @@ class AdManager(
                 else -> config.configs.displayAdTypeGooglePlayApp
             }
         }.lowercase()
-        provider
+        return provider
     }
 
     fun getUnitId(providerName: String, placement: String): String {
@@ -208,6 +215,11 @@ class AdManager(
                 AdPlacement.INTERSTITIAL_BACKUP_APPS -> AdUnitIds.Tapsell.INTERSTITIAL_BACKUP_APPS
                 AdPlacement.INTERSTITIAL_BACKUP_CATEGORY_DETAIL -> AdUnitIds.Tapsell.INTERSTITIAL_BACKUP_CATEGORY_DETAIL
                 AdPlacement.INTERSTITIAL_SUGGESTION -> AdUnitIds.Tapsell.INTERSTITIAL_SUGGESTION
+                AdPlacement.BROWSER_HOME_NATIVE -> AdUnitIds.Tapsell.BROWSER_HOME_NATIVE
+                AdPlacement.BROWSER_CLEANUP_NATIVE -> AdUnitIds.Tapsell.BROWSER_CLEANUP_NATIVE
+                AdPlacement.NOTIFICATIONS_NATIVE -> AdUnitIds.Tapsell.NOTIFICATIONS_NATIVE
+                AdPlacement.INTERSTITIAL_BROWSER_EXIT -> AdUnitIds.Tapsell.INTERSTITIAL_BROWSER_EXIT
+                AdPlacement.INTERSTITIAL_NOTIFICATIONS -> AdUnitIds.Tapsell.INTERSTITIAL_NOTIFICATIONS
                 else -> ""
             }
             "adivery" -> when (placement) {
@@ -231,6 +243,11 @@ class AdManager(
                 AdPlacement.INTERSTITIAL_BACKUP_APPS -> AdUnitIds.Adivery.INTERSTITIAL_BACKUP_APPS
                 AdPlacement.INTERSTITIAL_BACKUP_CATEGORY_DETAIL -> AdUnitIds.Adivery.INTERSTITIAL_BACKUP_CATEGORY_DETAIL
                 AdPlacement.INTERSTITIAL_SUGGESTION -> AdUnitIds.Adivery.INTERSTITIAL_SUGGESTION
+                AdPlacement.BROWSER_HOME_NATIVE -> AdUnitIds.Adivery.BROWSER_HOME_NATIVE
+                AdPlacement.BROWSER_CLEANUP_NATIVE -> AdUnitIds.Adivery.BROWSER_CLEANUP_NATIVE
+                AdPlacement.NOTIFICATIONS_NATIVE -> AdUnitIds.Adivery.NOTIFICATIONS_NATIVE
+                AdPlacement.INTERSTITIAL_BROWSER_EXIT -> AdUnitIds.Adivery.INTERSTITIAL_BROWSER_EXIT
+                AdPlacement.INTERSTITIAL_NOTIFICATIONS -> AdUnitIds.Adivery.INTERSTITIAL_NOTIFICATIONS
                 else -> ""
             }
             "admob" -> when (placement) {
@@ -254,6 +271,11 @@ class AdManager(
                 AdPlacement.INTERSTITIAL_BACKUP_APPS -> AdUnitIds.AdMob.INTERSTITIAL_BACKUP_APPS
                 AdPlacement.INTERSTITIAL_BACKUP_CATEGORY_DETAIL -> AdUnitIds.AdMob.INTERSTITIAL_BACKUP_CATEGORY_DETAIL
                 AdPlacement.INTERSTITIAL_SUGGESTION -> AdUnitIds.AdMob.INTERSTITIAL_SUGGESTION
+                AdPlacement.BROWSER_HOME_NATIVE -> AdUnitIds.AdMob.BROWSER_HOME_NATIVE
+                AdPlacement.BROWSER_CLEANUP_NATIVE -> AdUnitIds.AdMob.BROWSER_CLEANUP_NATIVE
+                AdPlacement.NOTIFICATIONS_NATIVE -> AdUnitIds.AdMob.NOTIFICATIONS_NATIVE
+                AdPlacement.INTERSTITIAL_BROWSER_EXIT -> AdUnitIds.AdMob.INTERSTITIAL_BROWSER_EXIT
+                AdPlacement.INTERSTITIAL_NOTIFICATIONS -> AdUnitIds.AdMob.INTERSTITIAL_NOTIFICATIONS
                 else -> ""
             }
             "magnet" -> when (placement) {
@@ -261,6 +283,8 @@ class AdManager(
                 AdPlacement.INTERSTITIAL_RAM_CLEANER -> AdUnitIds.Magnet.INTERSTITIAL_RAM_CLEANER
                 AdPlacement.INTERSTITIAL_IN_APP -> AdUnitIds.Magnet.INTERSTITIAL_IN_APP
                 AdPlacement.INTERSTITIAL_SUGGESTION -> AdUnitIds.Magnet.INTERSTITIAL_SUGGESTION
+                AdPlacement.INTERSTITIAL_BROWSER_EXIT -> AdUnitIds.Magnet.INTERSTITIAL_BROWSER_EXIT
+                AdPlacement.INTERSTITIAL_NOTIFICATIONS -> AdUnitIds.Magnet.INTERSTITIAL_NOTIFICATIONS
                 else -> ""
             }
             else -> ""
@@ -387,9 +411,13 @@ class AdManager(
             return
         }
 
+        val unitId = getUnitId(providerName, placement)
+        if (unitId.isBlank()) {
+            onError("No ad unit for placement=$placement provider=$providerName")
+            return
+        }
         isShowingInterstitial = true
         lastInterstitialRequestTime = System.currentTimeMillis()
-        val unitId = getUnitId(providerName, placement)
         Log.i("AD_PROVIDER_DEBUG", "🚀 REQUESTING INTERSTITIAL AD -> Provider: [$providerName] | Placement: [$placement] | ZoneId: [$unitId]")
 
         provider.loadAndShowInterstitialAd(
@@ -399,13 +427,27 @@ class AdManager(
                 Log.i("AD_PROVIDER_DEBUG", "ℹ️ INTERSTITIAL AD CLOSED -> Provider: [$providerName] | Placement: [$placement]")
                 isShowingInterstitial = false
                 onClosed()
+                preloadNextInterstitial(activity, provider, unitId)
             },
             onError = { error ->
                 Log.e("AD_PROVIDER_DEBUG", "❌ INTERSTITIAL AD FAILED -> Provider: [$providerName] | Placement: [$placement] | Error: $error")
                 isShowingInterstitial = false
                 onError(error)
+                preloadNextInterstitial(activity, provider, unitId)
             }
         )
+    }
+
+    /** Loads the next interstitial in the background so the following show needs no network wait. */
+    private fun preloadNextInterstitial(activity: Activity, provider: InterstitialAdProvider, unitId: String) {
+        if (unitId.isBlank()) return
+        val appContext = activity.applicationContext
+        android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+            try {
+                if (!provider.isInterstitialAdReady(unitId)) provider.preloadInterstitialAd(appContext, unitId)
+            } catch (_: Exception) {
+            }
+        }, 1500L)
     }
 
     fun resetInterstitialShowingState() {

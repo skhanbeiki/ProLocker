@@ -97,6 +97,8 @@ fun MainScreen(
     onNavigateToHideFiles: () -> Unit = {},
     onNavigateToBackup: () -> Unit = {},
     onNavigateToCallBlocker: () -> Unit = {},
+    onNavigateToPrivateBrowser: () -> Unit = {},
+    onNavigateToNotificationManager: () -> Unit = {},
     viewModel: MainViewModel = koinViewModel()
 ) {
     val updateState by viewModel.updateState.collectAsState()
@@ -410,7 +412,9 @@ fun MainScreen(
                     onNavigateToAppLock = { viewModel.setSelectedTab(MainTab.HOME) },
                     onNavigateToJunkCleaner = onNavigateToJunkCleaner,
                     // onNavigateToCallBlocker = onNavigateToCallBlocker,
-                    onNavigateToAudit = onNavigateToAudit
+                    onNavigateToAudit = onNavigateToAudit,
+                    onNavigateToPrivateBrowser = onNavigateToPrivateBrowser,
+                    onNavigateToNotificationManager = onNavigateToNotificationManager
                 )
 
                 MainTab.HOME -> HomeScreen(

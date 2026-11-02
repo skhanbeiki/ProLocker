@@ -41,63 +41,67 @@ class AdiveryNativeAdProvider(override val providerName: String = "adivery") : N
         onRendered: (View) -> Unit,
         onError: (String) -> Unit
     ) {
-        Adivery.requestNativeAd(context, zoneId, object : AdiveryNativeCallback() {
-            override fun onAdLoaded(ad: NativeAd) {
-                Log.i("AD_PROVIDER_DEBUG", "🎯 [ADIVERY] requestNativeAd onAdLoaded -> zoneId=$zoneId")
-                try {
-                    val adView = AdiveryNativeAdView(context)
-                    adView.setNativeAdLayout(layoutRes)
-                    adView.setPlacementId(zoneId)
+        // AdiveryNativeAdView.loadAd() requests and renders the ad itself. The previous code first
+        // called Adivery.requestNativeAd() and threw that ad away, so every slot made two
+        // sequential requests: twice the wait, and a wasted fill.
+        if (!validateLayoutIds(context, layoutRes)) {
+            Log.e("AD_PROVIDER_DEBUG", "❌ [ADIVERY] validateLayoutIds failed for layoutRes=$layoutRes")
+            onError("Invalid Adivery native layout")
+            return
+        }
+        try {
+            val adView = AdiveryNativeAdView(context)
+            adView.setNativeAdLayout(layoutRes)
+            adView.setPlacementId(zoneId)
+            var rendered = false
 
-                    if (!validateLayoutIds(context, layoutRes)) {
-                        Log.e("AD_PROVIDER_DEBUG", "❌ [ADIVERY] validateLayoutIds failed for layoutRes=$layoutRes")
-                        return
+            adView.setListener(object : AdiveryAdListener() {
+                override fun onAdLoaded() {
+                    Log.i("AD_PROVIDER_DEBUG", "🎯 [ADIVERY] adViewListener.onAdLoaded -> zoneId=$zoneId")
+                    if (!rendered) {
+                        rendered = true
+                        onRendered(adView)
                     }
-
-                    adView.setListener(object : AdiveryAdListener() {
-                        override fun onAdLoaded() {
-                            Log.i("AD_PROVIDER_DEBUG", "🎯 [ADIVERY] adViewListener.onAdLoaded -> zoneId=$zoneId")
-                        }
-
-                        override fun onAdShown() {
-                            Log.i("AD_PROVIDER_DEBUG", "👀 [ADIVERY] onAdShown -> ADIVERY NATIVE AD IS VISIBLE ON SCREEN! (zoneId=$zoneId)")
-                            onRendered(adView)
-                        }
-
-                        override fun onAdClicked() {
-                            Log.i("AD_PROVIDER_DEBUG", "🖱️ [ADIVERY] onAdClicked (zoneId=$zoneId)")
-                            try {
-                                com.carbon.prolocker.feature.lock.LockService.dismiss(context)
-                            } catch (_e: Exception) {}
-                        }
-
-                        override fun onAdClosed() {}
-
-                        override fun onError(reason: String) {
-                            Log.e("AD_PROVIDER_DEBUG", "❌ [ADIVERY] adViewListener onError: $reason | zoneId=$zoneId")
-                            onError(reason)
-                        }
-                    })
-                    container.removeAllViews()
-                    container.addView(adView)
-                    adView.loadAd()
-                } catch (e: Exception) {
-                    Log.e("AD_PROVIDER_DEBUG", "❌ [ADIVERY] Exception rendering native ad: ${e.message}")
-                    onError(e.message ?: "Failed to render Adivery native ad")
                 }
-            }
 
-            override fun onAdShown() {
-                Log.i("AD_PROVIDER_DEBUG", "👀 [ADIVERY] AdiveryNativeCallback.onAdShown -> zoneId=$zoneId")
-            }
+                override fun onAdShown() {
+                    Log.i("AD_PROVIDER_DEBUG", "👀 [ADIVERY] onAdShown (zoneId=$zoneId)")
+                    if (!rendered) {
+                        rendered = true
+                        onRendered(adView)
+                    }
+                }
 
-            override fun onAdClicked() {
-                Log.i("AD_PROVIDER_DEBUG", "🖱️ [ADIVERY] AdiveryNativeCallback.onAdClicked -> zoneId=$zoneId")
-            }
-        })
+                override fun onAdClicked() {
+                    Log.i("AD_PROVIDER_DEBUG", "🖱️ [ADIVERY] onAdClicked (zoneId=$zoneId)")
+                    try {
+                        com.carbon.prolocker.feature.lock.LockService.dismiss(context)
+                    } catch (_e: Exception) {}
+                }
+
+                override fun onAdClosed() {}
+
+                override fun onError(reason: String) {
+                    Log.e("AD_PROVIDER_DEBUG", "❌ [ADIVERY] adViewListener onError: $reason | zoneId=$zoneId")
+                    onError(reason)
+                }
+            })
+            container.removeAllViews()
+            container.addView(adView)
+            adView.loadAd()
+        } catch (e: Exception) {
+            Log.e("AD_PROVIDER_DEBUG", "❌ [ADIVERY] Exception rendering native ad: ${e.message}")
+            onError(e.message ?: "Failed to render Adivery native ad")
+        }
     }
 
-    private fun validateLayoutIds(context: Context, @LayoutRes layoutRes: Int): Boolean {
+    private val validatedLayouts = java.util.concurrent.ConcurrentHashMap<Int, Boolean>()
+
+    /** Inflating a layout just to check its ids is costly, so the answer is remembered per layout. */
+    private fun validateLayoutIds(context: Context, @LayoutRes layoutRes: Int): Boolean =
+        validatedLayouts.getOrPut(layoutRes) { checkLayoutIds(context, layoutRes) }
+
+    private fun checkLayoutIds(context: Context, @LayoutRes layoutRes: Int): Boolean {
         try {
             val view = LayoutInflater.from(context).inflate(layoutRes, null, false)
 

@@ -40,6 +40,8 @@ import androidx.compose.material.icons.outlined.PrivacyTip
 import androidx.compose.material.icons.outlined.Security
 import androidx.compose.material.icons.outlined.CleaningServices
 import androidx.compose.material.icons.outlined.VisibilityOff
+import androidx.compose.material.icons.outlined.NotificationsOff
+import androidx.compose.material.icons.outlined.Public
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -60,6 +62,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.runtime.collectAsState
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.material3.LocalTextStyle
@@ -87,7 +91,9 @@ enum class FeatureId {
     BACKUP,
     CALL_BLOCKER,
     JUNK_CLEANER,
-    PRIVACY_AUDITOR
+    PRIVACY_AUDITOR,
+    PRIVATE_BROWSER,
+    NOTIFICATION_MANAGER
 }
 
 data class ToolsFeatureItem(
@@ -97,7 +103,8 @@ data class ToolsFeatureItem(
     val icon: ImageVector,
     val gradient: List<Color>,
     val available: Boolean,
-    @RawRes val lottieRes: Int? = null
+    @RawRes val lottieRes: Int? = null,
+    val badgeCount: Int = 0
 )
 
 @Composable
@@ -184,6 +191,23 @@ fun FeatureCard(
                         overflow = TextOverflow.Ellipsis,
                         fontSize = 11.sp,
                         lineHeight = 15.sp
+                    )
+                }
+            }
+            if (item.badgeCount > 0) {
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .defaultMinSize(minWidth = 24.dp, minHeight = 24.dp)
+                        .background(Color.White, CircleShape)
+                        .padding(horizontal = 7.dp, vertical = 2.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = if (item.badgeCount > 99) "99+" else item.badgeCount.toString(),
+                        color = item.gradient.first(),
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 12.sp
                     )
                 }
             }
@@ -537,9 +561,14 @@ fun ToolsScreen(
     onNavigateToAppLock: () -> Unit = {},
     onNavigateToJunkCleaner: () -> Unit = {},
     onNavigateToCallBlocker: () -> Unit = {},
-    onNavigateToAudit: () -> Unit = {}
+    onNavigateToAudit: () -> Unit = {},
+    onNavigateToPrivateBrowser: () -> Unit = {},
+    onNavigateToNotificationManager: () -> Unit = {}
 ) {
     val analyticsManager: com.carbon.prolocker.core.analytics.AnalyticsManager = org.koin.compose.koinInject()
+    val notificationHiderRepository: com.carbon.prolocker.feature.notificationmanager.data.NotificationHiderRepository =
+        org.koin.compose.koinInject()
+    val hiddenAppsCount by notificationHiderRepository.hiddenApps.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     val appLockTitle = stringResource(R.string.tools_app_lock)
 
@@ -559,6 +588,23 @@ fun ToolsScreen(
             icon = Icons.Outlined.Security,
             gradient = listOf(Color(0xFF00D1B2), Color(0xFF00A896)),
             available = true
+        ),
+        ToolsFeatureItem(
+            id = FeatureId.PRIVATE_BROWSER,
+            title = stringResource(R.string.private_browser),
+            subtitle = stringResource(R.string.private_browser_subtitle),
+            icon = Icons.Outlined.Public,
+            gradient = com.carbon.prolocker.feature.privatebrowser.PrivateBrowserGradient,
+            available = true
+        ),
+        ToolsFeatureItem(
+            id = FeatureId.NOTIFICATION_MANAGER,
+            title = stringResource(R.string.notification_manager),
+            subtitle = stringResource(R.string.notification_manager_subtitle),
+            icon = Icons.Outlined.NotificationsOff,
+            gradient = com.carbon.prolocker.feature.notificationmanager.NotificationManagerGradient,
+            available = true,
+            badgeCount = hiddenAppsCount.size
         ),
         /*
         ToolsFeatureItem(
@@ -675,6 +721,8 @@ fun ToolsScreen(
                     FeatureId.CALL_BLOCKER -> { /* onNavigateToCallBlocker() */ }
                     FeatureId.JUNK_CLEANER -> onNavigateToJunkCleaner()
                     FeatureId.PRIVACY_AUDITOR -> onNavigateToAudit()
+                    FeatureId.PRIVATE_BROWSER -> onNavigateToPrivateBrowser()
+                    FeatureId.NOTIFICATION_MANAGER -> onNavigateToNotificationManager()
                 }
             },
             modifier = Modifier
