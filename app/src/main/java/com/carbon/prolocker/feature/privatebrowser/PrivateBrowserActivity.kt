@@ -55,6 +55,7 @@ import com.carbon.prolocker.feature.privatebrowser.ui.BrowserBookmarksScreen
 import com.carbon.prolocker.feature.privatebrowser.ui.BrowserHistoryScreen
 import com.carbon.prolocker.feature.privatebrowser.ui.BrowserMainScreen
 import com.carbon.prolocker.feature.privatebrowser.ui.BrowserSettingsScreen
+import com.carbon.prolocker.feature.privatebrowser.ui.BrowserShortcutOfferSheet
 import com.carbon.prolocker.feature.privatebrowser.ui.BrowserTabsScreen
 import com.carbon.prolocker.feature.privatebrowser.ui.ClearingDataScreen
 import com.carbon.prolocker.feature.privatebrowser.ui.ClearingRequest
@@ -105,6 +106,10 @@ class PrivateBrowserActivity : ComponentActivity() {
     private var clearing by mutableStateOf<ClearingRequest?>(null)
     /** Set once the browser is leaving: nothing is drawn while the exit interstitial shows. */
     private var exiting by mutableStateOf(false)
+    /** The one-time "add to home screen" sheet, shown on the first exit. */
+    private var showShortcutOffer by mutableStateOf(false)
+    /** The launcher's pin dialog is up after "add": no exit interstitial on top of it. */
+    private var skipExitAd = false
 
     private var awaitingAuth = false
     private var sessionStarted = false
@@ -177,6 +182,12 @@ class PrivateBrowserActivity : ComponentActivity() {
                             .imePadding()
                     ) {
                         if (authorized && !exiting) BrowserContent()
+                        if (showShortcutOffer) {
+                            BrowserShortcutOfferSheet(
+                                onAdd = { onShortcutOfferAnswered(add = true) },
+                                onDismiss = { onShortcutOfferAnswered(add = false) }
+                            )
+                        }
                     }
                 }
             }
@@ -313,6 +324,29 @@ class PrivateBrowserActivity : ComponentActivity() {
 
     /** Leaves the browser; shows the cleanup screen first when something has to be wiped. */
     private fun requestExit() {
+        if (clearing != null || showShortcutOffer) return
+        // First exit ever: offer the home-screen shortcut once, for more direct visits to the browser.
+        if (!repository.shortcutOfferShown) {
+            repository.shortcutOfferShown = true
+            if (BrowserShortcuts.canPin(this) && !BrowserShortcuts.isBrowserPinned(this)) {
+                showShortcutOffer = true
+                return
+            }
+        }
+        proceedExit()
+    }
+
+    private fun onShortcutOfferAnswered(add: Boolean) {
+        if (!showShortcutOffer) return
+        showShortcutOffer = false
+        if (add) {
+            BrowserShortcuts.pinBrowser(this)
+            skipExitAd = true
+        }
+        proceedExit()
+    }
+
+    private fun proceedExit() {
         if (clearing != null) return
         val settings = repository.settings.value
         if (!settings.closeTabsOnExit) repository.saveTabs(controller.openUrls())
@@ -329,6 +363,10 @@ class PrivateBrowserActivity : ComponentActivity() {
         cleanedUp = true
         repository.hasPendingCleanup = false
         exiting = true
+        if (skipExitAd) {
+            if (!isFinishing) finish()
+            return
+        }
         // The data is already wiped; the exit is a natural break for an (every N-th) interstitial.
         InAppInterstitial.maybeShow(this, AdPlacement.INTERSTITIAL_BROWSER_EXIT) {
             if (!isFinishing) finish()

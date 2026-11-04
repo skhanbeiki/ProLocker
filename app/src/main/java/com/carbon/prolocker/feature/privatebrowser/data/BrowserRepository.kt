@@ -162,6 +162,13 @@ class BrowserRepository(context: Context) {
             prefs.edit().putBoolean(KEY_PENDING_CLEANUP, value).commit()
         }
 
+    /** The one-time "add the browser to your home screen" offer, shown on the first exit. */
+    var shortcutOfferShown: Boolean
+        get() = prefs.getBoolean(KEY_SHORTCUT_OFFER, false)
+        set(value) {
+            prefs.edit().putBoolean(KEY_SHORTCUT_OFFER, value).apply()
+        }
+
     private fun readBookmarks(): List<BrowserBookmark> = try {
         if (bookmarksFile.exists()) json.decodeFromString<List<BrowserBookmark>>(bookmarksFile.readText()) else emptyList()
     } catch (_: Exception) {
@@ -211,5 +218,6 @@ class BrowserRepository(context: Context) {
         private const val KEY_JS = "javascript"
         private const val KEY_SECURE = "secure_screen"
         private const val KEY_PENDING_CLEANUP = "pending_cleanup"
+        private const val KEY_SHORTCUT_OFFER = "shortcut_offer_shown"
     }
 }

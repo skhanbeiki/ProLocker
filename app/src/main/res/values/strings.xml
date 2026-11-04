@@ -595,6 +595,10 @@
     <string name="pb_share">Share</string>
     <string name="pb_shortcut_not_supported">Your launcher does not support shortcuts</string>
     <string name="pb_shortcut_requested">Shortcut request sent</string>
+    <string name="pb_shortcut_offer_title">Add the private browser to your home screen</string>
+    <string name="pb_shortcut_offer_text">Open the private browser with one tap from your home screen. It stays protected by the app lock.</string>
+    <string name="pb_shortcut_offer_add">Add to home screen</string>
+    <string name="pb_shortcut_offer_later">Not now</string>
     <string name="pb_step_cache">Cache</string>
     <string name="pb_step_cookies">Cookies</string>
     <string name="pb_step_history">Browsing history</string>
@@ -637,6 +641,7 @@
     <string name="nm_intro_3_text">Message content never shows in the notification bar or on the lock screen.</string>
     <string name="nm_turn_on">Turn on</string>
     <string name="nm_select_apps">Select apps</string>
+    <string name="nm_select_apps_desc">No app is hidden right now. Choose the apps whose notifications should be hidden.</string>
     <string name="nm_hide_count">Hide (%1$d)</string>
     <string name="nm_all_apps">All</string>
     <string name="nm_selected_count">%1$d selected</string>

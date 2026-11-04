@@ -68,10 +68,13 @@ fun NotificationHomeScreen(
     hasAccess: Boolean,
     hiddenApps: Set<String>,
     summaries: List<HiddenAppSummary>,
+    /** True once apps were ever chosen (see NotificationHiderRepository.wasSetUp). */
+    wasSetUp: Boolean = false,
     onBack: () -> Unit,
     onToggle: (Boolean) -> Unit,
     onGrantAccess: () -> Unit,
     onManageApps: () -> Unit,
+    onSelectApps: () -> Unit = {},
     onOpenApp: (String) -> Unit,
     onClearAll: () -> Unit,
     /** Native ad slot between the hidden-apps row and the notification list. */
@@ -80,9 +83,10 @@ fun NotificationHomeScreen(
     var showHelp by rememberSaveable { mutableStateOf(false) }
     var confirmClear by rememberSaveable { mutableStateOf(false) }
     val formatTime = rememberTimeFormatter()
-    // Until an app is picked there is only the intro and one "turn on" button; the switch
-    // appears once there is something to switch.
-    val setUp = hiddenApps.isNotEmpty()
+    // Before any app was ever picked there is only the intro and one "turn on" button.
+    // Once apps were chosen (or notifications are kept) the intro never comes back, even when
+    // every app has been un-hidden: the saved notifications must stay reachable.
+    val setUp = hiddenApps.isNotEmpty() || wasSetUp || summaries.isNotEmpty()
 
     Scaffold(
         topBar = {
@@ -136,7 +140,13 @@ fun NotificationHomeScreen(
                 if (enabled && !hasAccess) {
                     item { AccessWarningCard(onGrantAccess) }
                 }
-                item { HiddenAppsRow(hiddenApps = hiddenApps, onClick = onManageApps) }
+                item {
+                    if (hiddenApps.isEmpty()) {
+                        SelectAppsCard(onClick = onSelectApps)
+                    } else {
+                        HiddenAppsRow(hiddenApps = hiddenApps, onClick = onManageApps)
+                    }
+                }
                 if (ad != null) {
                     item(key = "native_ad") { ad() }
                 }
@@ -324,6 +334,42 @@ private fun HiddenAppsRow(hiddenApps: Set<String>, onClick: () -> Unit) {
     }
 }
 
+/** Shown instead of the hidden-apps row when no app is hidden: leads to the app picker. */
+@Composable
+private fun SelectAppsCard(onClick: () -> Unit) {
+    NmCard {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable(onClick = onClick)
+                .padding(horizontal = 16.dp, vertical = 14.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            GradientIconBox(Icons.Outlined.Apps)
+            Spacer(Modifier.width(14.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = stringResource(R.string.nm_select_apps),
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Spacer(Modifier.height(2.dp))
+                Text(
+                    text = stringResource(R.string.nm_select_apps_desc),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            Icon(
+                Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+    }
+}
+
 @Composable
 private fun AppSummaryRow(summary: HiddenAppSummary, time: String, onClick: () -> Unit) {
     val label = rememberAppLabel(summary.packageName)
@@ -364,8 +410,11 @@ private fun AppSummaryRow(summary: HiddenAppSummary, time: String, onClick: () -
                     overflow = TextOverflow.Ellipsis
                 )
             }
-            Spacer(Modifier.width(10.dp))
-            CountBadge(summary.count)
+            // Unread only: the badge drops (and disappears) once that app's list has been read.
+            if (summary.unread > 0) {
+                Spacer(Modifier.width(10.dp))
+                CountBadge(summary.unread)
+            }
         }
     }
 }

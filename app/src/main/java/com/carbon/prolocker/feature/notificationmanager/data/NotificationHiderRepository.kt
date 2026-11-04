@@ -34,7 +34,9 @@ data class HiddenAppSummary(
     val packageName: String,
     val count: Int,
     val lastTime: Long,
-    val lastTitle: String
+    val lastTitle: String,
+    /** Kept notifications of this app the user has not read yet. */
+    val unread: Int = 0
 )
 
 /**
@@ -59,6 +61,14 @@ class NotificationHiderRepository(context: Context) {
     private val _hiddenApps = MutableStateFlow(prefs.getStringSet(KEY_APPS, emptySet())?.toSet() ?: emptySet())
     val hiddenApps: StateFlow<Set<String>> = _hiddenApps.asStateFlow()
 
+    /**
+     * True once apps were chosen at least once. The intro is then never shown again, even if every
+     * app is un-hidden later, so the saved notifications stay reachable.
+     */
+    private val _wasSetUp = MutableStateFlow(prefs.getBoolean(KEY_SET_UP, false) || _hiddenApps.value.isNotEmpty())
+        .also { if (it.value && !prefs.getBoolean(KEY_SET_UP, false)) prefs.edit().putBoolean(KEY_SET_UP, true).apply() }
+    val wasSetUp: StateFlow<Boolean> = _wasSetUp.asStateFlow()
+
     private val _notifications = MutableStateFlow(load())
     val notifications: StateFlow<List<HiddenNotification>> = _notifications.asStateFlow()
 
@@ -76,6 +86,10 @@ class NotificationHiderRepository(context: Context) {
     fun setHiddenApps(packages: Set<String>) {
         prefs.edit().putStringSet(KEY_APPS, HashSet(packages)).apply()
         _hiddenApps.value = packages.toSet()
+        if (packages.isNotEmpty() && !_wasSetUp.value) {
+            prefs.edit().putBoolean(KEY_SET_UP, true).apply()
+            _wasSetUp.value = true
+        }
     }
 
     fun hideApp(packageName: String) = setHiddenApps(_hiddenApps.value + packageName)
@@ -174,13 +188,20 @@ class NotificationHiderRepository(context: Context) {
         private const val KEY_ENABLED = "enabled"
         private const val KEY_APPS = "hidden_apps"
         private const val KEY_UNSEEN = "unseen_count"
+        private const val KEY_SET_UP = "was_set_up"
         private const val MAX_NOTIFICATIONS = 1000
 
         fun summarize(list: List<HiddenNotification>): List<HiddenAppSummary> =
             list.groupBy { it.packageName }
                 .map { (pkg, items) ->
                     val latest = items.maxBy { it.postedAt }
-                    HiddenAppSummary(pkg, items.size, latest.postedAt, latest.title.ifBlank { latest.text })
+                    HiddenAppSummary(
+                        packageName = pkg,
+                        count = items.size,
+                        lastTime = latest.postedAt,
+                        lastTitle = latest.title.ifBlank { latest.text },
+                        unread = items.count { !it.read }
+                    )
                 }
                 .sortedByDescending { it.lastTime }
     }

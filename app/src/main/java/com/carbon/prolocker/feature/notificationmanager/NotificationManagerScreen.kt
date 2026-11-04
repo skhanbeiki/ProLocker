@@ -56,6 +56,7 @@ fun NotificationManagerScreen(onBack: () -> Unit) {
     val adManager: AdManager = koinInject()
     val enabled by repository.enabled.collectAsState()
     val hiddenApps by repository.hiddenApps.collectAsState()
+    val wasSetUp by repository.wasSetUp.collectAsState()
     val notifications by repository.notifications.collectAsState()
     val unseen by repository.unseenCount.collectAsState()
 
@@ -115,6 +116,7 @@ fun NotificationManagerScreen(onBack: () -> Unit) {
             hasAccess = hasAccess,
             hiddenApps = hiddenApps,
             summaries = summaries,
+            wasSetUp = wasSetUp,
             onBack = onBack,
             onToggle = { on ->
                 if (!on) {
@@ -132,6 +134,7 @@ fun NotificationManagerScreen(onBack: () -> Unit) {
                 showGuide = true
             },
             onManageApps = { page = NmPage.MANAGE },
+            onSelectApps = { page = NmPage.SELECT },
             onOpenApp = {
                 currentApp = it
                 page = NmPage.APP

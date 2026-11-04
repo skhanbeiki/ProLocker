@@ -18,6 +18,21 @@ object BrowserShortcuts {
 
     private const val BROWSER_SHORTCUT_ID = "private_browser"
 
+    /** Whether the launcher can pin shortcuts at all. */
+    fun canPin(context: Context): Boolean = try {
+        ShortcutManagerCompat.isRequestPinShortcutSupported(context)
+    } catch (_: Exception) {
+        false
+    }
+
+    /** True when the browser shortcut is already on the home screen (best effort). */
+    fun isBrowserPinned(context: Context): Boolean = try {
+        ShortcutManagerCompat.getShortcuts(context, ShortcutManagerCompat.FLAG_MATCH_PINNED)
+            .any { it.id == BROWSER_SHORTCUT_ID }
+    } catch (_: Exception) {
+        false
+    }
+
     fun pinBrowser(context: Context) {
         pin(
             context = context,

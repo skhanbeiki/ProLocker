@@ -599,6 +599,10 @@
     <string name="pb_share">اشتراک‌گذاری</string>
     <string name="pb_shortcut_not_supported">لانچر شما از میانبر پشتیبانی نمی‌کند</string>
     <string name="pb_shortcut_requested">درخواست ایجاد میانبر ارسال شد</string>
+    <string name="pb_shortcut_offer_title">مرورگر خصوصی را به صفحه اصلی گوشی اضافه کنید</string>
+    <string name="pb_shortcut_offer_text">با یک لمس از صفحه اصلی گوشی وارد مرورگر خصوصی شوید. قفل برنامه همچنان از آن محافظت می‌کند.</string>
+    <string name="pb_shortcut_offer_add">افزودن به صفحه اصلی</string>
+    <string name="pb_shortcut_offer_later">الان نه</string>
     <string name="pb_step_cache">حافظه پنهان</string>
     <string name="pb_step_cookies">کوکی‌ها</string>
     <string name="pb_step_history">تاریخچه مرور</string>
@@ -641,6 +645,7 @@
     <string name="nm_intro_3_text">متن پیام‌ها هرگز در نوار اعلان یا صفحه قفل گوشی نمایش داده نمی‌شود.</string>
     <string name="nm_turn_on">روشن کردن</string>
     <string name="nm_select_apps">انتخاب برنامه‌ها</string>
+    <string name="nm_select_apps_desc">الان هیچ برنامه‌ای مخفی نیست. برنامه‌هایی را که می‌خواهید اعلانشان مخفی شود انتخاب کنید.</string>
     <string name="nm_hide_count">مخفی کردن (%1$d)</string>
     <string name="nm_all_apps">همه</string>
     <string name="nm_selected_count">%1$d انتخاب شده</string>
