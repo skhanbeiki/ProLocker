@@ -15,10 +15,8 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import org.koin.java.KoinJavaComponent.inject
 import java.util.Locale
 
@@ -43,9 +41,7 @@ class PermissionHealthMonitor(
 
     private fun getLocalizedContext(): Context {
         val languageTag = try {
-            runBlocking {
-                preferencesRepository.userPreferencesFlow.first().language
-            }
+            preferencesRepository.currentPreferences.language
         } catch (e: Exception) {
             Log.e(TAG, "PermissionHealthMonitor: failed to read language preference", e)
             ""
@@ -121,9 +117,7 @@ class PermissionHealthMonitor(
         }
 
         val appLanguageTag = try {
-            runBlocking {
-                preferencesRepository.userPreferencesFlow.first().language
-            }
+            preferencesRepository.currentPreferences.language
         } catch (_e: Exception) {
             Locale.getDefault().language
         }

@@ -1,6 +1,7 @@
 package com.carbon.prolocker.feature.privacyauditor
 
 import android.graphics.drawable.Drawable
+import androidx.annotation.StringRes
 
 enum class RiskLevel {
     HIGH,
@@ -21,7 +22,7 @@ enum class PermissionCategory {
 
 data class PermissionDetail(
     val permissionName: String,
-    val titleName: String,
+    @StringRes val titleRes: Int,
     val category: PermissionCategory,
     val isDangerous: Boolean
 )

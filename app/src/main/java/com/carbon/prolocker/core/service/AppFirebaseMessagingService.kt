@@ -15,8 +15,6 @@ import com.carbon.prolocker.R
 import com.carbon.prolocker.core.datastore.PreferencesRepository
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.runBlocking
 import org.koin.java.KoinJavaComponent.inject
 import java.util.Locale
 
@@ -32,9 +30,7 @@ class AppFirebaseMessagingService : FirebaseMessagingService() {
 
     private fun getLocalizedContext(): Context {
         val languageTag = try {
-            runBlocking {
-                preferencesRepository.userPreferencesFlow.first().language
-            }
+            preferencesRepository.currentPreferences.language
         } catch (e: Exception) {
             Log.e(TAG, "AppFirebaseMessagingService: failed to read language preference", e)
             ""
@@ -114,9 +110,7 @@ class AppFirebaseMessagingService : FirebaseMessagingService() {
         }
 
         val appLanguageTag = try {
-            runBlocking {
-                preferencesRepository.userPreferencesFlow.first().language
-            }
+            preferencesRepository.currentPreferences.language
         } catch (_: Exception) {
             Locale.getDefault().language
         }

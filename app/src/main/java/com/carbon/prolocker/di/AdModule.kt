@@ -3,8 +3,6 @@ package com.carbon.prolocker.di
 import com.carbon.prolocker.ad.AdManager
 import com.carbon.prolocker.ad.InterstitialAdProvider
 import com.carbon.prolocker.ad.NativeAdProvider
-import com.carbon.prolocker.ad.providers.AdMobInterstitialAdProvider
-import com.carbon.prolocker.ad.providers.AdMobNativeAdProvider
 import com.carbon.prolocker.ad.providers.AdiveryInterstitialAdProvider
 import com.carbon.prolocker.ad.providers.AdiveryNativeAdProvider
 import com.carbon.prolocker.ad.providers.MagnetInterstitialAdProvider
@@ -17,14 +15,12 @@ val adModule = module {
     single {
         val nativeProviders: Map<String, NativeAdProvider> = mapOf(
             "tapsell" to TapsellPlusNativeAdProvider("tapsell"),
-            "adivery" to AdiveryNativeAdProvider("adivery"),
-            "admob" to AdMobNativeAdProvider("admob")
+            "adivery" to AdiveryNativeAdProvider("adivery")
         )
 
         val interstitialProviders: Map<String, InterstitialAdProvider> = mapOf(
             "tapsell" to TapsellPlusInterstitialAdProvider("tapsell"),
             "adivery" to AdiveryInterstitialAdProvider("adivery"),
-            "admob" to AdMobInterstitialAdProvider("admob"),
             "magnet" to MagnetInterstitialAdProvider("magnet")
         )
 

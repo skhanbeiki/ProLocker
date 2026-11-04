@@ -215,7 +215,6 @@ dependencies {
     implementation(libs.ktor.client.logging)
     implementation(libs.work.runtime.ktx)
 
-    implementation(libs.play.services.ads)
     implementation(libs.tapsell)
     implementation(libs.legacy)
     implementation(libs.adivery)

@@ -466,6 +466,7 @@ class AppMonitorService : Service() {
                         )
                     } catch (e: Exception) {
                         Log.e(TAG, "Failed to elevate foreground service type for camera", e)
+                        Unit
                     }
                 }
 
@@ -484,6 +485,7 @@ class AppMonitorService : Service() {
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "Exception during intruder capture", e)
+                Unit
             }
         }
     }

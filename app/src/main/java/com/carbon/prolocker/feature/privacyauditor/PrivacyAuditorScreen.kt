@@ -73,6 +73,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -167,12 +168,12 @@ fun PrivacyAuditorScreen(
                         Spacer(modifier = Modifier.width(12.dp))
                         Column {
                             Text(
-                                "آنالیز حریم خصوصی",
+                                stringResource(R.string.pa_title),
                                 style = MaterialTheme.typography.titleLarge,
                                 fontWeight = FontWeight.Bold
                             )
                             Text(
-                                "تحلیل دسترسی برنامه‌های نصب‌شده",
+                                stringResource(R.string.pa_subtitle),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -209,7 +210,7 @@ fun PrivacyAuditorScreen(
                         CircularProgressIndicator(color = ProLockerPrimary)
                         Spacer(modifier = Modifier.height(16.dp))
                         Text(
-                            "در حال تحلیل دسترسی برنامه‌ها...",
+                            stringResource(R.string.pa_loading),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -231,7 +232,7 @@ fun PrivacyAuditorScreen(
                         )
                         Spacer(modifier = Modifier.height(12.dp))
                         Text(
-                            "هیچ برنامه‌ای در این فیلتر یافت نشد",
+                            stringResource(R.string.pa_empty_filter),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold
                         )
@@ -292,22 +293,22 @@ fun PrivacySummaryHeroCard(summary: PrivacySummary) {
             ) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        "امتیاز حریم خصوصی دستگاه",
+                        stringResource(R.string.pa_score_title),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         color = Color.White
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        "${summary.highRiskApps} برنامه دارای دسترسی به ریسک بالا",
+                        pluralStringResource(R.plurals.pa_high_risk_count, summary.highRiskApps, summary.highRiskApps),
                         style = MaterialTheme.typography.bodySmall,
                         color = Color.White.copy(alpha = 0.9f)
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                        SummaryBadge(label = "کل برنامه‌ها", value = summary.totalApps.toString())
-                        SummaryBadge(label = "ریسک بالا", value = summary.highRiskApps.toString())
-                        SummaryBadge(label = "ایمن", value = summary.safeApps.toString())
+                        SummaryBadge(label = stringResource(R.string.pa_total_apps), value = summary.totalApps.toString())
+                        SummaryBadge(label = stringResource(R.string.pa_high_risk), value = summary.highRiskApps.toString())
+                        SummaryBadge(label = stringResource(R.string.pa_safe), value = summary.safeApps.toString())
                     }
                 }
                 Box(
@@ -324,7 +325,13 @@ fun PrivacySummaryHeroCard(summary: PrivacySummary) {
                             color = Color.White
                         )
                         Text(
-                            text = if (summary.healthScore >= 80) "عالی" else if (summary.healthScore >= 50) "متوسط" else "خطرناک",
+                            text = stringResource(
+                                when {
+                                    summary.healthScore >= 80 -> R.string.pa_score_excellent
+                                    summary.healthScore >= 50 -> R.string.pa_score_fair
+                                    else -> R.string.pa_score_dangerous
+                                }
+                            ),
                             fontSize = 10.sp,
                             color = Color.White.copy(alpha = 0.9f)
                         )
@@ -356,17 +363,17 @@ fun FilterChipRow(
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         val filters = listOf(
-            RiskFilter.ALL to "همه",
-            RiskFilter.HIGH_RISK to "ریسک بالا 🔴",
-            RiskFilter.CAMERA_MIC to "دوربین و میکروفون 📷",
-            RiskFilter.LOCATION to "موقعیت مکانی 📍",
-            RiskFilter.SMS_CONTACTS to "پیامک و مخاطبین ✉️"
+            RiskFilter.ALL to R.string.pa_filter_all,
+            RiskFilter.HIGH_RISK to R.string.pa_filter_high_risk,
+            RiskFilter.CAMERA_MIC to R.string.pa_filter_camera_mic,
+            RiskFilter.LOCATION to R.string.pa_filter_location,
+            RiskFilter.SMS_CONTACTS to R.string.pa_filter_sms_contacts
         )
-        items(filters) { (filter, label) ->
+        items(filters) { (filter, labelRes) ->
             FilterChip(
                 selected = activeFilter == filter,
                 onClick = { onSelectFilter(filter) },
-                label = { Text(label, fontSize = 12.sp) },
+                label = { Text(stringResource(labelRes), fontSize = 12.sp) },
                 colors = FilterChipDefaults.filterChipColors(
                     selectedContainerColor = ProLockerPrimary,
                     selectedLabelColor = Color.White
@@ -389,9 +396,9 @@ fun AppAuditCard(
     }
 
     val riskText = when (appInfo.riskLevel) {
-        RiskLevel.HIGH -> "ریسک بالا"
-        RiskLevel.MEDIUM -> "ریسک متوسط"
-        RiskLevel.LOW -> "ایمن"
+        RiskLevel.HIGH -> stringResource(R.string.pa_high_risk)
+        RiskLevel.MEDIUM -> stringResource(R.string.pa_medium_risk)
+        RiskLevel.LOW -> stringResource(R.string.pa_safe)
     }
 
     Surface(
@@ -480,7 +487,7 @@ fun AppAuditCard(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    "مدیریت دسترسی‌ها",
+                    stringResource(R.string.pa_manage_permissions),
                     color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.Bold,
                     fontSize = 12.sp
@@ -519,7 +526,7 @@ fun PermissionBadge(perm: PermissionDetail) {
             )
             Spacer(modifier = Modifier.width(4.dp))
             Text(
-                text = perm.titleName,
+                text = stringResource(perm.titleRes),
                 fontSize = 10.sp,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

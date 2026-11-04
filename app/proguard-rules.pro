@@ -95,7 +95,6 @@
 
 -keep class ir.tapsell.plus.** { *; }
 -keep class com.adivery.** { *; }
--keep class com.google.android.gms.ads.** { *; }
 
 #############################################
 # Accessibility / Device Admin Safety
@@ -139,3 +138,22 @@
 -keep class com.hasin.magnetad.** { *; }
 -dontwarn com.hasin.magnetad.**
 
+
+#################################################
+# Strip logging from release builds
+# (logcat is readable on rooted/debuggable devices; the lock & notification
+#  features must not leak package names, titles or message text there)
+#################################################
+-assumenosideeffects class android.util.Log {
+    public static boolean isLoggable(java.lang.String, int);
+    public static int v(...);
+    public static int d(...);
+    public static int i(...);
+    public static int w(...);
+    public static int e(...);
+    public static int wtf(...);
+    public static int println(...);
+}
+-assumenosideeffects class java.lang.Throwable {
+    public void printStackTrace();
+}

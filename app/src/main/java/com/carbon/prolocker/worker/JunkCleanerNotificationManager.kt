@@ -13,8 +13,6 @@ import com.carbon.prolocker.MainActivity
 import com.carbon.prolocker.R
 import com.carbon.prolocker.core.datastore.PreferencesRepository
 import com.carbon.prolocker.core.security.NotificationLaunchToken
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.runBlocking
 import org.koin.java.KoinJavaComponent
 import java.util.Locale
 import kotlin.random.Random
@@ -37,9 +35,7 @@ class JunkCleanerNotificationManager(private val context: Context) {
 
     private fun getLocalizedContext(): Context {
         val languageTag = try {
-            runBlocking {
-                preferencesRepository.userPreferencesFlow.first().language
-            }
+            preferencesRepository.currentPreferences.language
         } catch (e: Exception) {
             Log.e(TAG, "JunkCleanerNotificationManager: failed to read language preference", e)
             ""
@@ -67,16 +63,9 @@ class JunkCleanerNotificationManager(private val context: Context) {
     fun showNotification() {
         val localizedContext = getLocalizedContext()
 
-        val appLanguageTag = try {
-            runBlocking {
-                preferencesRepository.userPreferencesFlow.first().language
-            }
-        } catch (e: Exception) {
-            Locale.getDefault().language
-        }
-        val isPersian = appLanguageTag == "fa"
-
-        val (title, body) = if (isPersian) getRandomPersianText() else getRandomEnglishText()
+        val (titleRes, bodyRes) = JUNK_MESSAGES[Random.nextInt(JUNK_MESSAGES.size)]
+        val title = localizedContext.getString(titleRes)
+        val body = localizedContext.getString(bodyRes)
 
         val intent = Intent(context, MainActivity::class.java).apply {
             putExtra("navigation_type", "memory")
@@ -104,40 +93,10 @@ class JunkCleanerNotificationManager(private val context: Context) {
 
         notificationManager.notify(NOTIFICATION_ID, notification)
     }
-
-    private fun getRandomPersianText(): Pair<String, String> {
-        val messages = listOf(
-            Pair(
-                "زمان پاک‌سازی فایل‌های زائد است",
-                "با پاک‌سازی فایل‌های موقت و کش، فضای ذخیره‌سازی گوشی را آزاد کنید."
-            ),
-            Pair(
-                "حافظه گوشی پر شده؟",
-                "فایل‌های زائد و فایل‌های نصبی قدیمی را حذف کنید تا فضای بیشتری داشته باشید."
-            ),
-            Pair(
-                "فضای ذخیره‌سازی دستگاه را آزاد کنید",
-                "فایل‌های موقت را پاک کنید تا فضای بیشتری برای عکس‌ها و برنامه‌هایتان داشته باشید."
-            )
-        )
-        return messages[Random.nextInt(messages.size)]
-    }
-
-    private fun getRandomEnglishText(): Pair<String, String> {
-        val messages = listOf(
-            Pair(
-                "Time to clean junk files",
-                "Clean temporary and cache files to free up valuable storage space."
-            ),
-            Pair(
-                "Running out of storage?",
-                "Remove obsolete APKs and junk files to make room for what matters."
-            ),
-            Pair(
-                "Free up storage space",
-                "Clean junk and residual files with one quick tap."
-            )
-        )
-        return messages[Random.nextInt(messages.size)]
-    }
 }
+
+private val JUNK_MESSAGES = listOf(
+    R.string.junk_notif_title_1 to R.string.junk_notif_body_1,
+    R.string.junk_notif_title_2 to R.string.junk_notif_body_2,
+    R.string.junk_notif_title_3 to R.string.junk_notif_body_3
+)

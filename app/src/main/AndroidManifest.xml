@@ -71,10 +71,6 @@
         android:theme="@style/Theme.MyApplication"
         android:usesCleartextTraffic="true">
 
-        <!-- Disable automatic Google Mobile Ads initialization to prevent crash and remove test ads dialog -->
-        <provider
-            android:name="com.google.android.gms.ads.MobileAdsInitProvider"
-            tools:node="remove" />
 
         <activity
             android:name=".MainActivity"
@@ -207,11 +203,6 @@
             android:name="com.adivery.sdk.core.UninstallReceiver"
             tools:node="remove" />
 
-        <!-- Fix Google Mobile Ads NotificationHandlerActivity NPE on malformed intent -->
-        <activity
-            android:name="com.google.android.gms.ads.NotificationHandlerActivity"
-            android:exported="false"
-            tools:replace="android:exported" />
 
         <service
             android:name="com.carbon.prolocker.feature.lock.LockService"

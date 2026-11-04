@@ -6,7 +6,6 @@ import com.carbon.prolocker.core.database.LockedAppsRepository
 import com.carbon.prolocker.core.datastore.PreferencesRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.first
 import org.koin.android.ext.android.inject
 
 class AppMonitorAccessibilityService : AccessibilityService() {
@@ -26,9 +25,7 @@ class AppMonitorAccessibilityService : AccessibilityService() {
         val packageName = event.packageName?.toString() ?: return
 
         val prefs = try {
-            kotlinx.coroutines.runBlocking {
-                preferencesRepository.userPreferencesFlow.first()
-            }
+            preferencesRepository.currentPreferences
         } catch (_: Exception) {
             return
         }

@@ -289,7 +289,7 @@ fun BackgroundPreviewScreen(
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             Text(
-                                text = "۱۲:۴۵",
+                                text = stringResource(R.string.bg_preview_mock_time),
                                 color = Color.White,
                                 style = AppTypography.headlineLarge,
                                 fontWeight = FontWeight.Bold,
@@ -297,7 +297,7 @@ fun BackgroundPreviewScreen(
                             )
                             Spacer(modifier = Modifier.height(2.dp))
                             Text(
-                                text = "دوشنبه، ۲۷ مرداد",
+                                text = stringResource(R.string.bg_preview_mock_date),
                                 color = Color.White.copy(alpha = 0.85f),
                                 style = AppTypography.labelMedium,
                                 fontSize = 11.sp
@@ -309,7 +309,7 @@ fun BackgroundPreviewScreen(
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             Text(
-                                text = "الگوی ورود را رسم کنید",
+                                text = stringResource(R.string.bg_preview_mock_prompt),
                                 color = Color.White.copy(alpha = 0.9f),
                                 style = AppTypography.bodySmall,
                                 fontSize = 11.sp,

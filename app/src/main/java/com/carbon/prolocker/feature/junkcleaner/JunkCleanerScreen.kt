@@ -114,7 +114,6 @@ import com.carbon.prolocker.core.theme.AppTypography
 import com.carbon.prolocker.network.repository.RemoteConfigRepository
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import androidx.core.view.WindowCompat
 import java.util.Locale
 
@@ -253,7 +252,7 @@ fun JunkCleanerScreen(
 
     val cleanerAdEnabled = remember {
         try {
-            runBlocking { remoteConfigRepository.getConfig().configs.nativeAdRamCleanerPage }
+            remoteConfigRepository.cachedConfig().configs.nativeAdRamCleanerPage
         } catch (_e: Exception) {
             true
         }

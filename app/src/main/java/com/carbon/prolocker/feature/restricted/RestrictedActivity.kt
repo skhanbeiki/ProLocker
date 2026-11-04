@@ -19,7 +19,6 @@ import com.carbon.prolocker.core.navigation.RestrictedModeManager
 import com.carbon.prolocker.core.navigation.RestrictedNavigation
 import com.carbon.prolocker.core.theme.ProLockerTheme
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.runBlocking
 import org.koin.android.ext.android.inject
 
 class RestrictedActivity : ComponentActivity() {

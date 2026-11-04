@@ -664,4 +664,44 @@
         <item quantity="one">%1$d hidden notification</item>
         <item quantity="other">%1$d hidden notifications</item>
     </plurals>
+
+    <!-- Moved from hardcoded Kotlin strings -->
+    <string name="bg_preview_mock_time">12:45</string>
+    <string name="bg_preview_mock_date">Monday, Aug 18</string>
+    <string name="bg_preview_mock_prompt">Draw your unlock pattern</string>
+    <string name="junk_notif_title_1">Time to clean junk files</string>
+    <string name="junk_notif_body_1">Clean temporary and cache files to free up valuable storage space.</string>
+    <string name="junk_notif_title_2">Running out of storage?</string>
+    <string name="junk_notif_body_2">Remove obsolete APKs and junk files to make room for what matters.</string>
+    <string name="junk_notif_title_3">Free up storage space</string>
+    <string name="junk_notif_body_3">Clean junk and residual files with one quick tap.</string>
+    <string name="pa_title">Privacy analysis</string>
+    <string name="pa_subtitle">Permission analysis of installed apps</string>
+    <string name="pa_loading">Analyzing app permissions…</string>
+    <string name="pa_empty_filter">No apps found for this filter</string>
+    <string name="pa_score_title">Device privacy score</string>
+    <string name="pa_total_apps">Total apps</string>
+    <string name="pa_high_risk">High risk</string>
+    <string name="pa_medium_risk">Medium risk</string>
+    <string name="pa_safe">Safe</string>
+    <string name="pa_score_excellent">Excellent</string>
+    <string name="pa_score_fair">Fair</string>
+    <string name="pa_score_dangerous">Dangerous</string>
+    <string name="pa_filter_all">All</string>
+    <string name="pa_filter_high_risk">High risk 🔴</string>
+    <string name="pa_filter_camera_mic">Camera &amp; mic 📷</string>
+    <string name="pa_filter_location">Location 📍</string>
+    <string name="pa_filter_sms_contacts">SMS &amp; contacts ✉️</string>
+    <string name="pa_manage_permissions">Manage permissions</string>
+    <string name="pa_perm_camera">Camera</string>
+    <string name="pa_perm_microphone">Microphone</string>
+    <string name="pa_perm_location">Location</string>
+    <string name="pa_perm_sms">SMS</string>
+    <string name="pa_perm_contacts">Contacts</string>
+    <string name="pa_perm_call_log">Call log</string>
+    <string name="pa_perm_storage">Storage</string>
+    <plurals name="pa_high_risk_count">
+        <item quantity="one">%1$d app has high-risk permissions</item>
+        <item quantity="other">%1$d apps have high-risk permissions</item>
+    </plurals>
 </resources>

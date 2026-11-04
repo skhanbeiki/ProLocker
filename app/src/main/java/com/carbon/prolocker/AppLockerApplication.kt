@@ -252,9 +252,11 @@ class ProLockerApplication : Application(), Application.ActivityLifecycleCallbac
                     startMonitoringServiceIfNeeded()
                 } else {
                     Log.d(TAG, "No locked apps, skipping service start")
+                    Unit
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "Error ensuring service is running", e)
+                Unit
             }
         }
     }
@@ -280,8 +282,9 @@ class ProLockerApplication : Application(), Application.ActivityLifecycleCallbac
         val defaultHandler = Thread.getDefaultUncaughtExceptionHandler()
         Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
             try {
+                // Bounded so a slow disk can never hang the dying process.
                 runBlocking {
-                    crashRepository.saveCrash(throwable)
+                    kotlinx.coroutines.withTimeoutOrNull(2_000) { crashRepository.saveCrash(throwable) }
                 }
             } catch (_e: Exception) {
                 // Ignore failure during crash handling

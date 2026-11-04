@@ -78,44 +78,6 @@ object AdUnitIds {
         const val INTERSTITIAL_NOTIFICATIONS = "8a00739b-d8ef-4ce3-b9b4-c3a4b5a943a6"
     }
 
-    object AdMob {
-        const val APP_ID = "ca-app-pub-3940256099942544~3347511713"
-
-        const val HOME_TAB_APPS = "ca-app-pub-3940256099942544/2247696110"
-        const val HOME_TAB_THEMES = "ca-app-pub-3940256099942544/2247696110"
-        const val HOME_TAB_SETTINGS = "ca-app-pub-3940256099942544/2247696110"
-
-        const val LOCKSCREEN_TOP = "ca-app-pub-3940256099942544/2247696110"
-        const val LOCKSCREEN_BOTTOM = "ca-app-pub-3940256099942544/2247696110"
-
-        const val RAM_CLEANER_NATIVE = "ca-app-pub-3940256099942544/2247696110"
-
-        const val BACKGROUND_LIST_NATIVE = "ca-app-pub-3940256099942544/2247696110"
-        const val BACKGROUND_PREVIEW_NATIVE = "ca-app-pub-3940256099942544/2247696110"
-
-        const val EXIT_NATIVE = "ca-app-pub-3940256099942544/2247696110"
-
-        const val INTERSTITIAL_BACKGROUND = "ca-app-pub-3940256099942544/1033173712"
-        const val INTERSTITIAL_RAM_CLEANER = "ca-app-pub-3940256099942544/1033173712"
-        const val INTERSTITIAL_IN_APP = "ca-app-pub-3940256099942544/1033173712"
-
-        const val INTERSTITIAL_HIDDEN_ITEMS = "ca-app-pub-3940256099942544/1033173712"
-        const val INTERSTITIAL_HIDE_FILES = "ca-app-pub-3940256099942544/1033173712"
-        const val INTERSTITIAL_CALL_BLOCKER = "ca-app-pub-3940256099942544/1033173712"
-        const val INTERSTITIAL_PRIVACY_AUDITOR = "ca-app-pub-3940256099942544/1033173712"
-        const val INTERSTITIAL_BACKUP_HOME = "ca-app-pub-3940256099942544/1033173712"
-        const val INTERSTITIAL_BACKUP_APPS = "ca-app-pub-3940256099942544/1033173712"
-        const val INTERSTITIAL_BACKUP_CATEGORY_DETAIL = "ca-app-pub-3940256099942544/1033173712"
-        const val INTERSTITIAL_SUGGESTION = "ca-app-pub-3940256099942544/1033173712"
-
-        // New placements: these reuse existing zones until dedicated ones are created in the panel.
-        const val BROWSER_HOME_NATIVE = HOME_TAB_APPS
-        const val BROWSER_CLEANUP_NATIVE = RAM_CLEANER_NATIVE
-        const val NOTIFICATIONS_NATIVE = HOME_TAB_APPS
-        const val INTERSTITIAL_BROWSER_EXIT = INTERSTITIAL_IN_APP
-        const val INTERSTITIAL_NOTIFICATIONS = INTERSTITIAL_IN_APP
-    }
-
     object Magnet {
         const val APP_ID = "99d647ce-d554-412f-bce2-d84be0601d58"
         const val INTERSTITIAL_BACKGROUND = "53d041ff-795f-494a-a632-bf1356d90bb5"

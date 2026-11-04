@@ -250,34 +250,6 @@ class AdManager(
                 AdPlacement.INTERSTITIAL_NOTIFICATIONS -> AdUnitIds.Adivery.INTERSTITIAL_NOTIFICATIONS
                 else -> ""
             }
-            "admob" -> when (placement) {
-                AdPlacement.HOME_TAB_APPS -> AdUnitIds.AdMob.HOME_TAB_APPS
-                AdPlacement.HOME_TAB_THEMES -> AdUnitIds.AdMob.HOME_TAB_THEMES
-                AdPlacement.HOME_TAB_SETTINGS -> AdUnitIds.AdMob.HOME_TAB_SETTINGS
-                AdPlacement.LOCKSCREEN_TOP -> AdUnitIds.AdMob.LOCKSCREEN_TOP
-                AdPlacement.LOCKSCREEN_BOTTOM -> AdUnitIds.AdMob.LOCKSCREEN_BOTTOM
-                AdPlacement.RAM_CLEANER_NATIVE -> AdUnitIds.AdMob.RAM_CLEANER_NATIVE
-                AdPlacement.BACKGROUND_LIST_NATIVE -> AdUnitIds.AdMob.BACKGROUND_LIST_NATIVE
-                AdPlacement.BACKGROUND_PREVIEW_NATIVE -> AdUnitIds.AdMob.BACKGROUND_PREVIEW_NATIVE
-                AdPlacement.EXIT_NATIVE -> AdUnitIds.AdMob.EXIT_NATIVE
-                AdPlacement.INTERSTITIAL_BACKGROUND -> AdUnitIds.AdMob.INTERSTITIAL_BACKGROUND
-                AdPlacement.INTERSTITIAL_RAM_CLEANER -> AdUnitIds.AdMob.INTERSTITIAL_RAM_CLEANER
-                AdPlacement.INTERSTITIAL_IN_APP -> AdUnitIds.AdMob.INTERSTITIAL_IN_APP
-                AdPlacement.INTERSTITIAL_HIDDEN_ITEMS -> AdUnitIds.AdMob.INTERSTITIAL_HIDDEN_ITEMS
-                AdPlacement.INTERSTITIAL_HIDE_FILES -> AdUnitIds.AdMob.INTERSTITIAL_HIDE_FILES
-                AdPlacement.INTERSTITIAL_CALL_BLOCKER -> AdUnitIds.AdMob.INTERSTITIAL_CALL_BLOCKER
-                AdPlacement.INTERSTITIAL_PRIVACY_AUDITOR -> AdUnitIds.AdMob.INTERSTITIAL_PRIVACY_AUDITOR
-                AdPlacement.INTERSTITIAL_BACKUP_HOME -> AdUnitIds.AdMob.INTERSTITIAL_BACKUP_HOME
-                AdPlacement.INTERSTITIAL_BACKUP_APPS -> AdUnitIds.AdMob.INTERSTITIAL_BACKUP_APPS
-                AdPlacement.INTERSTITIAL_BACKUP_CATEGORY_DETAIL -> AdUnitIds.AdMob.INTERSTITIAL_BACKUP_CATEGORY_DETAIL
-                AdPlacement.INTERSTITIAL_SUGGESTION -> AdUnitIds.AdMob.INTERSTITIAL_SUGGESTION
-                AdPlacement.BROWSER_HOME_NATIVE -> AdUnitIds.AdMob.BROWSER_HOME_NATIVE
-                AdPlacement.BROWSER_CLEANUP_NATIVE -> AdUnitIds.AdMob.BROWSER_CLEANUP_NATIVE
-                AdPlacement.NOTIFICATIONS_NATIVE -> AdUnitIds.AdMob.NOTIFICATIONS_NATIVE
-                AdPlacement.INTERSTITIAL_BROWSER_EXIT -> AdUnitIds.AdMob.INTERSTITIAL_BROWSER_EXIT
-                AdPlacement.INTERSTITIAL_NOTIFICATIONS -> AdUnitIds.AdMob.INTERSTITIAL_NOTIFICATIONS
-                else -> ""
-            }
             "magnet" -> when (placement) {
                 AdPlacement.INTERSTITIAL_BACKGROUND -> AdUnitIds.Magnet.INTERSTITIAL_BACKGROUND
                 AdPlacement.INTERSTITIAL_RAM_CLEANER -> AdUnitIds.Magnet.INTERSTITIAL_RAM_CLEANER

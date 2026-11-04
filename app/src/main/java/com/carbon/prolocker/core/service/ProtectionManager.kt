@@ -74,6 +74,7 @@ class ProtectionManager(
                     }
                 } catch (e: Exception) {
                     android.util.Log.e("ProtectionManager", "Failed to start AppMonitorService", e)
+                    Unit
                 }
             } else {
                 stopMonitoring()
@@ -94,6 +95,7 @@ class ProtectionManager(
                     }
                 } catch (e: Exception) {
                     android.util.Log.e("ProtectionManager", "Failed to start AppMonitorService", e)
+                    Unit
                 }
             }
         }

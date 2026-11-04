@@ -438,7 +438,7 @@
     <string name="backup_permission_required_title">مجوز لازم است</string>
     <string name="backup_permission_required_msg">قفل حرفه‌ای برای دسترسی و بازیابی ایمن داده‌های %1$s به مجوز نیاز دارد.</string>
     <string name="backup_grant_permission">اعطای مجوز</string>
-    <string name="backup_open_app_settings">فتح تنظیمات برنامه</string>
+    <string name="backup_open_app_settings">باز کردن تنظیمات برنامه</string>
     <!-- Call Blocking Feature Strings -->
     <string name="call_blocker_title">مسدودسازی تماس</string>
     <string name="call_blocker_subtitle">مسدودسازی تماس‌های نامطلوب بر اساس شماره یا الگو</string>
@@ -667,5 +667,45 @@
     <plurals name="nm_summary_title">
         <item quantity="one">%1$d اعلان مخفی‌شده</item>
         <item quantity="other">%1$d اعلان مخفی‌شده</item>
+    </plurals>
+
+    <!-- Moved from hardcoded Kotlin strings -->
+    <string name="bg_preview_mock_time">۱۲:۴۵</string>
+    <string name="bg_preview_mock_date">دوشنبه، ۲۷ مرداد</string>
+    <string name="bg_preview_mock_prompt">الگوی ورود را رسم کنید</string>
+    <string name="junk_notif_title_1">زمان پاک‌سازی فایل‌های زائد است</string>
+    <string name="junk_notif_body_1">با پاک‌سازی فایل‌های موقت و کش، فضای ذخیره‌سازی گوشی را آزاد کنید.</string>
+    <string name="junk_notif_title_2">حافظه گوشی پر شده؟</string>
+    <string name="junk_notif_body_2">فایل‌های زائد و فایل‌های نصبی قدیمی را حذف کنید تا فضای بیشتری داشته باشید.</string>
+    <string name="junk_notif_title_3">فضای ذخیره‌سازی دستگاه را آزاد کنید</string>
+    <string name="junk_notif_body_3">فایل‌های موقت را پاک کنید تا فضای بیشتری برای عکس‌ها و برنامه‌هایتان داشته باشید.</string>
+    <string name="pa_title">آنالیز حریم خصوصی</string>
+    <string name="pa_subtitle">تحلیل دسترسی برنامه‌های نصب‌شده</string>
+    <string name="pa_loading">در حال تحلیل دسترسی برنامه‌ها...</string>
+    <string name="pa_empty_filter">هیچ برنامه‌ای در این فیلتر یافت نشد</string>
+    <string name="pa_score_title">امتیاز حریم خصوصی دستگاه</string>
+    <string name="pa_total_apps">کل برنامه‌ها</string>
+    <string name="pa_high_risk">ریسک بالا</string>
+    <string name="pa_medium_risk">ریسک متوسط</string>
+    <string name="pa_safe">ایمن</string>
+    <string name="pa_score_excellent">عالی</string>
+    <string name="pa_score_fair">متوسط</string>
+    <string name="pa_score_dangerous">خطرناک</string>
+    <string name="pa_filter_all">همه</string>
+    <string name="pa_filter_high_risk">ریسک بالا 🔴</string>
+    <string name="pa_filter_camera_mic">دوربین و میکروفون 📷</string>
+    <string name="pa_filter_location">موقعیت مکانی 📍</string>
+    <string name="pa_filter_sms_contacts">پیامک و مخاطبین ✉️</string>
+    <string name="pa_manage_permissions">مدیریت دسترسی‌ها</string>
+    <string name="pa_perm_camera">دوربین</string>
+    <string name="pa_perm_microphone">میکروفون</string>
+    <string name="pa_perm_location">موقعیت مکانی</string>
+    <string name="pa_perm_sms">پیامک‌ها</string>
+    <string name="pa_perm_contacts">مخاطبین</string>
+    <string name="pa_perm_call_log">لیست تماس</string>
+    <string name="pa_perm_storage">حافظه</string>
+    <plurals name="pa_high_risk_count">
+        <item quantity="one">%1$d برنامه دارای دسترسی به ریسک بالا</item>
+        <item quantity="other">%1$d برنامه دارای دسترسی به ریسک بالا</item>
     </plurals>
 </resources>

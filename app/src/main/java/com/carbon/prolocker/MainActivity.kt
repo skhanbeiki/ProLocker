@@ -37,7 +37,6 @@ import com.carbon.prolocker.worker.RemoteConfigWorker
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import org.koin.android.ext.android.inject
 
 class MainActivity : AppCompatActivity() {
@@ -144,7 +143,7 @@ class MainActivity : AppCompatActivity() {
         val isRecoveryLaunch = intent?.component?.className ==
             "com.carbon.prolocker.launcher.RecoveryLauncherAlias"
 
-        val prefs = runBlocking { preferencesRepository.userPreferencesFlow.first() }
+        val prefs = preferencesRepository.currentPreferences
         val isStealthEnabled = prefs.isStealthModeEnabled
         val isOnboardingCompleted = prefs.onboardingCompleted && prefs.lockType != "NONE"
 
@@ -248,7 +247,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         enableEdgeToEdge()
-        val prefs = runBlocking { preferencesRepository.userPreferencesFlow.first() }
+        val prefs = preferencesRepository.currentPreferences
         val isOnboardingCompleted = prefs.onboardingCompleted && prefs.lockType != "NONE"
 
         // Snapshot deep-link state, then clear it so a re-inflated navigation (e.g. after the
