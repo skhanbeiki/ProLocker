@@ -1,5 +1,7 @@
 package com.carbon.prolocker.feature.hidefile.ui
 
+import com.carbon.prolocker.core.ui.centeredMaxWidth
+import com.carbon.prolocker.core.ui.Adaptive
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -109,7 +111,7 @@ fun HideSuccessBottomSheet(
             Button(
                 onClick = onDismiss,
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .fillMaxWidth().centeredMaxWidth(Adaptive.ButtonMaxWidth)
                     .height(52.dp),
                 shape = RoundedCornerShape(16.dp),
                 colors = ButtonDefaults.buttonColors(

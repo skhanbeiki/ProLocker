@@ -1,5 +1,8 @@
 package com.carbon.prolocker.feature.hidefile.ui
 
+import com.carbon.prolocker.core.ui.centeredMaxWidth
+import com.carbon.prolocker.core.ui.adaptiveGridCells
+import com.carbon.prolocker.core.ui.Adaptive
 import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.os.Environment
@@ -154,7 +157,7 @@ fun MediaPickerScreen(
                             onBack()
                         },
                         modifier = Modifier
-                            .fillMaxWidth()
+                            .fillMaxWidth().centeredMaxWidth(Adaptive.ButtonMaxWidth)
                             .padding(20.dp)
                             .navigationBarsPadding(),
                         shape = RoundedCornerShape(16.dp),
@@ -178,12 +181,12 @@ fun MediaPickerScreen(
                     modifier = Modifier.fillMaxSize()
                 )
                 else -> LazyVerticalGrid(
-                    columns = GridCells.Fixed(3),
+                    columns = adaptiveGridCells(phoneColumns = 3, tabletMinCellSize = 140.dp),
                     contentPadding = PaddingValues(16.dp, 8.dp, 16.dp, 24.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    items(media, key = { it.id }) { item ->
+                    items(media.distinctBy { it.id }, key = { it.id }) { item ->
                         val isSelected = item.id in selected
                         val onClick = {
                             selected = if (isSelected) selected - item.id else selected + item.id

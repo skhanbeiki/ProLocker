@@ -10,8 +10,14 @@ interface CrashDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertCrash(crash: CrashEntity)
 
-    @Query("SELECT * FROM pending_crashes WHERE isSent = 0 ORDER BY createdAt ASC")
+    // Bounded: each row carries a crash report body, and an unbounded read could overflow the
+    // 2 MB CursorWindow (CursorWindowAllocationException) when many reports piled up offline.
+    @Query("SELECT * FROM pending_crashes WHERE isSent = 0 ORDER BY createdAt ASC LIMIT 20")
     suspend fun getPendingCrashes(): List<CrashEntity>
+
+    /** Keeps only the newest reports so the table cannot grow without limit while offline. */
+    @Query("DELETE FROM pending_crashes WHERE id NOT IN (SELECT id FROM pending_crashes ORDER BY createdAt DESC LIMIT 50)")
+    suspend fun trimOldCrashes()
 
     @Query("DELETE FROM pending_crashes WHERE id = :id")
     suspend fun deleteCrash(id: Long)

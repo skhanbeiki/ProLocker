@@ -1,5 +1,12 @@
 package com.carbon.prolocker.feature.privatebrowser.ui
 
+import com.carbon.prolocker.core.ui.centeredMaxWidth
+import com.carbon.prolocker.core.ui.Adaptive
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
+import com.carbon.prolocker.core.ui.adaptiveGridHorizontalArrangement
+import com.carbon.prolocker.core.ui.adaptiveStaggeredCells
+import androidx.compose.foundation.lazy.staggeredgrid.items
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -74,13 +81,16 @@ fun BrowserSettingsScreen(
         containerColor = MaterialTheme.colorScheme.background,
         topBar = { BrowserPageTopBar(title = stringResource(R.string.pb_settings_title), onBack = onBack) }
     ) { padding ->
-        LazyColumn(
+        LazyVerticalStaggeredGrid(
+            columns = adaptiveStaggeredCells(),
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding),
-            contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 32.dp)
-        ) {
+            contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 32.dp),
+            horizontalArrangement = adaptiveGridHorizontalArrangement()
+) {
             item {
+Column(modifier = Modifier.fillMaxWidth()) {
                 SettingsCard {
                     SearchEngineRow(settings.searchEngine) { engine -> onUpdate { it.copy(searchEngine = engine) } }
                     RowDivider()
@@ -89,9 +99,10 @@ fun BrowserSettingsScreen(
                     ) { v -> onUpdate { it.copy(savePasswords = v) } }
                 }
             }
+}
 
-            item { SectionHeader(stringResource(R.string.pb_settings_clear_on_exit), stringResource(R.string.pb_settings_clear_on_exit_desc)) }
             item {
+Column(modifier = Modifier.fillMaxWidth()) { SectionHeader(stringResource(R.string.pb_settings_clear_on_exit), stringResource(R.string.pb_settings_clear_on_exit_desc)) 
                 SettingsCard {
                     SwitchRow(Icons.Outlined.DeleteSweep, stringResource(R.string.pb_setting_clear_cache), null,
                         settings.clearCacheOnExit) { v -> onUpdate { it.copy(clearCacheOnExit = v) } }
@@ -110,9 +121,10 @@ fun BrowserSettingsScreen(
                         settings.closeTabsOnExit) { v -> onUpdate { it.copy(closeTabsOnExit = v) } }
                 }
             }
+}
 
-            item { SectionHeader(stringResource(R.string.pb_settings_privacy), null) }
             item {
+Column(modifier = Modifier.fillMaxWidth()) { SectionHeader(stringResource(R.string.pb_settings_privacy), null) 
                 SettingsCard {
                     SwitchRow(Icons.Outlined.Layers, stringResource(R.string.pb_setting_third_party), null,
                         settings.blockThirdPartyCookies) { v -> onUpdate { it.copy(blockThirdPartyCookies = v) } }
@@ -132,9 +144,10 @@ fun BrowserSettingsScreen(
                         settings.secureScreen) { v -> onUpdate { it.copy(secureScreen = v) } }
                 }
             }
+}
 
-            item { SectionHeader(stringResource(R.string.pb_settings_shortcut), null) }
             item {
+Column(modifier = Modifier.fillMaxWidth()) { SectionHeader(stringResource(R.string.pb_settings_shortcut), null) 
                 SettingsCard {
                     ActionRow(
                         icon = Icons.Outlined.AddToHomeScreen,
@@ -144,8 +157,10 @@ fun BrowserSettingsScreen(
                     )
                 }
             }
+}
 
-            item {
+            item(span = StaggeredGridItemSpan.FullLine) {
+Column(modifier = Modifier.fillMaxWidth()) {
                 Spacer(modifier = Modifier.height(24.dp))
                 OutlinedButton(
                     onClick = onClearNow,
@@ -153,7 +168,7 @@ fun BrowserSettingsScreen(
                     border = BorderStroke(1.dp, MaterialTheme.colorScheme.error.copy(alpha = 0.6f)),
                     colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error),
                     modifier = Modifier
-                        .fillMaxWidth()
+                        .fillMaxWidth().centeredMaxWidth(Adaptive.ButtonMaxWidth)
                         .height(52.dp)
                 ) {
                     Icon(Icons.Outlined.DeleteForever, contentDescription = null)
@@ -161,6 +176,7 @@ fun BrowserSettingsScreen(
                     Text(stringResource(R.string.pb_clear_now), fontWeight = FontWeight.SemiBold)
                 }
             }
+}
         }
     }
 }

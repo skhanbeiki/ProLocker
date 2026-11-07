@@ -1,5 +1,7 @@
 package com.carbon.prolocker.feature.lock
 
+import androidx.compose.foundation.layout.BoxWithConstraints
+import com.carbon.prolocker.core.ui.isTablet
 import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
 import androidx.compose.animation.core.Animatable
@@ -204,8 +206,12 @@ fun LockScreenContent(
             }
         ) { padding ->
             val configuration = LocalContext.current.resources.configuration
-            val isLandscape =
+            val isLandscapeConfig =
                 configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
+            // The overlay's context keeps the configuration it was created with, so on tablets the
+            // orientation is read from the real size of the window instead (phones keep the old check).
+            BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+            val isLandscape = if (isTablet()) maxWidth > maxHeight else isLandscapeConfig
             val isRtl =
                 LocalLayoutDirection.current == LayoutDirection.Rtl
             if (isLandscape) {
@@ -732,6 +738,7 @@ fun LockScreenContent(
 
 
 
+            }
             }
         }
         if (showForgotDialog) {

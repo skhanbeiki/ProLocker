@@ -1,5 +1,6 @@
 package com.carbon.prolocker.feature.backup.data
 
+import com.carbon.prolocker.core.utils.toSafeBitmap
 import android.content.ContentProviderOperation
 import android.content.ContentValues
 import android.content.Context
@@ -90,7 +91,11 @@ class BackupRepository(
             }
 
             val label = pm.getApplicationLabel(appInfo).toString()
-            val icon = try { pm.getApplicationIcon(appInfo) } catch (_: Exception) { null }
+            // Small bitmap instead of the full icon: the whole app list is kept in memory.
+            val icon = try {
+                pm.getApplicationIcon(appInfo).toSafeBitmap(128, 128)
+                    ?.let { android.graphics.drawable.BitmapDrawable(context.resources, it) }
+            } catch (_: Throwable) { null }
             val apkFile = File(appInfo.sourceDir)
             val size = if (apkFile.exists()) apkFile.length() else 0L
 

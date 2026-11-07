@@ -1,5 +1,6 @@
 package com.carbon.prolocker.ad
 
+import com.carbon.prolocker.core.ui.centeredMaxWidth
 import android.util.Log
 import android.view.View
 import android.widget.FrameLayout
@@ -18,6 +19,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import com.carbon.prolocker.core.language.findActivity
+import com.carbon.prolocker.core.ui.Adaptive
 
 // ─── Overload: pre-loaded ad view ──────────────────────────────────────────
 
@@ -35,7 +37,7 @@ fun NativeAdContainer(
             }
             preloadedAd
         },
-        modifier = modifier
+        modifier = Modifier.centeredMaxWidth(Adaptive.NativeAdMaxWidth).then(modifier)
     )
 }
 
@@ -156,7 +158,9 @@ private fun NativeAdContainerInternal(
     // alpha(0f) still participates in layout so the space is reserved — no layout jump.
     AndroidView(
         factory = { container },
-        modifier = if (isAdLoaded) modifier else modifier.alpha(0f)
+        // Ad layouts stretch to their container, so on tablets they get a capped, centered width.
+        modifier = Modifier.centeredMaxWidth(Adaptive.NativeAdMaxWidth)
+            .then(if (isAdLoaded) modifier else modifier.alpha(0f))
     )
 }
 

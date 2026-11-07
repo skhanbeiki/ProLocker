@@ -1,5 +1,6 @@
 package com.carbon.prolocker.feature.onboarding
 
+import com.carbon.prolocker.core.utils.SafeSettings
 import android.content.res.Configuration
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -173,7 +174,7 @@ fun PermissionsScreen(
                             PermissionManager.getBatteryOptimizationSettingsIntent()
                         if (PermissionManager.canResolveIntent(context, fallbackIntent)) {
                             batteryPermissionPhase = BatteryPermissionLaunchPhase.FALLBACK_SETTINGS
-                            batterySettingsLauncher.launch(fallbackIntent)
+                            SafeSettings.launch(batterySettingsLauncher, context, fallbackIntent)
                         } else {
                             batteryPermissionPhase = BatteryPermissionLaunchPhase.IDLE
                         }
@@ -252,13 +253,13 @@ fun PermissionsScreen(
                                 PermissionType.USAGE_ACCESS -> {
                                     batteryPermissionPhase = BatteryPermissionLaunchPhase.IDLE
                                     TrustedReturnManager.startTrustedReturn()
-                                    batteryRequestLauncher.launch(PermissionManager.getUsageAccessIntent())
+                                    SafeSettings.launch(batteryRequestLauncher, context, PermissionManager.getUsageAccessIntent())
                                 }
 
                                 PermissionType.OVERLAY -> {
                                     batteryPermissionPhase = BatteryPermissionLaunchPhase.IDLE
                                     TrustedReturnManager.startTrustedReturn()
-                                    batteryRequestLauncher.launch(
+                                    SafeSettings.launch(batteryRequestLauncher, context, 
                                         PermissionManager.getOverlayPermissionIntent(
                                             context
                                         )
@@ -283,7 +284,7 @@ fun PermissionsScreen(
                                             batteryPermissionPhase =
                                                 BatteryPermissionLaunchPhase.DIRECT_REQUEST
                                             TrustedReturnManager.startTrustedReturn()
-                                            batteryRequestLauncher.launch(requestIntent)
+                                            SafeSettings.launch(batteryRequestLauncher, context, requestIntent)
                                         } else {
                                             val fallbackIntent =
                                                 PermissionManager.getBatteryOptimizationSettingsIntent()
@@ -295,7 +296,7 @@ fun PermissionsScreen(
                                                 batteryPermissionPhase =
                                                     BatteryPermissionLaunchPhase.FALLBACK_SETTINGS
                                                 TrustedReturnManager.startTrustedReturn()
-                                                batterySettingsLauncher.launch(fallbackIntent)
+                                                SafeSettings.launch(batterySettingsLauncher, context, fallbackIntent)
                                             } else {
                                                 refreshPermissionStates()
                                             }

@@ -526,6 +526,7 @@
     <string name="notification_manager">مدیریت اعلان‌ها</string>
     <string name="notification_manager_desc">اعلان‌های برنامه‌های دیگر را مخفی کنید تا محتوای آن‌ها دیده نشود.</string>
     <string name="notification_manager_subtitle">مخفی‌سازی اعلان سایر برنامه‌ها</string>
+    <string name="badge_new">جدید</string>
     <string name="quick_private_browser">مرورگر خصوصی</string>
     <string name="quick_notification_manager">مدیریت اعلان</string>
     <string name="feature_coming_soon">به‌زودی</string>

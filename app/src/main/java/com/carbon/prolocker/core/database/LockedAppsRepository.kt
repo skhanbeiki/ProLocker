@@ -26,6 +26,11 @@ class LockedAppsRepository(private val dao: LockedAppDao) {
     }
 
     suspend fun recordUnlockTime(packageName: String, time: Long) {
-        dao.updateUnlockTime(packageName, time)
+        // Bookkeeping only: a failed write (e.g. SQLiteFullException on a full disk) must not crash the unlock.
+        try {
+            dao.updateUnlockTime(packageName, time)
+        } catch (_: android.database.SQLException) {
+        } catch (_: IllegalStateException) {
+        }
     }
 }

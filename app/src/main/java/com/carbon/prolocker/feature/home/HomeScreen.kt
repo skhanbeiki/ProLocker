@@ -1,5 +1,10 @@
 package com.carbon.prolocker.feature.home
 
+import androidx.compose.ui.unit.Dp
+import com.carbon.prolocker.core.ui.adaptiveGridHorizontalArrangement
+import com.carbon.prolocker.core.ui.adaptiveStaggeredCells
+import androidx.compose.foundation.lazy.staggeredgrid.items
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
@@ -91,6 +96,8 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun HomeScreen(
     paddingValues: PaddingValues = PaddingValues(0.dp),
+    /** Height of the main bottom bar (ad + navigation) drawn over this tab; lists pad their end by it. */
+    bottomBarPadding: Dp = 0.dp,
     onNavigateToLockedApps: () -> Unit,
     onNavigateToGallery: () -> Unit = {},
     onNavigateToPermissions: (String) -> Unit = {}
@@ -106,7 +113,7 @@ fun HomeScreen(
     val serviceStatus by viewModel?.serviceStatus?.collectAsState(initial = ServiceStatus.IDLE)
         ?: remember { mutableStateOf(ServiceStatus.IDLE) }
 
-    val listState = rememberLazyListState()
+    val listState = androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState()
     var isHeaderVisible by remember { mutableStateOf(true) }
 
 
@@ -224,6 +231,8 @@ fun HomeScreen(
         },
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { padding ->
+        // Lists keep scrolling under the bottom ad/bar; this end padding lets the last item stop above it.
+        val bottomOverlap = (bottomBarPadding - padding.calculateBottomPadding()).coerceAtLeast(0.dp)
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -461,15 +470,19 @@ fun HomeScreen(
                     }
                 }
             } else {
-                LazyColumn(
+                LazyVerticalStaggeredGrid(
+                    columns = adaptiveStaggeredCells(),
                     state = listState,
                     modifier = Modifier.fillMaxSize(),
                     contentPadding = PaddingValues(
-                        bottom = 160.dp
+                        // Was a fixed 160dp guess; now the measured bottom bar (ad + navigation) plus breathing room.
+                        bottom = bottomOverlap + 16.dp
                     ),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                    verticalItemSpacing = 8.dp,
+                    horizontalArrangement = adaptiveGridHorizontalArrangement()
                 ) {
                     items(apps, key = { it.packageName }) { app ->
+Column(modifier = Modifier.fillMaxWidth()) {
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -575,6 +588,7 @@ fun HomeScreen(
                             }
                         }
                     }
+}
                 }
             }
         }

@@ -1,5 +1,12 @@
 package com.carbon.prolocker.feature.privacyauditor
 
+import com.carbon.prolocker.core.utils.SafeSettings
+import com.carbon.prolocker.core.ui.centeredMaxWidth
+import com.carbon.prolocker.core.ui.Adaptive
+import com.carbon.prolocker.core.ui.adaptiveGridHorizontalArrangement
+import com.carbon.prolocker.core.ui.adaptiveStaggeredCells
+import androidx.compose.foundation.lazy.staggeredgrid.items
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
@@ -239,12 +246,15 @@ fun PrivacyAuditorScreen(
                     }
                 }
             } else {
-                LazyColumn(
+                LazyVerticalStaggeredGrid(
+                    columns = adaptiveStaggeredCells(),
                     modifier = Modifier.fillMaxSize(),
                     contentPadding = PaddingValues(horizontal = 20.dp, vertical = 12.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                    verticalItemSpacing = 12.dp,
+                    horizontalArrangement = adaptiveGridHorizontalArrangement()
                 ) {
                     items(filteredApps, key = { it.packageName }) { appInfo ->
+Column(modifier = Modifier.fillMaxWidth()) {
                         AppAuditCard(
                             appInfo = appInfo,
                             onManagePermission = {
@@ -252,12 +262,13 @@ fun PrivacyAuditorScreen(
                                     val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
                                         data = Uri.parse("package:${appInfo.packageName}")
                                     }
-                                    context.startActivity(intent)
+                                    SafeSettings.open(context, intent)
                                 } catch (e: Exception) {
                                 }
                             }
                         )
                     }
+}
                 }
             }
         }
@@ -475,7 +486,7 @@ fun AppAuditCard(
             Spacer(modifier = Modifier.height(12.dp))
             Button(
                 onClick = onManagePermission,
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().centeredMaxWidth(Adaptive.ButtonMaxWidth),
                 shape = RoundedCornerShape(14.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.surface)
             ) {

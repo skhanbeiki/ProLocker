@@ -1,5 +1,8 @@
 package com.carbon.prolocker.feature.callblocker.ui
 
+import com.carbon.prolocker.core.utils.SafeSettings
+import com.carbon.prolocker.core.ui.centeredMaxWidth
+import com.carbon.prolocker.core.ui.Adaptive
 import android.app.role.RoleManager
 import android.content.Context
 import android.content.Intent
@@ -194,7 +197,7 @@ fun CallBlockerPermissionGate(
                 onClick = { requestPermissionsFlow() },
                 shape = RoundedCornerShape(16.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = ProLockerPrimary),
-                modifier = Modifier.fillMaxWidth().height(48.dp)
+                modifier = Modifier.fillMaxWidth().centeredMaxWidth(Adaptive.ButtonMaxWidth).height(48.dp)
             ) {
                 Text(
                     text = stringResource(R.string.call_blocker_grant_role),
@@ -210,10 +213,10 @@ fun CallBlockerPermissionGate(
                     val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
                         data = Uri.parse("package:${context.packageName}")
                     }
-                    context.startActivity(intent)
+                    SafeSettings.open(context, intent)
                 },
                 shape = RoundedCornerShape(16.dp),
-                modifier = Modifier.fillMaxWidth().height(48.dp)
+                modifier = Modifier.fillMaxWidth().centeredMaxWidth(Adaptive.ButtonMaxWidth).height(48.dp)
             ) {
                 Text(
                     text = stringResource(R.string.backup_open_app_settings),

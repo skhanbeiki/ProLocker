@@ -1,5 +1,12 @@
 package com.carbon.prolocker.feature.notificationmanager.ui
 
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
+import com.carbon.prolocker.core.ui.adaptiveGridHorizontalArrangement
+import com.carbon.prolocker.core.ui.adaptiveStaggeredCells
+import androidx.compose.foundation.lazy.staggeredgrid.items
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
+import com.carbon.prolocker.core.ui.Adaptive
+import com.carbon.prolocker.core.ui.centeredMaxWidth
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -89,7 +96,7 @@ fun SelectAppsScreen(
                     onClick = { onConfirm(selectedSet) },
                     enabled = selectedSet.isNotEmpty(),
                     modifier = Modifier
-                        .fillMaxWidth()
+                        .fillMaxWidth().centeredMaxWidth(Adaptive.ButtonMaxWidth)
                         .navigationBarsPadding()
                         .padding(16.dp)
                         .height(54.dp),
@@ -124,11 +131,14 @@ fun SelectAppsScreen(
                 )
                 return@Column
             }
-            LazyColumn(
+            LazyVerticalStaggeredGrid(
+                columns = adaptiveStaggeredCells(),
                 contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                verticalItemSpacing = 8.dp,
+                horizontalArrangement = adaptiveGridHorizontalArrangement()
             ) {
-                item(key = "__all__") {
+                item(key = "__all__", span = StaggeredGridItemSpan.FullLine) {
+Column(modifier = Modifier.fillMaxWidth()) {
                     PickRow(
                         leading = { GradientIconBox(Icons.Outlined.Apps, size = 42.dp) },
                         title = stringResource(R.string.nm_all_apps),
@@ -140,7 +150,9 @@ fun SelectAppsScreen(
                         }
                     )
                 }
+}
                 items(visible, key = { it.packageName }) { app ->
+Column(modifier = Modifier.fillMaxWidth()) {
                     val checked = app.packageName in selectedSet
                     PickRow(
                         leading = { AppIcon(app.packageName, size = 42.dp) },
@@ -152,6 +164,7 @@ fun SelectAppsScreen(
                         }
                     )
                 }
+}
             }
         }
     }
@@ -213,11 +226,14 @@ fun ManageAppsScreen(
                 )
                 return@Column
             }
-            LazyColumn(
+            LazyVerticalStaggeredGrid(
+                columns = adaptiveStaggeredCells(),
                 contentPadding = PaddingValues(horizontal = 16.dp, vertical = 4.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                verticalItemSpacing = 8.dp,
+                horizontalArrangement = adaptiveGridHorizontalArrangement()
             ) {
                 items(list, key = { it.packageName }) { app ->
+Column(modifier = Modifier.fillMaxWidth()) {
                     val hidden = tab == 1
                     PickRow(
                         leading = { AppIcon(app.packageName, size = 42.dp) },
@@ -235,6 +251,7 @@ fun ManageAppsScreen(
                         onClick = { if (hidden) onShow(app.packageName) else onHide(app.packageName) }
                     )
                 }
+}
             }
         }
     }

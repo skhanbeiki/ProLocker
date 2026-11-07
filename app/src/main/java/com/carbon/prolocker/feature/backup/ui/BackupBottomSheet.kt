@@ -1,5 +1,7 @@
 package com.carbon.prolocker.feature.backup.ui
 
+import com.carbon.prolocker.core.ui.centeredMaxWidth
+import com.carbon.prolocker.core.ui.Adaptive
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -211,7 +213,7 @@ fun BackupBottomSheet(
             Button(
                 onClick = onRestore,
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .fillMaxWidth().centeredMaxWidth(Adaptive.ButtonMaxWidth)
                     .height(52.dp),
                 shape = RoundedCornerShape(16.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = ProLockerPrimary)

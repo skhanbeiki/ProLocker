@@ -59,6 +59,9 @@ fun NotificationManagerScreen(onBack: () -> Unit) {
     val wasSetUp by repository.wasSetUp.collectAsState()
     val notifications by repository.notifications.collectAsState()
     val unseen by repository.unseenCount.collectAsState()
+    LaunchedEffect(Unit) {
+        com.carbon.prolocker.core.ui.NewFeatureBadges.markSeen(context, com.carbon.prolocker.core.ui.NewFeatureBadges.NOTIFICATION_MANAGER)
+    }
 
     var page by rememberSaveable { mutableStateOf(NmPage.HOME) }
     var currentApp by rememberSaveable { mutableStateOf<String?>(null) }

@@ -1,5 +1,7 @@
 package com.carbon.prolocker.core.ui.components
 
+import com.carbon.prolocker.core.ui.centeredMaxWidth
+import com.carbon.prolocker.core.ui.Adaptive
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -68,7 +70,7 @@ fun RecoverySetupIntroDialog(
             Spacer(modifier = Modifier.height(12.dp))
             TextButton(
                 onClick = onNotNow,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth().centeredMaxWidth(Adaptive.ButtonMaxWidth)
             ) {
                 Text(
                     text = stringResource(R.string.not_now),

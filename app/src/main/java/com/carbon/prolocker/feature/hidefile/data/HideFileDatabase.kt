@@ -32,7 +32,7 @@ class HideFileDatabase(context: Context) :
         if (updated == 0) {
             db.insert(TABLE, null, values)
         }
-        db.close()
+        // The helper is a shared singleton: closing here broke concurrent calls ("re-open an already-closed object").
     }
 
     fun getAllItems(filterKey: String? = null): List<HideItem> {
@@ -50,7 +50,7 @@ class HideFileDatabase(context: Context) :
                     }
                 }
             }
-            db.close()
+            // The helper is a shared singleton: closing here broke concurrent calls ("re-open an already-closed object").
         } catch (e: Exception) {
             // ignore: mirror old behavior of silently returning empty list
         }
@@ -67,20 +67,20 @@ class HideFileDatabase(context: Context) :
             put(KEY_SIZE, item.size)
         }
         val rows = db.update(TABLE, values, "$KEY_ID = ?", arrayOf(item.id.toString()))
-        db.close()
+        // The helper is a shared singleton: closing here broke concurrent calls ("re-open an already-closed object").
         return rows
     }
 
     fun deleteEntry(name: String) {
         val db = writableDatabase
         db.delete(TABLE, "$KEY_NAME = ?", arrayOf(name))
-        db.close()
+        // The helper is a shared singleton: closing here broke concurrent calls ("re-open an already-closed object").
     }
 
     fun getItemCount(): Int {
         val db = readableDatabase
         val count = db.rawQuery("SELECT * FROM $TABLE", null)?.use { it.count } ?: 0
-        db.close()
+        // The helper is a shared singleton: closing here broke concurrent calls ("re-open an already-closed object").
         return count
     }
 

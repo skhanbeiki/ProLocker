@@ -1,5 +1,10 @@
 package com.carbon.prolocker.feature.privatebrowser.ui
 
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
+import com.carbon.prolocker.core.ui.adaptiveGridHorizontalArrangement
+import com.carbon.prolocker.core.ui.adaptiveStaggeredCells
+import androidx.compose.foundation.lazy.staggeredgrid.items
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -95,14 +100,17 @@ fun BrowserTabsScreen(controller: BrowserController, onBack: () -> Unit) {
             )
         }
     ) { padding ->
-        LazyColumn(
+        LazyVerticalStaggeredGrid(
+            columns = adaptiveStaggeredCells(),
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding),
             contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 96.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
+            verticalItemSpacing = 10.dp,
+            horizontalArrangement = adaptiveGridHorizontalArrangement()
         ) {
             items(controller.tabs, key = { it.id }) { tab ->
+Column(modifier = Modifier.fillMaxWidth()) {
                 TabCard(
                     tab = tab,
                     selected = tab.id == controller.currentTab?.id,
@@ -110,6 +118,7 @@ fun BrowserTabsScreen(controller: BrowserController, onBack: () -> Unit) {
                     onClose = { controller.closeTab(tab) }
                 )
             }
+}
         }
     }
 }
@@ -191,13 +200,16 @@ fun BrowserBookmarksScreen(
                 modifier = Modifier.padding(padding)
             )
         } else {
-            LazyColumn(
+            LazyVerticalStaggeredGrid(
+                columns = adaptiveStaggeredCells(),
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(padding),
-                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)
-            ) {
+                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
+                horizontalArrangement = adaptiveGridHorizontalArrangement()
+) {
                 items(bookmarks, key = { it.url }) { bookmark ->
+Column(modifier = Modifier.fillMaxWidth()) {
                     var menu by remember { mutableStateOf(false) }
                     SiteRow(
                         title = bookmark.title,
@@ -231,6 +243,7 @@ fun BrowserBookmarksScreen(
                         }
                     )
                 }
+}
             }
         }
     }
@@ -313,12 +326,15 @@ fun BrowserHistoryScreen(
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 8.dp)
             )
-            LazyColumn(
+            LazyVerticalStaggeredGrid(
+                columns = adaptiveStaggeredCells(),
                 modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp)
-            ) {
+                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
+                horizontalArrangement = adaptiveGridHorizontalArrangement()
+) {
                 grouped.forEach { (day, entries) ->
-                    item(key = "header_$day") {
+                    item(key = "header_$day", span = StaggeredGridItemSpan.FullLine) {
+Column(modifier = Modifier.fillMaxWidth()) {
                         Text(
                             text = day,
                             style = MaterialTheme.typography.labelLarge,
@@ -327,7 +343,9 @@ fun BrowserHistoryScreen(
                             modifier = Modifier.padding(start = 8.dp, top = 14.dp, bottom = 6.dp)
                         )
                     }
+}
                     items(entries, key = { "h_${it.visitedAt}_${it.url}" }) { entry ->
+Column(modifier = Modifier.fillMaxWidth()) {
                         SiteRow(
                             title = entry.title,
                             url = entry.url,
@@ -344,6 +362,7 @@ fun BrowserHistoryScreen(
                             }
                         )
                     }
+}
                 }
             }
         }

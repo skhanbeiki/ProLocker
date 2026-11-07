@@ -178,60 +178,10 @@ class AppMonitorService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        val localizedContext = getLocalizedContext()
-        val channelId = "prolocker_monitor_channel"
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                channelId,
-                localizedContext.getString(R.string.notification_channel_name),
-                NotificationManager.IMPORTANCE_LOW
-            ).apply {
-                description = localizedContext.getString(R.string.notification_channel_desc)
-                setShowBadge(false)
-            }
-            val manager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-            manager.createNotificationChannel(channel)
-        }
-        val notification = createNotification()
-        val hasCameraPermission = ContextCompat.checkSelfPermission(
-            this,
-            android.Manifest.permission.CAMERA
-        ) == PackageManager.PERMISSION_GRANTED
-
-        val fgServiceType = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-            var type = android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
-            if (hasCameraPermission) {
-                type = type or android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_CAMERA
-            }
-            type
-        } else {
-            0
-        }
-
-        try {
-            androidx.core.app.ServiceCompat.startForeground(
-                this,
-                1001,
-                notification,
-                fgServiceType
-            )
-        } catch (e: Exception) {
-            Log.e(TAG, "Failed to startForeground with type in AppMonitorService, fallback to SPECIAL_USE", e)
-            try {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-                    androidx.core.app.ServiceCompat.startForeground(
-                        this,
-                        1001,
-                        notification,
-                        android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
-                    )
-                } else {
-                    startForeground(1001, notification)
-                }
-            } catch (e2: Exception) {
-                Log.e(TAG, "Critical: Failed to startForeground in AppMonitorService", e2)
-            }
-        }
+        // Must happen first: the system kills the app (ForegroundServiceDidNotStartInTimeException)
+        // if a service started with startForegroundService() does not call startForeground() in time,
+        // including when it is stopped before doing so.
+        enterForeground()
         val prefs = preferencesRepository.currentPreferences
         if (prefs.isProtectionEnabled) {
             if (!isScreenReceiverRegistered) {
@@ -249,12 +199,27 @@ class AppMonitorService : Service() {
                     Log.e(TAG, "Failed to register screenReceiver", e)
                 }
             }
-            ServiceWatchdog.startWatchdog(this)
-            permissionHealthMonitor.startMonitoring()
+            // System calls here can throw DeadSystemException (wrapped) while the system restarts.
+            try {
+                ServiceWatchdog.startWatchdog(this)
+            } catch (e: RuntimeException) {
+                Log.e(TAG, "startWatchdog failed", e)
+            }
+            try {
+                permissionHealthMonitor.startMonitoring()
+            } catch (e: RuntimeException) {
+                Log.e(TAG, "permission monitoring failed to start", e)
+            }
         }
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        // Every startForegroundService() call needs its own startForeground(), so it runs on every
+        // start command, before any early return or stopSelf().
+        if (!enterForeground()) {
+            stopSelf()
+            return START_NOT_STICKY
+        }
         val prefs = preferencesRepository.currentPreferences
         if (!prefs.isProtectionEnabled) {
             stopForeground(STOP_FOREGROUND_REMOVE)
@@ -488,6 +453,76 @@ class AppMonitorService : Service() {
                 Unit
             }
         }
+    }
+
+    /**
+     * Puts the service in the foreground. Never throws: a channel or notification problem falls back
+     * to a minimal notification, a rejected service type falls back to the plain special-use type.
+     * Returns false only when the system refuses the foreground start altogether.
+     */
+    private fun enterForeground(): Boolean {
+        val notification = try {
+            createNotification()
+        } catch (e: Throwable) {
+            Log.e(TAG, "createNotification failed, using a minimal notification", e)
+            fallbackNotification()
+        }
+        val withCamera = Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE &&
+            ContextCompat.checkSelfPermission(this, android.Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
+        val types = buildList {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                if (withCamera) {
+                    add(android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE or
+                        android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_CAMERA)
+                }
+                add(android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE)
+            } else {
+                add(0)
+            }
+        }
+        for (type in types) {
+            try {
+                androidx.core.app.ServiceCompat.startForeground(this, 1001, notification, type)
+                return true
+            } catch (e: Throwable) {
+                // SecurityException (type not allowed), ForegroundServiceStartNotAllowedException (12+),
+                // or a bad notification: try the next, simpler option.
+                Log.e(TAG, "startForeground failed for type=$type", e)
+            }
+        }
+        return try {
+            androidx.core.app.ServiceCompat.startForeground(
+                this, 1001, fallbackNotification(),
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
+                    android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE else 0
+            )
+            true
+        } catch (e: Throwable) {
+            Log.e(TAG, "Critical: startForeground refused", e)
+            false
+        }
+    }
+
+    /** A notification that only needs a channel with a fixed name and a system icon. */
+    private fun fallbackNotification(): Notification {
+        val channelId = "prolocker_monitor_channel"
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            try {
+                val manager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+                if (manager.getNotificationChannel(channelId) == null) {
+                    manager.createNotificationChannel(
+                        NotificationChannel(channelId, getString(R.string.app_name), NotificationManager.IMPORTANCE_LOW)
+                    )
+                }
+            } catch (_: Throwable) {
+            }
+        }
+        return NotificationCompat.Builder(this, channelId)
+            .setSmallIcon(android.R.drawable.ic_lock_idle_lock)
+            .setContentTitle(getString(R.string.app_name))
+            .setOngoing(true)
+            .setPriority(NotificationCompat.PRIORITY_LOW)
+            .build()
     }
 
     private fun createNotification(): Notification {

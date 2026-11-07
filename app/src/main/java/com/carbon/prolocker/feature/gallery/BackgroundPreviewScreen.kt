@@ -1,5 +1,9 @@
 package com.carbon.prolocker.feature.gallery
 
+import com.carbon.prolocker.core.ui.components.OverlaySafeAlertDialog
+import com.carbon.prolocker.core.ui.isTablet
+import com.carbon.prolocker.core.ui.centeredMaxWidth
+import com.carbon.prolocker.core.ui.Adaptive
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
@@ -142,42 +146,6 @@ fun BackgroundPreviewScreen(
         }
     }
 
-    if (showDeleteConfirmDialog) {
-        AlertDialog(
-            onDismissRequest = { showDeleteConfirmDialog = false },
-            title = {
-                Text(
-                    text = stringResource(R.string.delete_download),
-                    style = AppTypography.titleMedium,
-                    fontWeight = FontWeight.Bold
-                )
-            },
-            text = {
-                Text(
-                    text = stringResource(R.string.delete_wallpaper_confirm),
-                    style = AppTypography.bodyMedium
-                )
-            },
-            confirmButton = {
-                Button(
-                    onClick = {
-                        showDeleteConfirmDialog = false
-                        viewModel.deleteDownloadedBackground(id)
-                        onBack()
-                    },
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
-                ) {
-                    Text(stringResource(R.string.delete))
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showDeleteConfirmDialog = false }) {
-                    Text(stringResource(R.string.close))
-                }
-            }
-        )
-    }
-
     Scaffold(
         topBar = {
             TopAppBar(
@@ -234,7 +202,8 @@ fun BackgroundPreviewScreen(
                 // Phone Frame Preview Canvas with Live Pattern Overlay Mockup
                 Box(
                     modifier = Modifier
-                        .fillMaxWidth(0.72f)
+                        // Phones: 72% of the width. Tablets: a fixed phone-sized mockup, not a fraction of the screen.
+                        .then(if (isTablet()) Modifier.width(320.dp) else Modifier.fillMaxWidth(0.72f))
                         .aspectRatio(0.56f)
                         .shadow(12.dp, RoundedCornerShape(24.dp))
                         .clip(RoundedCornerShape(24.dp))
@@ -402,7 +371,7 @@ fun BackgroundPreviewScreen(
                                 enabled = false,
                                 shape = RoundedCornerShape(16.dp),
                                 modifier = Modifier
-                                    .fillMaxWidth()
+                                    .fillMaxWidth().centeredMaxWidth(Adaptive.ButtonMaxWidth)
                                     .height(52.dp)
                             ) {
                                 Icon(
@@ -431,7 +400,7 @@ fun BackgroundPreviewScreen(
                                     containerColor = MaterialTheme.colorScheme.primary
                                 ),
                                 modifier = Modifier
-                                    .fillMaxWidth()
+                                    .fillMaxWidth().centeredMaxWidth(Adaptive.ButtonMaxWidth)
                                     .height(52.dp)
                             ) {
                                 Icon(
@@ -457,7 +426,8 @@ fun BackgroundPreviewScreen(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 14.dp),
+                            .padding(horizontal = 16.dp, vertical = 14.dp)
+                            .centeredMaxWidth(Adaptive.ButtonBarMaxWidth),
                         horizontalArrangement = Arrangement.spacedBy(10.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -624,6 +594,43 @@ fun BackgroundPreviewScreen(
                 }
             }
         }
+    }
+
+    if (showDeleteConfirmDialog) {
+        // Drawn after the Scaffold: this screen is also shown inside the lock overlay (no Activity).
+        OverlaySafeAlertDialog(
+            onDismissRequest = { showDeleteConfirmDialog = false },
+            title = {
+                Text(
+                    text = stringResource(R.string.delete_download),
+                    style = AppTypography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+            },
+            text = {
+                Text(
+                    text = stringResource(R.string.delete_wallpaper_confirm),
+                    style = AppTypography.bodyMedium
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        showDeleteConfirmDialog = false
+                        viewModel.deleteDownloadedBackground(id)
+                        onBack()
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
+                ) {
+                    Text(stringResource(R.string.delete))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteConfirmDialog = false }) {
+                    Text(stringResource(R.string.close))
+                }
+            }
+        )
     }
 }
 

@@ -1,5 +1,7 @@
 package com.carbon.prolocker.ad.providers
 
+import com.carbon.prolocker.ad.NativeAdImageRounding
+
 import android.content.Context
 import android.util.Log
 import android.view.LayoutInflater
@@ -58,6 +60,10 @@ class AdiveryNativeAdProvider(override val providerName: String = "adivery") : N
             adView.setListener(object : AdiveryAdListener() {
                 override fun onAdLoaded() {
                     Log.i("AD_PROVIDER_DEBUG", "🎯 [ADIVERY] adViewListener.onAdLoaded -> zoneId=$zoneId")
+                    // Adivery can (re)inflate its layout when it shows the ad, so round on every callback
+                    // and again after the next layout pass.
+                    NativeAdImageRounding.apply(adView)
+                    adView.post { NativeAdImageRounding.apply(adView) }
                     if (!rendered) {
                         rendered = true
                         onRendered(adView)
@@ -66,6 +72,10 @@ class AdiveryNativeAdProvider(override val providerName: String = "adivery") : N
 
                 override fun onAdShown() {
                     Log.i("AD_PROVIDER_DEBUG", "👀 [ADIVERY] onAdShown (zoneId=$zoneId)")
+                    // Adivery can (re)inflate its layout when it shows the ad, so round on every callback
+                    // and again after the next layout pass.
+                    NativeAdImageRounding.apply(adView)
+                    adView.post { NativeAdImageRounding.apply(adView) }
                     if (!rendered) {
                         rendered = true
                         onRendered(adView)

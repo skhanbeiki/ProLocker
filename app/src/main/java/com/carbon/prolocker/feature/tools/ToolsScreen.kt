@@ -1,5 +1,7 @@
 package com.carbon.prolocker.feature.tools
 
+import androidx.compose.ui.unit.Dp
+import com.carbon.prolocker.core.ui.isTablet
 import android.content.res.Configuration
 import androidx.annotation.RawRes
 import androidx.compose.animation.core.Spring
@@ -104,7 +106,9 @@ data class ToolsFeatureItem(
     val gradient: List<Color>,
     val available: Boolean,
     @RawRes val lottieRes: Int? = null,
-    val badgeCount: Int = 0
+    val badgeCount: Int = 0,
+    /** Recently added section the user hasn't opened yet: shows a "New" badge. */
+    val isNew: Boolean = false
 )
 
 @Composable
@@ -194,7 +198,30 @@ fun FeatureCard(
                     )
                 }
             }
-            if (item.badgeCount > 0) {
+            if (item.isNew) {
+                Row(
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .defaultMinSize(minHeight = 24.dp)
+                        .background(Color.White, CircleShape)
+                        .padding(horizontal = 8.dp, vertical = 2.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = androidx.compose.material.icons.Icons.Filled.AutoAwesome,
+                        contentDescription = null,
+                        tint = item.gradient.first(),
+                        modifier = Modifier.size(12.dp)
+                    )
+                    Spacer(modifier = Modifier.width(3.dp))
+                    Text(
+                        text = stringResource(R.string.badge_new),
+                        color = item.gradient.first(),
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 12.sp
+                    )
+                }
+            } else if (item.badgeCount > 0) {
                 Box(
                     modifier = Modifier
                         .align(Alignment.TopEnd)
@@ -489,7 +516,9 @@ fun ToolsGrid(
     onHeroClick: () -> Unit,
     onFeatureClick: (ToolsFeatureItem) -> Unit,
     modifier: Modifier = Modifier,
-    badgeText: String? = null
+    badgeText: String? = null,
+    /** Extra end padding so the last row can scroll above the bottom ad/bar drawn over the grid. */
+    bottomExtra: Dp = 0.dp
 ) {
     val gridItems = remember(features) {
         features.filter { it.id != FeatureId.JUNK_CLEANER }
@@ -499,13 +528,14 @@ fun ToolsGrid(
     }
 
     LazyVerticalGrid(
-        columns = GridCells.Fixed(2),
+        // Phones: 2 tool cards per row. Tablets: all 4 tools in one row at a natural card size.
+        columns = if (isTablet()) GridCells.Fixed(4) else GridCells.Fixed(2),
         modifier = modifier,
-        contentPadding = PaddingValues(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 24.dp),
+        contentPadding = PaddingValues(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 24.dp + bottomExtra),
         horizontalArrangement = Arrangement.spacedBy(14.dp),
         verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
-        item(span = { GridItemSpan(2) }) {
+        item(span = { GridItemSpan(maxLineSpan) }) {
             AppLockHeroCard(
                 title = heroTitle,
                 subtitle = heroSubtitle,
@@ -529,7 +559,7 @@ fun ToolsGrid(
         }
 
         if (junkCleanerItem != null) {
-            item(span = { GridItemSpan(2) }, key = junkCleanerItem.id.name) {
+            item(span = { GridItemSpan(maxLineSpan) }, key = junkCleanerItem.id.name) {
                 JunkCleanerCard(
                     item = junkCleanerItem,
                     onClick = { onFeatureClick(junkCleanerItem) },
@@ -541,7 +571,7 @@ fun ToolsGrid(
             }
         }
 
-        item(span = { GridItemSpan(2) }) {
+        item(span = { GridItemSpan(maxLineSpan) }) {
             Spacer(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -555,6 +585,8 @@ fun ToolsGrid(
 @Composable
 fun ToolsScreen(
     paddingValues: PaddingValues = PaddingValues(0.dp),
+    /** Height of the main bottom bar (ad + navigation) drawn over this tab; lists pad their end by it. */
+    bottomBarPadding: Dp = 0.dp,
     onNavigateToSecurity: () -> Unit = {},
     onNavigateToHideFiles: () -> Unit = {},
     onNavigateToBackup: () -> Unit = {},
@@ -571,6 +603,10 @@ fun ToolsScreen(
     // Badge = saved hidden notifications not read yet (read = seen in that app's list).
     val savedNotifications by notificationHiderRepository.notifications.collectAsState()
     val unreadNotificationCount = remember(savedNotifications) { savedNotifications.count { !it.read } }
+    // "New" badge on recently added sections until the user opens them once.
+    val badgeContext = androidx.compose.ui.platform.LocalContext.current
+    val seenFeatures by com.carbon.prolocker.core.ui.NewFeatureBadges.seen(badgeContext).collectAsState()
+    fun isNew(feature: String) = seenFeatures?.contains(feature) == false
     val snackbarHostState = remember { SnackbarHostState() }
     val appLockTitle = stringResource(R.string.tools_app_lock)
 
@@ -597,7 +633,8 @@ fun ToolsScreen(
             subtitle = stringResource(R.string.private_browser_subtitle),
             icon = Icons.Outlined.Public,
             gradient = com.carbon.prolocker.feature.privatebrowser.PrivateBrowserGradient,
-            available = true
+            available = true,
+            isNew = isNew(com.carbon.prolocker.core.ui.NewFeatureBadges.PRIVATE_BROWSER)
         ),
         ToolsFeatureItem(
             id = FeatureId.NOTIFICATION_MANAGER,
@@ -606,7 +643,8 @@ fun ToolsScreen(
             icon = Icons.Outlined.NotificationsOff,
             gradient = com.carbon.prolocker.feature.notificationmanager.NotificationManagerGradient,
             available = true,
-            badgeCount = unreadNotificationCount
+            badgeCount = unreadNotificationCount,
+            isNew = isNew(com.carbon.prolocker.core.ui.NewFeatureBadges.NOTIFICATION_MANAGER)
         ),
         /*
         ToolsFeatureItem(
@@ -705,7 +743,10 @@ fun ToolsScreen(
         },
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { innerPadding ->
+        // The grid keeps scrolling under the bottom ad/bar; this end padding lets the last row stop above it.
+        val bottomOverlap = (bottomBarPadding - innerPadding.calculateBottomPadding()).coerceAtLeast(0.dp)
         ToolsGrid(
+            bottomExtra = bottomOverlap,
             features = features,
             heroTitle = appLockTitle,
             heroSubtitle = stringResource(R.string.tools_app_lock_subtitle),
@@ -723,8 +764,14 @@ fun ToolsScreen(
                     FeatureId.CALL_BLOCKER -> { /* onNavigateToCallBlocker() */ }
                     FeatureId.JUNK_CLEANER -> onNavigateToJunkCleaner()
                     FeatureId.PRIVACY_AUDITOR -> onNavigateToAudit()
-                    FeatureId.PRIVATE_BROWSER -> onNavigateToPrivateBrowser()
-                    FeatureId.NOTIFICATION_MANAGER -> onNavigateToNotificationManager()
+                    FeatureId.PRIVATE_BROWSER -> {
+                        com.carbon.prolocker.core.ui.NewFeatureBadges.markSeen(badgeContext, com.carbon.prolocker.core.ui.NewFeatureBadges.PRIVATE_BROWSER)
+                        onNavigateToPrivateBrowser()
+                    }
+                    FeatureId.NOTIFICATION_MANAGER -> {
+                        com.carbon.prolocker.core.ui.NewFeatureBadges.markSeen(badgeContext, com.carbon.prolocker.core.ui.NewFeatureBadges.NOTIFICATION_MANAGER)
+                        onNavigateToNotificationManager()
+                    }
                 }
             },
             modifier = Modifier

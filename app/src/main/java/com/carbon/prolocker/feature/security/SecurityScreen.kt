@@ -1,5 +1,14 @@
 package com.carbon.prolocker.feature.security
 
+import androidx.compose.material3.VerticalDivider
+import androidx.compose.foundation.layout.IntrinsicSize
+import com.carbon.prolocker.core.ui.isTablet
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
+import com.carbon.prolocker.core.ui.adaptiveGridHorizontalArrangement
+import com.carbon.prolocker.core.ui.adaptiveStaggeredCells
+import androidx.compose.foundation.lazy.staggeredgrid.items
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
+import com.carbon.prolocker.core.ui.adaptiveGridCells
 import android.Manifest
 import android.content.pm.PackageManager
 import android.content.res.Configuration
@@ -251,7 +260,7 @@ fun SecurityScreen(
                         shape = RoundedCornerShape(20.dp),
                         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
                     ) {
-                        Column(modifier = Modifier.fillMaxWidth()) {
+                        val selfieRow: @Composable () -> Unit = {
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -297,11 +306,8 @@ fun SecurityScreen(
                                     )
                                 )
                             }
-
-                            HorizontalDivider(
-                                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f),
-                                modifier = Modifier.padding(horizontal = 16.dp)
-                            )
+                        }
+                        val alarmRow: @Composable () -> Unit = {
 
                             Row(
                                 modifier = Modifier
@@ -334,8 +340,35 @@ fun SecurityScreen(
                                     )
                                 )
                             }
+                        }
+                        if (isTablet()) {
+                            // Tablets: the two settings sit side by side instead of two stretched rows.
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(IntrinsicSize.Min)
+                                    .padding(vertical = 4.dp)
+                            ) {
+                                Box(modifier = Modifier.weight(1f)) { selfieRow() }
+                                VerticalDivider(
+                                    color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f),
+                                    modifier = Modifier.padding(vertical = 16.dp)
+                                )
+                                Box(modifier = Modifier.weight(1f)) { alarmRow() }
+                            }
+                        } else {
+                        Column(modifier = Modifier.fillMaxWidth()) {
+                            selfieRow()
+
+                            HorizontalDivider(
+                                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f),
+                                modifier = Modifier.padding(horizontal = 16.dp)
+                            )
+
+                            alarmRow()
 
                             Spacer(modifier = Modifier.height(8.dp))
+                        }
                         }
                     }
                 }
@@ -450,13 +483,14 @@ fun SecurityScreen(
                     }
                     LazyVerticalGrid(
                         state = gridState,
-                        columns = GridCells.Fixed(3),
+                        columns = adaptiveGridCells(phoneColumns = 3, tabletMinCellSize = 140.dp),
                         contentPadding = PaddingValues(20.dp, bottom = 160.dp),
                         horizontalArrangement = Arrangement.spacedBy(10.dp),
                         verticalArrangement = Arrangement.spacedBy(10.dp),
                         modifier = Modifier.weight(1f)
                     ) {
                         items(events, key = { it.id }) { event ->
+Column(modifier = Modifier.fillMaxWidth()) {
                             Log.d(
                                 "INTRUDER_LOAD",
                                 "Loading event id=${event.id}, path=${event.photoPath}, exists=${
@@ -540,6 +574,7 @@ fun SecurityScreen(
                                 }
                             }
                         }
+}
                     }
                 }
             } else if (selectedTab == 1) {
@@ -596,15 +631,20 @@ fun SecurityScreen(
                             )
                         }
                     }
-                    LazyColumn(
+                    LazyVerticalStaggeredGrid(
+                        columns = adaptiveStaggeredCells(),
                         modifier = Modifier
                             .weight(1f)
                             .padding(horizontal = 20.dp),
-                        verticalArrangement = Arrangement.spacedBy(10.dp),
+                        verticalItemSpacing = 10.dp,
+                        horizontalArrangement = adaptiveGridHorizontalArrangement(),
                         contentPadding = PaddingValues(bottom = 160.dp),
                     ) {
-                        item { Spacer(modifier = Modifier.height(8.dp)) }
+                        item(span = StaggeredGridItemSpan.FullLine) {
+Column(modifier = Modifier.fillMaxWidth()) { Spacer(modifier = Modifier.height(8.dp)) }
+}
                         items(lockEvents.size) { index ->
+Column(modifier = Modifier.fillMaxWidth()) {
                             val event = lockEvents[index]
                             Card(
                                 colors = CardDefaults.cardColors(
@@ -661,6 +701,7 @@ fun SecurityScreen(
                                 }
                             }
                         }
+}
                     }
                 }
             }

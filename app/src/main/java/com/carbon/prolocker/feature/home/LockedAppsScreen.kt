@@ -1,5 +1,10 @@
 package com.carbon.prolocker.feature.home
 
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
+import com.carbon.prolocker.core.ui.adaptiveGridHorizontalArrangement
+import com.carbon.prolocker.core.ui.adaptiveStaggeredCells
+import androidx.compose.foundation.lazy.staggeredgrid.items
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -71,13 +76,16 @@ fun LockedAppsScreen(
                 .background(MaterialTheme.colorScheme.background)
                 .padding(padding)
         ) {
-            LazyColumn(
+            LazyVerticalStaggeredGrid(
+                columns = adaptiveStaggeredCells(),
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(24.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+                verticalItemSpacing = 12.dp,
+                horizontalArrangement = adaptiveGridHorizontalArrangement()
             ) {
                 if (lockedApps.isEmpty()) {
-                    item {
+                    item(span = StaggeredGridItemSpan.FullLine) {
+Column(modifier = Modifier.fillMaxWidth()) {
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -91,9 +99,11 @@ fun LockedAppsScreen(
                             )
                         }
                     }
+}
                 }
 
                 items(lockedApps, key = { it.packageName }) { app ->
+Column(modifier = Modifier.fillMaxWidth()) {
                     Card(
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(20.dp),
@@ -168,6 +178,7 @@ fun LockedAppsScreen(
                         }
                     }
                 }
+}
             }
         }
     }

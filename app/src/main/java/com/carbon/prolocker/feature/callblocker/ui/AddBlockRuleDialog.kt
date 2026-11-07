@@ -1,5 +1,7 @@
 package com.carbon.prolocker.feature.callblocker.ui
 
+import com.carbon.prolocker.core.ui.centeredMaxWidth
+import com.carbon.prolocker.core.ui.Adaptive
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -281,7 +283,7 @@ fun CustomNumberTabContent(
             enabled = customNumber.isNotBlank(),
             shape = RoundedCornerShape(16.dp),
             colors = ButtonDefaults.buttonColors(containerColor = ProLockerPrimary),
-            modifier = Modifier.fillMaxWidth().height(48.dp)
+            modifier = Modifier.fillMaxWidth().centeredMaxWidth(Adaptive.ButtonMaxWidth).height(48.dp)
         ) {
             Text(stringResource(R.string.call_blocker_btn_save), fontWeight = FontWeight.Bold)
         }
@@ -380,7 +382,7 @@ fun PatternTabContent(
             enabled = patternText.isNotBlank(),
             shape = RoundedCornerShape(16.dp),
             colors = ButtonDefaults.buttonColors(containerColor = ProLockerPrimary),
-            modifier = Modifier.fillMaxWidth().height(48.dp)
+            modifier = Modifier.fillMaxWidth().centeredMaxWidth(Adaptive.ButtonMaxWidth).height(48.dp)
         ) {
             Text(stringResource(R.string.call_blocker_btn_save), fontWeight = FontWeight.Bold)
         }

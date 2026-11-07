@@ -1,5 +1,12 @@
 package com.carbon.prolocker.feature.hidefile.ui
 
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
+import com.carbon.prolocker.core.ui.adaptiveGridHorizontalArrangement
+import com.carbon.prolocker.core.ui.adaptiveStaggeredCells
+import androidx.compose.foundation.lazy.staggeredgrid.items
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
+import com.carbon.prolocker.core.ui.Adaptive
+import com.carbon.prolocker.core.ui.centeredMaxWidth
 import android.content.res.Configuration
 import android.os.Environment
 import androidx.compose.foundation.background
@@ -163,7 +170,7 @@ fun FilePickerScreen(
                             onBack()
                         },
                         modifier = Modifier
-                            .fillMaxWidth()
+                            .fillMaxWidth().centeredMaxWidth(Adaptive.ButtonMaxWidth)
                             .padding(20.dp)
                             .navigationBarsPadding(),
                         shape = RoundedCornerShape(16.dp),
@@ -197,14 +204,17 @@ fun FilePickerScreen(
                         Text(stringResource(R.string.hide_files_files))
                     }
                 }
-                else -> LazyColumn(
+                else -> LazyVerticalStaggeredGrid(
+                    columns = adaptiveStaggeredCells(),
                     contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                    verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(6.dp)
+                    verticalItemSpacing = 6.dp,
+                    horizontalArrangement = adaptiveGridHorizontalArrangement()
                 ) {
                     if (currentDir.parentFile != null && currentDir.absolutePath !=
                         Environment.getExternalStorageDirectory().absolutePath
                     ) {
-                        item(key = "up") {
+                        item(key = "up", span = StaggeredGridItemSpan.FullLine) {
+Column(modifier = Modifier.fillMaxWidth()) {
                             FilePickerRow(
                                 label = stringResource(R.string.hide_files_go_up),
                                 icon = Icons.AutoMirrored.Outlined.ArrowForward,
@@ -216,8 +226,10 @@ fun FilePickerScreen(
                                 }
                             )
                         }
+}
                     }
-                    items(entries, key = { it.absolutePath }) { file ->
+                    items(entries.distinctBy { it.absolutePath }, key = { it.absolutePath }) { file ->
+Column(modifier = Modifier.fillMaxWidth()) {
                         val isSelected = file.absolutePath in selectedPaths
                         FilePickerRow(
                             label = file.name,
@@ -235,6 +247,7 @@ fun FilePickerScreen(
                             }
                         )
                     }
+}
                 }
             }
         }

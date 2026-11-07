@@ -93,7 +93,9 @@ fun PinLockView(
     val haptic = LocalHapticFeedback.current
     val configuration = LocalContext.current.resources.configuration
     val isLandscape =
-        configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
+        configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE &&
+            // Compact keypad only when height is short (phones); landscape tablets have room for the full size.
+            configuration.screenHeightDp < 600
 
     val scope = rememberCoroutineScope()
     val shakeOffset = remember { Animatable(0f) }
@@ -266,7 +268,9 @@ fun PinKeypadButton(text: String, onClick: (String) -> Unit) {
     )
     val handleClick = remember(text, onClick) { { onClick(text) } }
     val configuration = LocalContext.current.resources.configuration
-    val isLandscape = configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
+    val isLandscape = configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE &&
+            // Compact keypad only when height is short (phones); landscape tablets have room for the full size.
+            configuration.screenHeightDp < 600
     val buttonSize = if (isLandscape) 52.dp else 62.dp
 
     Box(
@@ -307,7 +311,9 @@ fun PinKeypadDeleteButton(onClick: () -> Unit) {
         label = "deleteButtonPress"
     )
     val configuration = LocalContext.current.resources.configuration
-    val isLandscape = configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
+    val isLandscape = configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE &&
+            // Compact keypad only when height is short (phones); landscape tablets have room for the full size.
+            configuration.screenHeightDp < 600
     val buttonSize = if (isLandscape) 52.dp else 62.dp
 
     Box(

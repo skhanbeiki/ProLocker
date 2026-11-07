@@ -1,5 +1,10 @@
 package com.carbon.prolocker.feature.account
 
+import androidx.compose.ui.unit.Dp
+import com.carbon.prolocker.core.ui.adaptiveGridHorizontalArrangement
+import com.carbon.prolocker.core.ui.adaptiveStaggeredCells
+import androidx.compose.foundation.lazy.staggeredgrid.items
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import android.content.Intent
 import android.content.res.Configuration
 import android.net.Uri
@@ -61,6 +66,8 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun AccountScreen(
     paddingValues: PaddingValues = PaddingValues(0.dp),
+    /** Height of the main bottom bar (ad + navigation) drawn over this tab; lists pad their end by it. */
+    bottomBarPadding: Dp = 0.dp,
     onNavigateToLockSetup: () -> Unit,
     onNavigateToAudit: () -> Unit = {},
     onNavigateToAppSettings: () -> Unit = {},
@@ -86,15 +93,21 @@ fun AccountScreen(
             )
         }
     ) { innerPadding ->
-        LazyColumn(
+        // Lists keep scrolling under the bottom ad/bar; this end padding lets the last item stop above it.
+        val bottomOverlap = (bottomBarPadding - innerPadding.calculateBottomPadding()).coerceAtLeast(0.dp)
+        LazyVerticalStaggeredGrid(
+            columns = adaptiveStaggeredCells(),
             modifier = Modifier
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
                 .padding(innerPadding)
                 .padding(horizontal = 20.dp),
-            verticalArrangement = Arrangement.spacedBy(24.dp)
+            contentPadding = PaddingValues(bottom = bottomOverlap + 16.dp),
+            verticalItemSpacing = 24.dp,
+            horizontalArrangement = adaptiveGridHorizontalArrangement()
         ) {
             item {
+Column(modifier = Modifier.fillMaxWidth()) {
                 Card(
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
                     shape = RoundedCornerShape(20.dp),
@@ -134,8 +147,10 @@ fun AccountScreen(
                     }
                 }
             }
+}
 
             item {
+Column(modifier = Modifier.fillMaxWidth()) {
                 Card(
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
                     shape = RoundedCornerShape(20.dp),
@@ -262,10 +277,12 @@ fun AccountScreen(
                     }
                 }
             }
+}
 
             // Privacy Policy section — visible only on Google Play
             if (MarketConfig.isGooglePlay) {
                 item {
+Column(modifier = Modifier.fillMaxWidth()) {
                     Text(
                         text = stringResource(R.string.privacy_policy),
                         style = MaterialTheme.typography.titleMedium,
@@ -340,9 +357,11 @@ fun AccountScreen(
                         }
                     }
                 }
+}
             }
 
             item {
+Column(modifier = Modifier.fillMaxWidth()) {
                 Text(
                     text = stringResource(R.string.other),
                     style = MaterialTheme.typography.titleMedium,
@@ -498,6 +517,7 @@ fun AccountScreen(
                 }
                 Spacer(modifier = Modifier.height(86.dp))
             }
+}
         }
 
         RecoverySetupDialog(

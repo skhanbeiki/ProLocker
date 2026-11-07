@@ -1,5 +1,12 @@
 package com.carbon.prolocker.feature.hidefile.ui
 
+import com.carbon.prolocker.core.ui.centeredMaxWidth
+import com.carbon.prolocker.core.ui.Adaptive
+import com.carbon.prolocker.core.ui.adaptiveGridHorizontalArrangement
+import com.carbon.prolocker.core.ui.adaptiveStaggeredCells
+import androidx.compose.foundation.lazy.staggeredgrid.items
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
+import com.carbon.prolocker.core.ui.adaptiveGridCells
 import android.content.res.Configuration
 import android.graphics.BitmapFactory
 import android.os.Environment
@@ -229,25 +236,31 @@ fun HiddenItemsScreen(
                 )
             } else if (isMedia) {
                 LazyVerticalGrid(
-                    columns = GridCells.Fixed(3),
+                    columns = adaptiveGridCells(phoneColumns = 3, tabletMinCellSize = 140.dp),
                     contentPadding = PaddingValues(20.dp, bottom = 120.dp),
                     horizontalArrangement = Arrangement.spacedBy(10.dp),
                     verticalArrangement = Arrangement.spacedBy(10.dp),
                     modifier = Modifier.weight(1f)
                 ) {
-                    items(items, key = { "${it.id}_${it.path}_${it.name}" }) { item ->
+                    items(items.distinctBy { "${it.id}_${it.path}_${it.name}" }, key = { "${it.id}_${it.path}_${it.name}" }) { item ->
+Column(modifier = Modifier.fillMaxWidth()) {
                         HiddenMediaThumb(item, onClick = { selectedItem = item })
                     }
+}
                 }
             } else {
-                LazyColumn(
+                LazyVerticalStaggeredGrid(
+                    columns = adaptiveStaggeredCells(),
                     modifier = Modifier.weight(1f),
                     contentPadding = PaddingValues(20.dp, 4.dp, 20.dp, 120.dp),
-                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                    verticalItemSpacing = 10.dp,
+                    horizontalArrangement = adaptiveGridHorizontalArrangement()
                 ) {
-                    items(items, key = { "${it.id}_${it.path}_${it.name}" }) { item ->
+                    items(items.distinctBy { "${it.id}_${it.path}_${it.name}" }, key = { "${it.id}_${it.path}_${it.name}" }) { item ->
+Column(modifier = Modifier.fillMaxWidth()) {
                         HiddenFileRow(item, onClick = { selectedItem = item })
                     }
+}
                 }
             }
         }
@@ -296,7 +309,7 @@ fun HiddenItemsScreen(
                         selectedItem = null
                     },
                     modifier = Modifier
-                        .fillMaxWidth()
+                        .fillMaxWidth().centeredMaxWidth(Adaptive.ButtonMaxWidth)
                         .padding(horizontal = 20.dp, vertical = 8.dp)
                         .height(50.dp),
                     shape = RoundedCornerShape(16.dp),
@@ -509,15 +522,13 @@ private fun HiddenSheetPreview(item: HideItem) {
             .background(MaterialTheme.colorScheme.surfaceVariant),
         contentAlignment = Alignment.Center
     ) {
-        val art = if (item.type == HideItem.TYPE_AUDIO && item.image != null) {
-            item.image!!.takeIf { it.isNotEmpty() }?.let {
-                try {
-                    BitmapFactory.decodeByteArray(it, 0, it.size)
-                } catch (e: Exception) {
-                    null
-                }
-            }
-        } else null
+        // Decoded once and downsampled to the 72dp preview: full-size cover art decoded on every
+        // recomposition wasted memory on low-end phones.
+        val art = remember(item.name, item.image) {
+            if (item.type == HideItem.TYPE_AUDIO && item.image != null) {
+                item.image!!.takeIf { it.isNotEmpty() }?.let { decodeSampled(it, 256) }
+            } else null
+        }
         if (art != null) {
             Image(
                 painter = rememberAsyncImagePainter(art),
@@ -589,4 +600,16 @@ fun HiddenItemsScreenDarkPreview() {
     com.carbon.prolocker.core.theme.ProLockerTheme {
         HiddenItemsScreen(type = HideItem.TYPE_IMAGE)
     }
+}
+
+
+/** Decodes [bytes] scaled down so neither side is much larger than [maxPx]; null on any failure. */
+private fun decodeSampled(bytes: ByteArray, maxPx: Int): android.graphics.Bitmap? = try {
+    val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+    BitmapFactory.decodeByteArray(bytes, 0, bytes.size, bounds)
+    var sample = 1
+    while (bounds.outWidth / (sample * 2) >= maxPx && bounds.outHeight / (sample * 2) >= maxPx) sample *= 2
+    BitmapFactory.decodeByteArray(bytes, 0, bytes.size, BitmapFactory.Options().apply { inSampleSize = sample })
+} catch (_: Throwable) {
+    null
 }

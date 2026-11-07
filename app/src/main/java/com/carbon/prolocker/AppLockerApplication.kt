@@ -52,6 +52,7 @@ class ProLockerApplication : Application(), Application.ActivityLifecycleCallbac
     private val languageManager: com.carbon.prolocker.core.language.LanguageManager by inject()
 
     private var startedActivityCount = 0
+    private var restartingForConfigChange = false
 
     override fun onCreate() {
         super.onCreate()
@@ -96,7 +97,10 @@ class ProLockerApplication : Application(), Application.ActivityLifecycleCallbac
     override fun onActivityStarted(activity: Activity) {
         currentActivityRef = java.lang.ref.WeakReference(activity)
         startedActivityCount++
-        if (startedActivityCount == 1) {
+        // An activity being recreated for a configuration change (tablet rotation) is not a new entry.
+        val isConfigChangeRestart = restartingForConfigChange
+        restartingForConfigChange = false
+        if (startedActivityCount == 1 && !isConfigChangeRestart) {
             AppEntryLockActivity.markNeedsAuthentication()
             verifyServiceOnForeground()
         }
@@ -104,6 +108,7 @@ class ProLockerApplication : Application(), Application.ActivityLifecycleCallbac
 
     override fun onActivityStopped(activity: Activity) {
         startedActivityCount--
+        if (activity.isChangingConfigurations) restartingForConfigChange = true
     }
 
     override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {

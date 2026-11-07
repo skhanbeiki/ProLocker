@@ -1,5 +1,8 @@
 package com.carbon.prolocker.feature.gallery
 
+import com.carbon.prolocker.core.ui.Adaptive
+import com.carbon.prolocker.core.ui.centeredMaxWidth
+import com.carbon.prolocker.core.ui.adaptiveGridCells
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -208,6 +211,7 @@ fun BackgroundGalleryScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 8.dp)
+                    .centeredMaxWidth(Adaptive.ControlMaxWidth)
             )
 
             // Content Area based on Tab
@@ -249,7 +253,7 @@ fun BackgroundGalleryScreen(
                             } else {
                                 LazyVerticalGrid(
                                     state = onlineGridState,
-                                    columns = GridCells.Fixed(2),
+                                    columns = adaptiveGridCells(phoneColumns = 2, tabletMinCellSize = 180.dp),
                                     contentPadding = PaddingValues(16.dp),
                                     horizontalArrangement = Arrangement.spacedBy(14.dp),
                                     verticalArrangement = Arrangement.spacedBy(14.dp),
@@ -277,7 +281,7 @@ fun BackgroundGalleryScreen(
                                     }
 
                                     if (isLoadingMore) {
-                                        item(span = { GridItemSpan(2) }) {
+                                        item(span = { GridItemSpan(maxLineSpan) }) {
                                             Box(
                                                 modifier = Modifier
                                                     .fillMaxWidth()
@@ -299,7 +303,7 @@ fun BackgroundGalleryScreen(
                     // Downloaded Wallpapers Tab (includes permanent Default Background card)
                     LazyVerticalGrid(
                         state = downloadedGridState,
-                        columns = GridCells.Fixed(2),
+                        columns = adaptiveGridCells(phoneColumns = 2, tabletMinCellSize = 180.dp),
                         contentPadding = PaddingValues(16.dp),
                         horizontalArrangement = Arrangement.spacedBy(14.dp),
                         verticalArrangement = Arrangement.spacedBy(14.dp),

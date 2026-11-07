@@ -1,5 +1,7 @@
 package com.carbon.prolocker.core.rate
 
+import com.carbon.prolocker.core.ui.centeredMaxWidth
+import com.carbon.prolocker.core.ui.Adaptive
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -79,7 +81,7 @@ fun RateAppDialog(
             Button(
                 onClick = onRateClicked,
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .fillMaxWidth().centeredMaxWidth(Adaptive.ButtonMaxWidth)
                     .height(48.dp),
                 shape = RoundedCornerShape(14.dp),
                 elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
@@ -98,7 +100,7 @@ fun RateAppDialog(
             TextButton(
                 onClick = onLaterClicked,
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .fillMaxWidth().centeredMaxWidth(Adaptive.ButtonMaxWidth)
                     .height(40.dp),
                 shape = RoundedCornerShape(14.dp),
                 colors = ButtonDefaults.textButtonColors(

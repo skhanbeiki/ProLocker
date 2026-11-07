@@ -1,5 +1,9 @@
 package com.carbon.prolocker.feature.notificationmanager.ui
 
+import com.carbon.prolocker.core.ui.adaptiveGridHorizontalArrangement
+import com.carbon.prolocker.core.ui.adaptiveStaggeredCells
+import androidx.compose.foundation.lazy.staggeredgrid.items
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -83,14 +87,17 @@ fun AppNotificationsScreen(
         },
         containerColor = MaterialTheme.colorScheme.background
     ) { padding ->
-        LazyColumn(
+        LazyVerticalStaggeredGrid(
+            columns = adaptiveStaggeredCells(),
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding),
             contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 24.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
+            verticalItemSpacing = 10.dp,
+            horizontalArrangement = adaptiveGridHorizontalArrangement()
         ) {
             items(notifications, key = { it.id }) { item ->
+Column(modifier = Modifier.fillMaxWidth()) {
                 NotificationCard(
                     item = item,
                     appLabel = label,
@@ -99,6 +106,7 @@ fun AppNotificationsScreen(
                     onDelete = { onDelete(item) }
                 )
             }
+}
         }
     }
 

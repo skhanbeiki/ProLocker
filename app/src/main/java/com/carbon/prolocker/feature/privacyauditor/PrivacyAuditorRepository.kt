@@ -1,5 +1,6 @@
 package com.carbon.prolocker.feature.privacyauditor
 
+import com.carbon.prolocker.core.utils.toSafeBitmap
 import android.Manifest
 import android.content.Context
 import android.content.pm.ApplicationInfo
@@ -32,9 +33,11 @@ class PrivacyAuditorRepository(private val context: Context) {
                 val appInfo = packageInfo.applicationInfo ?: return@mapNotNull null
                 val isSystem = (appInfo.flags and ApplicationInfo.FLAG_SYSTEM) != 0
                 val appName = pm.getApplicationLabel(appInfo).toString()
+                // Small bitmap instead of the full icon: the whole app list is kept in memory.
                 val iconDrawable = try {
-                    pm.getApplicationIcon(appInfo)
-                } catch (e: Exception) {
+                    pm.getApplicationIcon(appInfo).toSafeBitmap(128, 128)
+                        ?.let { android.graphics.drawable.BitmapDrawable(context.resources, it) }
+                } catch (_: Throwable) {
                     null
                 }
 

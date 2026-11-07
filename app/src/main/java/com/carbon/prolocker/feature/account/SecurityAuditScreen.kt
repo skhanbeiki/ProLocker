@@ -1,5 +1,10 @@
 package com.carbon.prolocker.feature.account
 
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
+import com.carbon.prolocker.core.ui.adaptiveGridHorizontalArrangement
+import com.carbon.prolocker.core.ui.adaptiveStaggeredCells
+import androidx.compose.foundation.lazy.staggeredgrid.items
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -99,14 +104,17 @@ fun SecurityAuditScreen(onBack: () -> Unit) {
         },
         containerColor = MaterialTheme.colorScheme.background
     ) { padding ->
-        LazyColumn(
+        LazyVerticalStaggeredGrid(
+            columns = adaptiveStaggeredCells(),
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
                 .padding(horizontal = 20.dp),
-            verticalArrangement = Arrangement.spacedBy(24.dp)
+            verticalItemSpacing = 24.dp,
+            horizontalArrangement = adaptiveGridHorizontalArrangement()
         ) {
             item {
+Column(modifier = Modifier.fillMaxWidth()) {
                 Card(
                     shape = RoundedCornerShape(20.dp),
                     elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
@@ -153,8 +161,10 @@ fun SecurityAuditScreen(onBack: () -> Unit) {
                     }
                 }
             }
+}
 
-            item {
+            item(span = StaggeredGridItemSpan.FullLine) {
+Column(modifier = Modifier.fillMaxWidth()) {
                 Text(
                     text = stringResource(R.string.protection_status),
                     style = MaterialTheme.typography.titleMedium,
@@ -162,15 +172,27 @@ fun SecurityAuditScreen(onBack: () -> Unit) {
                     modifier = Modifier.padding(start = 4.dp)
                 )
             }
-
-            item { AuditItem(stringResource(R.string.audit_usage_access), stringResource(R.string.audit_usage_access_desc), usageStats) }
-            item { AuditItem(stringResource(R.string.audit_draw_over_apps), stringResource(R.string.audit_draw_over_apps_desc), overlay) }
-            item { AuditItem(stringResource(R.string.audit_battery_opt), stringResource(R.string.audit_battery_opt_desc), batteryOpt) }
-            item { AuditItem(stringResource(R.string.audit_device_admin), stringResource(R.string.audit_device_admin_desc), admin, isWarningMode = true) }
-            // item { AuditItem(stringResource(R.string.audit_accessibility_mode), stringResource(R.string.audit_accessibility_mode_desc), accessibility, isWarningMode = true) }
-            item { AuditItem(stringResource(R.string.audit_background_service), stringResource(R.string.audit_background_service_desc), service) }
+}
 
             item {
+Column(modifier = Modifier.fillMaxWidth()) { AuditItem(stringResource(R.string.audit_usage_access), stringResource(R.string.audit_usage_access_desc), usageStats) }
+}
+            item {
+Column(modifier = Modifier.fillMaxWidth()) { AuditItem(stringResource(R.string.audit_draw_over_apps), stringResource(R.string.audit_draw_over_apps_desc), overlay) }
+}
+            item {
+Column(modifier = Modifier.fillMaxWidth()) { AuditItem(stringResource(R.string.audit_battery_opt), stringResource(R.string.audit_battery_opt_desc), batteryOpt) }
+}
+            item {
+Column(modifier = Modifier.fillMaxWidth()) { AuditItem(stringResource(R.string.audit_device_admin), stringResource(R.string.audit_device_admin_desc), admin, isWarningMode = true) }
+}
+            // item { AuditItem(stringResource(R.string.audit_accessibility_mode), stringResource(R.string.audit_accessibility_mode_desc), accessibility, isWarningMode = true) }
+            item {
+Column(modifier = Modifier.fillMaxWidth()) { AuditItem(stringResource(R.string.audit_background_service), stringResource(R.string.audit_background_service_desc), service) }
+}
+
+            item(span = StaggeredGridItemSpan.FullLine) {
+Column(modifier = Modifier.fillMaxWidth()) {
                 Text(
                     text = stringResource(R.string.event_log),
                     style = MaterialTheme.typography.titleMedium,
@@ -178,9 +200,11 @@ fun SecurityAuditScreen(onBack: () -> Unit) {
                     modifier = Modifier.padding(start = 4.dp)
                 )
             }
+}
 
             if (events.isEmpty()) {
-                item {
+                item(span = StaggeredGridItemSpan.FullLine) {
+Column(modifier = Modifier.fillMaxWidth()) {
                     Text(
                         stringResource(R.string.no_events_recorded),
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -188,13 +212,18 @@ fun SecurityAuditScreen(onBack: () -> Unit) {
                         modifier = Modifier.padding(16.dp)
                     )
                 }
+}
             } else {
                 items(events, key = { it.id }) { event ->
+Column(modifier = Modifier.fillMaxWidth()) {
                     EventLogItem(event)
                 }
+}
             }
 
-            item { Spacer(modifier = Modifier.height(24.dp)) }
+            item(span = StaggeredGridItemSpan.FullLine) {
+Column(modifier = Modifier.fillMaxWidth()) { Spacer(modifier = Modifier.height(24.dp)) }
+}
         }
     }
 }

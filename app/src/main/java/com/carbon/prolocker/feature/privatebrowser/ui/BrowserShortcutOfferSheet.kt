@@ -1,5 +1,7 @@
 package com.carbon.prolocker.feature.privatebrowser.ui
 
+import com.carbon.prolocker.core.ui.centeredMaxWidth
+import com.carbon.prolocker.core.ui.Adaptive
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -73,7 +75,7 @@ fun BrowserShortcutOfferSheet(onAdd: () -> Unit, onDismiss: () -> Unit) {
             Button(
                 onClick = onAdd,
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .fillMaxWidth().centeredMaxWidth(Adaptive.ButtonMaxWidth)
                     .height(52.dp),
                 shape = RoundedCornerShape(16.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = PrivateBrowserGradient.first())
@@ -85,7 +87,7 @@ fun BrowserShortcutOfferSheet(onAdd: () -> Unit, onDismiss: () -> Unit) {
                 )
             }
             Spacer(Modifier.height(4.dp))
-            TextButton(onClick = onDismiss, modifier = Modifier.fillMaxWidth()) {
+            TextButton(onClick = onDismiss, modifier = Modifier.fillMaxWidth().centeredMaxWidth(Adaptive.ButtonMaxWidth)) {
                 Text(
                     text = stringResource(R.string.pb_shortcut_offer_later),
                     color = MaterialTheme.colorScheme.onSurfaceVariant

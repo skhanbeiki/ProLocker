@@ -1,5 +1,6 @@
 package com.carbon.prolocker.feature.privatebrowser.ui
 
+import com.carbon.prolocker.core.ui.adaptiveGridCells
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.compose.foundation.BorderStroke
@@ -500,7 +501,8 @@ private fun BrowserHomeContent(
     homeAd: (@Composable () -> Unit)? = null
 ) {
     LazyVerticalGrid(
-        columns = GridCells.Fixed(4),
+        // 4 shortcuts per row on phones; tablets fit more phone-sized shortcuts per row.
+        columns = adaptiveGridCells(phoneColumns = 4, tabletMinCellSize = 120.dp),
         modifier = Modifier.fillMaxSize(),
         contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 20.dp, vertical = 16.dp),
         horizontalArrangement = Arrangement.spacedBy(10.dp),

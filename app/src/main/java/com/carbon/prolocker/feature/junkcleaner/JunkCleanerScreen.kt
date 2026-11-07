@@ -1,5 +1,16 @@
 package com.carbon.prolocker.feature.junkcleaner
 
+import com.carbon.prolocker.core.utils.SafeSettings
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.layout.onSizeChanged
+import com.carbon.prolocker.core.ui.centeredMaxWidth
+import com.carbon.prolocker.core.ui.Adaptive
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
+import com.carbon.prolocker.core.ui.adaptiveGridHorizontalArrangement
+import com.carbon.prolocker.core.ui.adaptiveStaggeredCells
+import androidx.compose.foundation.lazy.staggeredgrid.items
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import android.Manifest
 import android.content.Context
 import android.content.Intent
@@ -203,10 +214,10 @@ fun JunkCleanerScreen(
                 val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION).apply {
                     data = Uri.parse("package:${context.packageName}")
                 }
-                allFilesLauncher.launch(intent)
+                SafeSettings.launch(allFilesLauncher, context, intent)
             } catch (_e: Exception) {
                 val intent = Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION)
-                allFilesLauncher.launch(intent)
+                SafeSettings.launch(allFilesLauncher, context, intent)
             }
         } else {
             legacyPermissionLauncher.launch(
@@ -636,6 +647,7 @@ private fun ReviewStateContent(
     onCleanClick: () -> Unit,
     onBack: () -> Unit
 ) {
+    var bottomOverlayHeightPx by remember { mutableIntStateOf(0) }
     val totalFoundBytes = groups.sumOf { it.totalSize }
     val selectedBytes = selectedItems.sumOf { it.size }
     val (sizeValue, sizeUnit) = splitSize(totalFoundBytes)
@@ -740,13 +752,16 @@ private fun ReviewStateContent(
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                 border = BorderStroke(1.dp, MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f))
             ) {
-                LazyColumn(
+                LazyVerticalStaggeredGrid(
+                    columns = adaptiveStaggeredCells(),
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(horizontal = 20.dp, vertical = 18.dp),
-                    verticalArrangement = Arrangement.spacedBy(14.dp)
+                    verticalItemSpacing = 14.dp,
+                    horizontalArrangement = adaptiveGridHorizontalArrangement()
                 ) {
                     items(groups, key = { it.category.name }) { group ->
+Column(modifier = Modifier.fillMaxWidth()) {
                         val isExpanded = expandedCategories.contains(group.category)
                         val items = group.items
                         val allSelected = items.isNotEmpty() && items.all { selectedItems.contains(it) }
@@ -859,10 +874,14 @@ private fun ReviewStateContent(
                             }
                         }
                     }
+}
 
-                    item {
-                        Spacer(modifier = Modifier.height(180.dp))
+                    item(span = StaggeredGridItemSpan.FullLine) {
+Column(modifier = Modifier.fillMaxWidth()) {
+                        // Room for the floating ad + button (measured), so the last group scrolls fully above it.
+                        Spacer(modifier = Modifier.height(with(LocalDensity.current) { bottomOverlayHeightPx.toDp() } + 16.dp))
                     }
+}
                 }
             }
         }
@@ -871,6 +890,7 @@ private fun ReviewStateContent(
         Column(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
+                .onSizeChanged { bottomOverlayHeightPx = it.height }
                 .fillMaxWidth()
                 .navigationBarsPadding()
                 .padding(bottom = 16.dp, start = 20.dp, end = 20.dp)
@@ -891,7 +911,7 @@ private fun ReviewStateContent(
                 onClick = onCleanClick,
                 enabled = selectedItems.isNotEmpty(),
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .fillMaxWidth().centeredMaxWidth(Adaptive.ButtonMaxWidth)
                     .height(54.dp)
                     .shadow(
                         elevation = if (selectedItems.isNotEmpty()) 8.dp else 0.dp,
@@ -1268,7 +1288,7 @@ private fun IdleStateContent(
                     Button(
                         onClick = onStartScan,
                         modifier = Modifier
-                            .fillMaxWidth()
+                            .fillMaxWidth().centeredMaxWidth(Adaptive.ButtonMaxWidth)
                             .height(54.dp)
                             .shadow(elevation = 8.dp, shape = RoundedCornerShape(27.dp), spotColor = Color(0xFFFF5277)),
                         shape = RoundedCornerShape(27.dp),
@@ -1433,7 +1453,7 @@ private fun CompletedStateContent(
             Button(
                 onClick = onDone,
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .fillMaxWidth().centeredMaxWidth(Adaptive.ButtonMaxWidth)
                     .height(52.dp),
                 shape = RoundedCornerShape(26.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
@@ -1526,7 +1546,7 @@ private fun JunkPermissionFullScreenContent(
             Spacer(modifier = Modifier.height(20.dp))
 
             Card(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().centeredMaxWidth(Adaptive.StandaloneCardMaxWidth),
                 shape = RoundedCornerShape(20.dp),
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.55f)
@@ -1577,7 +1597,7 @@ private fun JunkPermissionFullScreenContent(
             Button(
                 onClick = onGrantPermission,
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .fillMaxWidth().centeredMaxWidth(Adaptive.ButtonMaxWidth)
                     .height(52.dp),
                 shape = RoundedCornerShape(16.dp),
                 colors = ButtonDefaults.buttonColors(

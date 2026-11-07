@@ -93,7 +93,9 @@ class MainActivity : AppCompatActivity() {
         }
 
         requestedOrientation = try {
-            ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+            // Phones stay portrait; tablets follow the device rotation (layouts adapt to landscape).
+            if (resources.configuration.smallestScreenWidthDp >= 600) ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+            else ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         } catch (_: IllegalStateException) {
             ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
         }

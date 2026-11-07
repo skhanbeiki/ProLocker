@@ -1,5 +1,9 @@
 package com.carbon.prolocker.feature.backup.ui
 
+import com.carbon.prolocker.core.ui.adaptiveGridHorizontalArrangement
+import com.carbon.prolocker.core.ui.adaptiveStaggeredCells
+import androidx.compose.foundation.lazy.staggeredgrid.items
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
@@ -309,12 +313,15 @@ fun AppsBackupTabContent(
                 CircularProgressIndicator(color = ProLockerPrimary)
             }
         } else {
-            LazyColumn(
+            LazyVerticalStaggeredGrid(
+                columns = adaptiveStaggeredCells(),
                 contentPadding = PaddingValues(start = 20.dp, end = 20.dp, bottom = 80.dp),
-                verticalArrangement = Arrangement.spacedBy(10.dp),
+                verticalItemSpacing = 10.dp,
+                horizontalArrangement = adaptiveGridHorizontalArrangement(),
                 modifier = Modifier.weight(1f)
             ) {
-                items(uiState.filteredApps, key = { it.packageName }) { app ->
+                items(uiState.filteredApps.distinctBy { it.packageName }, key = { it.packageName }) { app ->
+Column(modifier = Modifier.fillMaxWidth()) {
                     Surface(
                         color = MaterialTheme.colorScheme.surfaceVariant,
                         shape = RoundedCornerShape(18.dp),
@@ -380,6 +387,7 @@ fun AppsBackupTabContent(
                         }
                     }
                 }
+}
             }
         }
 
@@ -473,12 +481,15 @@ fun AppsRestoreTabContent(
             )
         }
     } else {
-        LazyColumn(
+        LazyVerticalStaggeredGrid(
+            columns = adaptiveStaggeredCells(),
             contentPadding = PaddingValues(horizontal = 20.dp, vertical = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+            verticalItemSpacing = 12.dp,
+            horizontalArrangement = adaptiveGridHorizontalArrangement(),
             modifier = Modifier.fillMaxSize()
         ) {
-            items(uiState.backupApkFiles, key = { "${it.fileName}_${it.filePath}" }) { fileInfo ->
+            items(uiState.backupApkFiles.distinctBy { "${it.fileName}_${it.filePath}" }, key = { "${it.fileName}_${it.filePath}" }) { fileInfo ->
+Column(modifier = Modifier.fillMaxWidth()) {
                 Surface(
                     color = MaterialTheme.colorScheme.surfaceVariant,
                     shape = RoundedCornerShape(20.dp),
@@ -533,6 +544,7 @@ fun AppsRestoreTabContent(
                     }
                 }
             }
+}
         }
     }
 }

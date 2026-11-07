@@ -1,5 +1,8 @@
 package com.carbon.prolocker.feature.main
 
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.fillMaxHeight
+import com.carbon.prolocker.core.ui.isExpandedWidth
 import android.content.Intent
 import android.content.res.Configuration
 import android.net.Uri
@@ -146,8 +149,12 @@ fun MainScreen(
     }
 
     var adKey by remember { mutableIntStateOf(0) }
+    // The slot already loads an ad when it first appears; bumping the key on that first run too threw
+    // that ad away and requested a second one at the same moment (two requests per open).
+    var lastAdTab by remember { mutableStateOf<MainTab?>(null) }
     LaunchedEffect(selectedTab) {
-        adKey++
+        if (lastAdTab != null && lastAdTab != selectedTab) adKey++
+        lastAdTab = selectedTab
         Log.d("MainScreen", "HOME_AD_REQUEST_START tab=$selectedTab")
     }
 
@@ -244,10 +251,119 @@ fun MainScreen(
         )
     }
 
+    val useRail = isExpandedWidth()
     Box(modifier = Modifier.fillMaxSize()) {
+        // Phones and portrait tablets: only the Scaffold (bottom bar). Landscape tablets: a navigation rail
+        // with the same tabs sits at the start edge instead of the bottom bar.
+        Row(modifier = Modifier.fillMaxSize()) {
+        if (useRail) {
+            androidx.compose.material3.NavigationRail(
+                containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                modifier = Modifier.fillMaxHeight()
+            ) {
+                Spacer(modifier = Modifier.weight(1f))
+                        androidx.compose.material3.NavigationRailItem(
+                            selected = selectedTab == MainTab.TOOLS,
+                            onClick = { viewModel.setSelectedTab(MainTab.TOOLS) },
+                            icon = {
+                                Icon(
+                                    Icons.Default.GridView,
+                                    contentDescription = null,
+                                    tint = if (selectedTab == MainTab.TOOLS)
+                                        MaterialTheme.colorScheme.primary
+                                    else
+                                        MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            },
+                            label = {
+                                Text(
+                                    stringResource(R.string.tools),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    fontWeight = if (selectedTab == MainTab.TOOLS)
+                                        FontWeight.SemiBold
+                                    else
+                                        FontWeight.Medium
+                                )
+                            },
+                            colors = androidx.compose.material3.NavigationRailItemDefaults.colors(
+                                selectedIconColor = MaterialTheme.colorScheme.primary,
+                                selectedTextColor = MaterialTheme.colorScheme.primary,
+                                indicatorColor = ProLockerSecondary.copy(alpha = 0.25f),
+                                unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                                unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                            )
+                        )
+                        androidx.compose.material3.NavigationRailItem(
+                            selected = selectedTab == MainTab.HOME,
+                            onClick = { viewModel.setSelectedTab(MainTab.HOME) },
+                            icon = {
+                                Icon(
+                                    painterResource(id = R.drawable.ic_notifi),
+                                    modifier = Modifier.size(26.dp),
+                                    contentDescription = null,
+                                    tint = if (selectedTab == MainTab.HOME)
+                                        MaterialTheme.colorScheme.primary
+                                    else
+                                        MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            },
+                            label = {
+                                Text(
+                                    stringResource(R.string.home),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    fontWeight = if (selectedTab == MainTab.HOME)
+                                        FontWeight.SemiBold
+                                    else
+                                        FontWeight.Medium
+                                )
+                            },
+                            colors = androidx.compose.material3.NavigationRailItemDefaults.colors(
+                                selectedIconColor = MaterialTheme.colorScheme.primary,
+                                selectedTextColor = MaterialTheme.colorScheme.primary,
+                                indicatorColor = ProLockerSecondary.copy(alpha = 0.25f),
+                                unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                                unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                            )
+                        )
+                        androidx.compose.material3.NavigationRailItem(
+                            selected = selectedTab == MainTab.ACCOUNT,
+                            onClick = { viewModel.setSelectedTab(MainTab.ACCOUNT) },
+                            icon = {
+                                Icon(
+                                    Icons.Default.Settings,
+                                    contentDescription = null,
+                                    tint = if (selectedTab == MainTab.ACCOUNT)
+                                        MaterialTheme.colorScheme.primary
+                                    else
+                                        MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            },
+                            label = {
+                                Text(
+                                    stringResource(R.string.account),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    fontWeight = if (selectedTab == MainTab.ACCOUNT)
+                                        FontWeight.SemiBold
+                                    else
+                                        FontWeight.Medium
+                                )
+                            },
+                            colors = androidx.compose.material3.NavigationRailItemDefaults.colors(
+                                selectedIconColor = MaterialTheme.colorScheme.primary,
+                                selectedTextColor = MaterialTheme.colorScheme.primary,
+                                indicatorColor = ProLockerSecondary.copy(alpha = 0.25f),
+                                unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                                unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                            )
+                        )
+                                    Spacer(modifier = Modifier.weight(1f))
+            }
+        }
         Scaffold(
+            modifier = Modifier.weight(1f),
             bottomBar = {
-                Column {
+                // Without the bottom bar (rail mode) the ad above it must keep clear of the system navigation bar.
+                Column(modifier = if (useRail) Modifier.navigationBarsPadding() else Modifier) {
                     if (updateState?.displayType == "notification") {
                         Surface(
                             color = ProLockerPrimary.copy(alpha = 0.15f),
@@ -300,6 +416,8 @@ fun MainScreen(
                         )
                     }
 
+                    // Landscape tablets (expanded width) use a navigation rail at the start edge instead.
+                    if (!useRail) {
                     NavigationBar(
                         containerColor = MaterialTheme.colorScheme.surfaceVariant,
                         tonalElevation = 0.dp
@@ -399,6 +517,7 @@ fun MainScreen(
                             )
                         )
                     }
+                    }
                 }
             },
             containerColor = MaterialTheme.colorScheme.background
@@ -406,6 +525,8 @@ fun MainScreen(
             when (selectedTab) {
                 MainTab.TOOLS -> ToolsScreen(
                     paddingValues = PaddingValues(0.dp),
+                    // Bottom bar (ad + navigation) height, measured by the Scaffold: lists add it as bottom content padding.
+                    bottomBarPadding = paddingValues.calculateBottomPadding(),
                     onNavigateToSecurity = onNavigateToSecurity,
                     onNavigateToHideFiles = onNavigateToHideFiles,
                     // onNavigateToBackup = onNavigateToBackup,
@@ -419,6 +540,8 @@ fun MainScreen(
 
                 MainTab.HOME -> HomeScreen(
                     paddingValues = PaddingValues(0.dp),
+                    // Bottom bar (ad + navigation) height, measured by the Scaffold: lists add it as bottom content padding.
+                    bottomBarPadding = paddingValues.calculateBottomPadding(),
                     onNavigateToLockedApps = onNavigateToLockedApps,
                     onNavigateToGallery = onNavigateToGallery,
                     onNavigateToPermissions = onNavigateToPermissions,
@@ -427,12 +550,15 @@ fun MainScreen(
 
                 MainTab.ACCOUNT -> AccountScreen(
                     paddingValues = PaddingValues(0.dp),
+                    // Bottom bar (ad + navigation) height, measured by the Scaffold: lists add it as bottom content padding.
+                    bottomBarPadding = paddingValues.calculateBottomPadding(),
                     onNavigateToLockSetup = onNavigateToLockSetup,
                     onNavigateToAudit = onNavigateToAudit,
                     onNavigateToAppSettings = onNavigateToAppSettings,
                     onNavigateToAboutUs = onNavigateToAboutUs
                 )
             }
+        }
         }
 
         if (showExitScreen) {

@@ -264,7 +264,8 @@ fun AppNavigation(
         }
         composable<BackupAppsProgressRoute> { backStackEntry ->
             val parentEntry = remember(backStackEntry) {
-                navController.getBackStackEntry<BackupAppsRoute>()
+                // The parent can already be popped while this screen animates out ("No destination ... on the back stack").
+                runCatching { navController.getBackStackEntry<BackupAppsRoute>() }.getOrNull() ?: backStackEntry
             }
             val viewModel: com.carbon.prolocker.feature.backup.ui.BackupAppsViewModel = org.koin.androidx.compose.koinViewModel(viewModelStoreOwner = parentEntry)
             com.carbon.prolocker.feature.backup.ui.BackupAppsProgressScreen(
@@ -300,7 +301,8 @@ fun AppNavigation(
         composable<MediaPickerRoute> { backStackEntry ->
             val route = backStackEntry.toRoute<MediaPickerRoute>()
             val parentEntry = remember(backStackEntry) {
-                navController.getBackStackEntry<HiddenItemsRoute>()
+                // The parent can already be popped while this screen animates out ("No destination ... on the back stack").
+                runCatching { navController.getBackStackEntry<HiddenItemsRoute>() }.getOrNull() ?: backStackEntry
             }
             val viewModel: com.carbon.prolocker.feature.hidefile.HideFileViewModel = org.koin.androidx.compose.koinViewModel(viewModelStoreOwner = parentEntry)
             if (route.category == com.carbon.prolocker.feature.hidefile.data.HideItem.TYPE_FILE) {

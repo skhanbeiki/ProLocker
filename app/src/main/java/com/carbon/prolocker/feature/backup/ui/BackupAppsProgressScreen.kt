@@ -1,5 +1,11 @@
 package com.carbon.prolocker.feature.backup.ui
 
+import com.carbon.prolocker.core.ui.centeredMaxWidth
+import com.carbon.prolocker.core.ui.Adaptive
+import com.carbon.prolocker.core.ui.adaptiveGridHorizontalArrangement
+import com.carbon.prolocker.core.ui.adaptiveStaggeredCells
+import androidx.compose.foundation.lazy.staggeredgrid.items
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -195,14 +201,18 @@ fun BackupAppsProgressScreen(
             )
 
             // Selected Apps Status List
-            LazyColumn(
+            LazyVerticalStaggeredGrid(
+                columns = adaptiveStaggeredCells(),
                 contentPadding = PaddingValues(bottom = 24.dp),
-                verticalArrangement = Arrangement.spacedBy(10.dp),
+                verticalItemSpacing = 10.dp,
+                horizontalArrangement = adaptiveGridHorizontalArrangement(),
                 modifier = Modifier.weight(1f)
             ) {
-                items(uiState.progressItems, key = { it.packageName }) { item ->
+                items(uiState.progressItems.distinctBy { it.packageName }, key = { it.packageName }) { item ->
+Column(modifier = Modifier.fillMaxWidth()) {
                     AppProgressStatusRow(item = item)
                 }
+}
             }
 
             if (uiState.isBackupFinished) {
@@ -213,7 +223,7 @@ fun BackupAppsProgressScreen(
                         onBack()
                     },
                     modifier = Modifier
-                        .fillMaxWidth()
+                        .fillMaxWidth().centeredMaxWidth(Adaptive.ButtonMaxWidth)
                         .padding(bottom = 20.dp)
                         .height(52.dp),
                     shape = RoundedCornerShape(16.dp),

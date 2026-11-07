@@ -1,5 +1,9 @@
 package com.carbon.prolocker.feature.backup.ui
 
+import com.carbon.prolocker.core.ui.adaptiveGridHorizontalArrangement
+import com.carbon.prolocker.core.ui.adaptiveStaggeredCells
+import androidx.compose.foundation.lazy.staggeredgrid.items
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
@@ -451,12 +455,15 @@ fun CategoryRestoreTabContent(
             )
         }
     } else {
-        LazyColumn(
+        LazyVerticalStaggeredGrid(
+            columns = adaptiveStaggeredCells(),
             contentPadding = PaddingValues(horizontal = 20.dp, vertical = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+            verticalItemSpacing = 12.dp,
+            horizontalArrangement = adaptiveGridHorizontalArrangement(),
             modifier = Modifier.fillMaxSize()
         ) {
-            items(uiState.backupFiles, key = { "${it.fileName}_${it.filePath}" }) { fileInfo ->
+            items(uiState.backupFiles.distinctBy { "${it.fileName}_${it.filePath}" }, key = { "${it.fileName}_${it.filePath}" }) { fileInfo ->
+Column(modifier = Modifier.fillMaxWidth()) {
                 Surface(
                     color = MaterialTheme.colorScheme.surfaceVariant,
                     shape = RoundedCornerShape(20.dp),
@@ -511,6 +518,7 @@ fun CategoryRestoreTabContent(
                     }
                 }
             }
+}
         }
     }
 }

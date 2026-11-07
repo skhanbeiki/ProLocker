@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface IntruderEventDao {
-    @Query("SELECT * FROM intruder_events ORDER BY timestamp DESC")
+    @Query("SELECT * FROM intruder_events ORDER BY timestamp DESC LIMIT 500")
     fun getAllEvents(): Flow<List<IntruderEventEntity>>
 
     @Insert

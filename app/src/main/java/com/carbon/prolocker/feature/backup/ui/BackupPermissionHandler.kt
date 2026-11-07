@@ -1,5 +1,8 @@
 package com.carbon.prolocker.feature.backup.ui
 
+import com.carbon.prolocker.core.utils.SafeSettings
+import com.carbon.prolocker.core.ui.centeredMaxWidth
+import com.carbon.prolocker.core.ui.Adaptive
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -177,7 +180,7 @@ fun BackupPermissionGate(
                 shape = RoundedCornerShape(16.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = ProLockerPrimary),
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .fillMaxWidth().centeredMaxWidth(Adaptive.ButtonMaxWidth)
                     .height(48.dp)
             ) {
                 Text(
@@ -194,11 +197,11 @@ fun BackupPermissionGate(
                     val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
                         data = Uri.parse("package:${context.packageName}")
                     }
-                    context.startActivity(intent)
+                    SafeSettings.open(context, intent)
                 },
                 shape = RoundedCornerShape(16.dp),
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .fillMaxWidth().centeredMaxWidth(Adaptive.ButtonMaxWidth)
                     .height(48.dp)
             ) {
                 Text(

@@ -1,5 +1,8 @@
 package com.carbon.prolocker.feature.hidefile.ui
 
+import com.carbon.prolocker.core.utils.SafeSettings
+import com.carbon.prolocker.core.ui.centeredMaxWidth
+import com.carbon.prolocker.core.ui.Adaptive
 import android.Manifest
 import android.content.Intent
 import android.net.Uri
@@ -82,10 +85,10 @@ fun StoragePermissionGate(
                     addCategory("android.intent.category.DEFAULT")
                     data = Uri.parse("package:${storage.context.packageName}")
                 }
-                allFilesLauncher.launch(intent)
+                SafeSettings.launch(allFilesLauncher, context, intent)
             } catch (_: Exception) {
                 try {
-                    allFilesLauncher.launch(Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION))
+                    SafeSettings.launch(allFilesLauncher, context, Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION))
                 } catch (_: Exception) {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                         runtimeLauncher.launch(
@@ -174,7 +177,7 @@ fun StoragePermissionGate(
                 shape = RoundedCornerShape(16.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = ProLockerPrimary),
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .fillMaxWidth().centeredMaxWidth(Adaptive.ButtonMaxWidth)
                     .height(48.dp)
             ) {
                 Text(
@@ -191,11 +194,11 @@ fun StoragePermissionGate(
                     val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
                         data = Uri.parse("package:${context.packageName}")
                     }
-                    context.startActivity(intent)
+                    SafeSettings.open(context, intent)
                 },
                 shape = RoundedCornerShape(16.dp),
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .fillMaxWidth().centeredMaxWidth(Adaptive.ButtonMaxWidth)
                     .height(48.dp)
             ) {
                 Text(
@@ -234,10 +237,10 @@ class StoragePermissionRequester(
                     addCategory("android.intent.category.DEFAULT")
                     data = Uri.parse("package:${storage.context.packageName}")
                 }
-                allFilesLauncher.launch(intent)
+                SafeSettings.launch(allFilesLauncher, storage.context, intent)
             } catch (_: Exception) {
                 try {
-                    allFilesLauncher.launch(Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION))
+                    SafeSettings.launch(allFilesLauncher, storage.context, Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION))
                 } catch (_: Exception) {
                     launchRuntimePermissions()
                 }

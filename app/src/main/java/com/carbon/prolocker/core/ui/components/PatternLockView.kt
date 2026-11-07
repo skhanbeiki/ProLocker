@@ -20,6 +20,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import com.carbon.prolocker.core.ui.Adaptive
+import com.carbon.prolocker.core.ui.isTablet
+import androidx.compose.foundation.layout.width
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
@@ -104,7 +107,8 @@ fun PatternLockView(
 
     Box(
         modifier = Modifier
-            .fillMaxWidth(0.75f)
+            // Phones: 75% of the width. Tablets: a fixed, phone-sized grid (75% of a tablet is far too big).
+            .then(if (isTablet()) Modifier.width(Adaptive.LockInputMaxWidth) else Modifier.fillMaxWidth(0.75f))
             .aspectRatio(1f)
             .pointerInput(Unit) {
                 var lastRawPosition: Offset? = null

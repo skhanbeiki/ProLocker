@@ -372,7 +372,11 @@ class LockService : Service(), OnBackPressedDispatcherOwner, ActivityResultRegis
         instance = this
         overlayManager = OverlayWindowManager(this)
         // A service that was started for something other than a show must not linger forever.
-        scheduleIdleStop()
+        try {
+            scheduleIdleStop()
+        } catch (e: RuntimeException) {
+            Log.e(TAG, "scheduleIdleStop failed in onCreate", e)
+        }
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -703,7 +707,12 @@ class LockService : Service(), OnBackPressedDispatcherOwner, ActivityResultRegis
         }
         val pkg = currentPackageName
         val wasShowing = isShowing
-        overlayManager.dismiss()
+        try {
+            overlayManager.dismiss()
+        } catch (e: RuntimeException) {
+            // DeadSystemException (wrapped) while the system server is going away: nothing left to clean.
+            Log.e(TAG, "overlay dismiss failed in onDestroy", e)
+        }
         isShowing = false
         showingPackageName = null
         currentPackageName = null

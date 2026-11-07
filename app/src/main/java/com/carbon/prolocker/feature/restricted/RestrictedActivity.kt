@@ -39,7 +39,12 @@ class RestrictedActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        // Phones stay portrait; tablets follow the device rotation.
+        requestedOrientation = if (resources.configuration.smallestScreenWidthDp >= 600) {
+            ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+        } else {
+            ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        }
 
         val destination = intent.getStringExtra(EXTRA_DESTINATION) ?: "backgrounds"
         RestrictedModeManager.enterRestrictedMode(destination)

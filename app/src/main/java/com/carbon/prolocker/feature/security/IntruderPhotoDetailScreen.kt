@@ -1,5 +1,6 @@
 package com.carbon.prolocker.feature.security
 
+import com.carbon.prolocker.core.ui.isTablet
 import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
@@ -157,8 +158,8 @@ fun IntruderPhotoDetailScreen(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .heightIn(min = 300.dp)
-                        .aspectRatio(1f)
+                        // Tablets: a fixed-height viewer instead of a square as wide as the screen.
+                        .then(if (isTablet()) Modifier.height(520.dp) else Modifier.heightIn(min = 300.dp).aspectRatio(1f))
                         .clipToBounds()
                         .background(Color.Black)
                         .pointerInput(Unit) {

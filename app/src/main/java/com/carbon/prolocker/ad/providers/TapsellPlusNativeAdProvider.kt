@@ -1,5 +1,7 @@
 package com.carbon.prolocker.ad.providers
 
+import com.carbon.prolocker.ad.NativeAdImageRounding
+
 import android.app.Activity
 import android.content.Context
 import android.os.Handler
@@ -116,6 +118,7 @@ class TapsellPlusNativeAdProvider(override val providerName: String = "tapsell")
             .inflate(layoutRes, container, false) as NativeAdViewContainer
 
         container.addView(adContainer)
+        NativeAdImageRounding.apply(adContainer)
 
         val logo = adContainer.findViewById<ImageView?>(R.id.tapsell_native_ad_logo)
         val title = adContainer.findViewById<TextView?>(R.id.tapsell_native_ad_title)

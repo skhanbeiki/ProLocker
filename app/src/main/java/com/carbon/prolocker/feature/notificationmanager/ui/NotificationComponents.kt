@@ -85,7 +85,7 @@ object NmAppInfoCache {
             val pm = context.packageManager
             val info = pm.getApplicationInfo(packageName, 0)
             Entry(pm.getApplicationLabel(info).toString(), pm.getApplicationIcon(info).toSafeBitmap(96))
-        } catch (_: Exception) {
+        } catch (_: Throwable) {
             Entry(packageName, null)
         }
         synchronized(cache) { cache.put(packageName, entry) }

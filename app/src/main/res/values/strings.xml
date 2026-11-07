@@ -522,6 +522,7 @@
     <string name="notification_manager">Notification Manager</string>
     <string name="notification_manager_desc">Hide notifications from other apps so their content stays private.</string>
     <string name="notification_manager_subtitle">Hide other apps\' notifications</string>
+    <string name="badge_new">New</string>
     <string name="quick_private_browser">Private browser</string>
     <string name="quick_notification_manager">Notifications</string>
     <string name="feature_coming_soon">Coming soon</string>

@@ -16,7 +16,8 @@ fun Drawable?.toSafeBitmap(maxSize: Int = 128): ImageBitmap? {
         val width = intrinsicWidth.coerceIn(1, maxSize)
         val height = intrinsicHeight.coerceIn(1, maxSize)
         toBitmap(width, height).asImageBitmap()
-    } catch (_: Exception) {
+    } catch (_: Throwable) {
+        // Also OutOfMemoryError and vendor icon customizer errors ("width and height must be > 0").
         null
     }
 }
@@ -31,7 +32,8 @@ fun Drawable?.toSafeBitmap(width: Int, height: Int): Bitmap? {
     val safeHeight = height.coerceIn(1, 512)
     return try {
         toBitmap(safeWidth, safeHeight)
-    } catch (_: Exception) {
+    } catch (_: Throwable) {
+        // Also OutOfMemoryError and vendor icon customizer errors ("width and height must be > 0").
         null
     }
 }

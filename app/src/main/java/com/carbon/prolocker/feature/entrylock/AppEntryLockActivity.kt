@@ -1,5 +1,8 @@
 package com.carbon.prolocker.feature.entrylock
 
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.Row
+import com.carbon.prolocker.core.ui.isTabletLandscape
 import android.os.Bundle
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
@@ -107,6 +110,10 @@ class AppEntryLockActivity : FragmentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // The manifest locks phones to portrait; tablets follow the device rotation (side-by-side layout).
+        if (resources.configuration.smallestScreenWidthDp >= 600) {
+            requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+        }
         if (!com.carbon.prolocker.BuildConfig.DEBUG) {
             window.setFlags(
                 WindowManager.LayoutParams.FLAG_SECURE,
@@ -226,17 +233,12 @@ fun EntryLockContent(
             .fillMaxSize()
             .background(ProLockerBackground)
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .systemBarsPadding(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceBetween
-        ) {
+        // Blocks of the lock screen. Phones (and portrait tablets) stack them in one column exactly as before;
+        // landscape tablets put the guide text and ads beside the PIN pad / pattern instead of one tall column.
+        val headerBlock: @Composable (Modifier) -> Unit = { weightModifier ->
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(0.3f),
+                modifier = weightModifier
+                    .fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 // With a top ad, the guide text sits at the bottom of this area, right above the ad.
                 verticalArrangement = if (showTopAd) Arrangement.Bottom else Arrangement.Center
@@ -284,7 +286,8 @@ fun EntryLockContent(
                     }
                 }
             }
-
+        }
+        val topAdBlock: @Composable () -> Unit = {
             // Top ad: placed under the guide text, above the pattern / PIN.
             if (showTopAd && adManager != null) {
                 val isBanner = lockScreenAdPlace == "topBanner"
@@ -305,11 +308,11 @@ fun EntryLockContent(
                     )
                 }
             }
-
+        }
+        val inputBlock: @Composable (Modifier) -> Unit = { weightModifier ->
             Box(
-                modifier = Modifier
+                modifier = weightModifier
                     .fillMaxWidth()
-                    .weight(0.7f)
                     .padding(horizontal = 16.dp),
                 contentAlignment = Alignment.Center
             ) {
@@ -412,7 +415,8 @@ fun EntryLockContent(
                     }
                 }
             }
-
+        }
+        val bottomBlock: @Composable () -> Unit = {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -445,6 +449,41 @@ fun EntryLockContent(
                     }
                 }
             }
+        }
+        if (isTabletLandscape()) {
+            Row(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .systemBarsPadding()
+                    .padding(horizontal = 32.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    headerBlock(Modifier)
+                    topAdBlock()
+                    bottomBlock()
+                }
+                inputBlock(Modifier.weight(1f).fillMaxHeight())
+            }
+        } else {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .systemBarsPadding(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.SpaceBetween
+        ) {
+            headerBlock(Modifier.weight(0.3f))
+            topAdBlock()
+            inputBlock(Modifier.weight(0.7f))
+            bottomBlock()
+        }
         }
 
         if (showForgotDialog) {

@@ -150,6 +150,7 @@ class PrivateBrowserActivity : ComponentActivity() {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         applySecureFlag(repository.settings.value.secureScreen)
+        com.carbon.prolocker.core.ui.NewFeatureBadges.markSeen(this, com.carbon.prolocker.core.ui.NewFeatureBadges.PRIVATE_BROWSER)
 
         // A previous session that was killed before it could clean up is wiped now.
         if (repository.hasPendingCleanup) {

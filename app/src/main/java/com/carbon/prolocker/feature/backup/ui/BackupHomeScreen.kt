@@ -1,5 +1,6 @@
 package com.carbon.prolocker.feature.backup.ui
 
+import com.carbon.prolocker.core.ui.adaptiveGridCells
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -251,7 +252,7 @@ fun BackupHomeScreen(
         ) {
             // 2-Column Grid
             LazyVerticalGrid(
-                columns = GridCells.Fixed(2),
+                columns = adaptiveGridCells(phoneColumns = 2, tabletMinCellSize = 200.dp),
                 contentPadding = PaddingValues(horizontal = 20.dp, vertical = 12.dp),
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp),

@@ -1,5 +1,6 @@
 package com.carbon.prolocker.feature.hidefile.ui
 
+import com.carbon.prolocker.core.ui.adaptiveGridCells
 import android.content.res.Configuration
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -207,7 +208,7 @@ fun HideFilesScreen(
                     .graphicsLayer { alpha = contentAlpha }
             ) {
                 LazyVerticalGrid(
-                    columns = GridCells.Fixed(2),
+                    columns = adaptiveGridCells(phoneColumns = 2, tabletMinCellSize = 170.dp),
                     modifier = Modifier.fillMaxSize(),
                     contentPadding = PaddingValues(start = 20.dp, end = 20.dp, top = 16.dp, bottom = 24.dp),
                     horizontalArrangement = Arrangement.spacedBy(16.dp),

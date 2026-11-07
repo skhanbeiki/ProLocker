@@ -1,5 +1,9 @@
 package com.carbon.prolocker.feature.callblocker.ui
 
+import com.carbon.prolocker.core.ui.adaptiveGridHorizontalArrangement
+import com.carbon.prolocker.core.ui.adaptiveStaggeredCells
+import androidx.compose.foundation.lazy.staggeredgrid.items
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
@@ -447,18 +451,22 @@ fun BlockedRulesTabContent(
             )
         }
     } else {
-        LazyColumn(
+        LazyVerticalStaggeredGrid(
+            columns = adaptiveStaggeredCells(),
             contentPadding = PaddingValues(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 80.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp),
+            verticalItemSpacing = 10.dp,
+            horizontalArrangement = adaptiveGridHorizontalArrangement(),
             modifier = Modifier.fillMaxSize()
         ) {
             items(filtered, key = { it.id }) { rule ->
+Column(modifier = Modifier.fillMaxWidth()) {
                 BlockedRuleRow(
                     rule = rule,
                     onToggle = { onToggleRule(rule) },
                     onDelete = { onDeleteRule(rule) }
                 )
             }
+}
         }
     }
 }
@@ -615,12 +623,15 @@ fun BlockedHistoryTabContent(
                 )
             }
         } else {
-            LazyColumn(
+            LazyVerticalStaggeredGrid(
+                columns = adaptiveStaggeredCells(),
                 contentPadding = PaddingValues(start = 20.dp, end = 20.dp, bottom = 24.dp),
-                verticalArrangement = Arrangement.spacedBy(10.dp),
+                verticalItemSpacing = 10.dp,
+                horizontalArrangement = adaptiveGridHorizontalArrangement(),
                 modifier = Modifier.fillMaxSize()
             ) {
                 items(filtered, key = { it.id }) { item ->
+Column(modifier = Modifier.fillMaxWidth()) {
                     Surface(
                         color = MaterialTheme.colorScheme.surfaceVariant,
                         shape = RoundedCornerShape(20.dp),
@@ -672,6 +683,7 @@ fun BlockedHistoryTabContent(
                         }
                     }
                 }
+}
             }
         }
     }

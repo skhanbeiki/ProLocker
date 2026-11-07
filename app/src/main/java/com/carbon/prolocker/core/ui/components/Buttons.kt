@@ -1,5 +1,7 @@
 package com.carbon.prolocker.core.ui.components
 
+import com.carbon.prolocker.core.ui.Adaptive
+import com.carbon.prolocker.core.ui.centeredMaxWidth
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -25,6 +27,8 @@ fun PrimaryButton(
         onClick = onClick,
         modifier = modifier
             .fillMaxWidth()
+            // Natural width on tablets instead of spanning the whole screen.
+            .centeredMaxWidth(Adaptive.ButtonMaxWidth)
             .height(56.dp),
         enabled = enabled,
         shape = RoundedCornerShape(16.dp),
@@ -59,6 +63,8 @@ fun SecondaryButton(
         onClick = onClick,
         modifier = modifier
             .fillMaxWidth()
+            // Natural width on tablets instead of spanning the whole screen.
+            .centeredMaxWidth(Adaptive.ButtonMaxWidth)
             .height(56.dp),
         enabled = enabled,
         shape = RoundedCornerShape(16.dp),
@@ -77,3 +83,4 @@ fun SecondaryButton(
         )
     }
 }
+

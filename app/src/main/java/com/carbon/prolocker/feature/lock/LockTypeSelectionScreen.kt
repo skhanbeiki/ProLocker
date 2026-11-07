@@ -1,5 +1,7 @@
 package com.carbon.prolocker.feature.lock
 
+import androidx.compose.foundation.layout.Arrangement
+import com.carbon.prolocker.core.ui.AdaptiveCardGrid
 import android.content.res.Configuration
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
@@ -73,6 +75,8 @@ fun LockTypeSelectionScreen(
 
             Spacer(modifier = Modifier.height(32.dp))
 
+            // Phones: the two options stack as before. Tablets: they sit side by side.
+            AdaptiveCardGrid(phoneArrangement = Arrangement.spacedBy(16.dp)) {
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -121,8 +125,6 @@ fun LockTypeSelectionScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
-
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -169,6 +171,8 @@ fun LockTypeSelectionScreen(
                         )
                     }
                 }
+            }
+
             }
 
             Spacer(modifier = Modifier.weight(1f))

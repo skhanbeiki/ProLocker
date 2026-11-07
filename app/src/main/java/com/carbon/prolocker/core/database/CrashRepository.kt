@@ -103,6 +103,10 @@ class CrashRepository(
 
             val bodyJson = Json.encodeToString(request)
 
+            try {
+                crashDao.trimOldCrashes()
+            } catch (_: Exception) {
+            }
             crashDao.insertCrash(
                 CrashEntity(
                     uuid = uuid,
@@ -110,8 +114,8 @@ class CrashRepository(
                     body = bodyJson
                 )
             )
-        } catch (_e: Exception) {
-            // Do not crash the app while handling a crash
+        } catch (_e: Throwable) {
+            // Do not crash the app while handling a crash (also a full disk: SQLiteFullException).
         }
     }
 

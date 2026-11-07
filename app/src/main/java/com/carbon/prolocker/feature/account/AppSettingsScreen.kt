@@ -1,5 +1,10 @@
 package com.carbon.prolocker.feature.account
 
+import com.carbon.prolocker.core.utils.SafeSettings
+import com.carbon.prolocker.core.ui.adaptiveGridHorizontalArrangement
+import com.carbon.prolocker.core.ui.adaptiveStaggeredCells
+import androidx.compose.foundation.lazy.staggeredgrid.items
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import android.content.Intent
 import android.content.res.Configuration
 import androidx.compose.foundation.clickable
@@ -145,23 +150,26 @@ fun AppSettingsScreen(
             )
         }
     ) { innerPadding ->
-        LazyColumn(
+        LazyVerticalStaggeredGrid(
+            columns = adaptiveStaggeredCells(),
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
                 .padding(horizontal = 20.dp),
-            verticalArrangement = Arrangement.spacedBy(24.dp)
+            verticalItemSpacing = 24.dp,
+            horizontalArrangement = adaptiveGridHorizontalArrangement()
         ) {
             item {
+Column(modifier = Modifier.fillMaxWidth()) {
                 Text(
                     text = stringResource(R.string.general_settings),
                     style = MaterialTheme.typography.titleMedium,
                     color = ProLockerPrimary,
                     modifier = Modifier.padding(start = 4.dp)
                 )
-            }
+            
+Spacer(modifier = Modifier.height(24.dp))
 
-            item {
                 Card(
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
                     shape = RoundedCornerShape(20.dp),
@@ -204,17 +212,19 @@ fun AppSettingsScreen(
                     }
                 }
             }
+}
 
             item {
+Column(modifier = Modifier.fillMaxWidth()) {
                 Text(
                     text = stringResource(R.string.app_settings),
                     style = MaterialTheme.typography.titleMedium,
                     color = ProLockerPrimary,
                     modifier = Modifier.padding(start = 4.dp)
                 )
-            }
+            
+Spacer(modifier = Modifier.height(24.dp))
 
-            item {
                 Card(
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
                     shape = RoundedCornerShape(20.dp),
@@ -365,17 +375,19 @@ fun AppSettingsScreen(
                     }
                 }
             }
+}
 
             item {
+Column(modifier = Modifier.fillMaxWidth()) {
                 Text(
                     text = stringResource(R.string.system_settings),
                     style = MaterialTheme.typography.titleMedium,
                     color = ProLockerPrimary,
                     modifier = Modifier.padding(start = 4.dp)
                 )
-            }
+            
+Spacer(modifier = Modifier.height(24.dp))
 
-            item {
                 Card(
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
                     shape = RoundedCornerShape(20.dp),
@@ -417,7 +429,7 @@ fun AppSettingsScreen(
                                 .clickable {
                                     if (!isInspection) {
                                         val intent = Intent(android.provider.Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
-                                        context.startActivity(intent)
+                                        SafeSettings.open(context, intent)
                                     }
                                 }
                                 .padding(horizontal = 16.dp, vertical = 14.dp),
@@ -442,17 +454,19 @@ fun AppSettingsScreen(
                     }
                 }
             }
+}
 
             item {
+Column(modifier = Modifier.fillMaxWidth()) {
                 Text(
                     text = stringResource(R.string.protection_settings),
                     style = MaterialTheme.typography.titleMedium,
                     color = ProLockerPrimary,
                     modifier = Modifier.padding(start = 4.dp)
                 )
-            }
+            
+Spacer(modifier = Modifier.height(24.dp))
 
-            item {
                 Card(
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
                     shape = RoundedCornerShape(20.dp),
@@ -466,7 +480,7 @@ fun AppSettingsScreen(
                                     if (!isInspection) {
                                         val deviceAdminManager = com.carbon.prolocker.core.security.DeviceAdminManager(context)
                                         if (!deviceAdminManager.isAdminActive()) {
-                                            context.startActivity(deviceAdminManager.getActivationIntent())
+                                            SafeSettings.open(context, deviceAdminManager.getActivationIntent())
                                         } else {
                                             deviceAdminManager.removeAdmin()
                                             refreshProtectionStates()
@@ -488,7 +502,7 @@ fun AppSettingsScreen(
                                     if (!isInspection) {
                                         val deviceAdminManager = com.carbon.prolocker.core.security.DeviceAdminManager(context)
                                         if (!deviceAdminManager.isAdminActive()) {
-                                            context.startActivity(deviceAdminManager.getActivationIntent())
+                                            SafeSettings.open(context, deviceAdminManager.getActivationIntent())
                                         } else {
                                             deviceAdminManager.removeAdmin()
                                             refreshProtectionStates()
@@ -519,7 +533,7 @@ fun AppSettingsScreen(
                                     if (!isInspection) {
                                         if (isAccessibilityActive) {
                                             val intent = Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS)
-                                            context.startActivity(intent)
+                                            SafeSettings.open(context, intent)
                                         } else {
                                             showAccessibilityDisclosure = true
                                         }
@@ -562,8 +576,10 @@ fun AppSettingsScreen(
                     }
                 }
             }
+}
 
             item {
+Column(modifier = Modifier.fillMaxWidth()) {
                 Card(
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
                     shape = RoundedCornerShape(20.dp),
@@ -597,6 +613,7 @@ fun AppSettingsScreen(
                     }
                 }
             }
+}
         }
 
         if (showThemeDialog) {
@@ -721,7 +738,7 @@ fun AppSettingsScreen(
                 onAccept = {
                     showAccessibilityDisclosure = false
                     val intent = Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS)
-                    context.startActivity(intent)
+                    SafeSettings.open(context, intent)
                 },
                 onDecline = {
                     showAccessibilityDisclosure = false

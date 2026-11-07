@@ -34,7 +34,7 @@ object AppIconCache {
                 entry
             } catch (_: PackageManager.NameNotFoundException) {
                 null
-            } catch (_: Exception) {
+            } catch (_: Throwable) {
                 null
             }
         }

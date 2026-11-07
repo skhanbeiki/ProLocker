@@ -1,5 +1,13 @@
 package com.carbon.prolocker.feature.notificationmanager.ui
 
+import com.carbon.prolocker.core.ui.AdaptiveCardGrid
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
+import com.carbon.prolocker.core.ui.adaptiveGridHorizontalArrangement
+import com.carbon.prolocker.core.ui.adaptiveStaggeredCells
+import androidx.compose.foundation.lazy.staggeredgrid.items
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
+import com.carbon.prolocker.core.ui.Adaptive
+import com.carbon.prolocker.core.ui.centeredMaxWidth
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -112,7 +120,7 @@ fun NotificationHomeScreen(
                     Button(
                         onClick = { onToggle(true) },
                         modifier = Modifier
-                            .fillMaxWidth()
+                            .fillMaxWidth().centeredMaxWidth(Adaptive.ButtonMaxWidth)
                             .navigationBarsPadding()
                             .padding(16.dp)
                             .height(54.dp),
@@ -126,31 +134,44 @@ fun NotificationHomeScreen(
         },
         containerColor = MaterialTheme.colorScheme.background
     ) { padding ->
-        LazyColumn(
+        LazyVerticalStaggeredGrid(
+            columns = adaptiveStaggeredCells(),
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding),
             contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 24.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            verticalItemSpacing = 12.dp,
+            horizontalArrangement = adaptiveGridHorizontalArrangement()
         ) {
             if (!setUp) {
-                item { IntroSection() }
+                item(span = StaggeredGridItemSpan.FullLine) {
+Column(modifier = Modifier.fillMaxWidth()) { IntroSection() }
+}
             } else {
-                item { ToggleCard(enabled = enabled, onToggle = onToggle) }
+                item {
+Column(modifier = Modifier.fillMaxWidth()) { ToggleCard(enabled = enabled, onToggle = onToggle) }
+}
                 if (enabled && !hasAccess) {
-                    item { AccessWarningCard(onGrantAccess) }
+                    item {
+Column(modifier = Modifier.fillMaxWidth()) { AccessWarningCard(onGrantAccess) }
+}
                 }
                 item {
+Column(modifier = Modifier.fillMaxWidth()) {
                     if (hiddenApps.isEmpty()) {
                         SelectAppsCard(onClick = onSelectApps)
                     } else {
                         HiddenAppsRow(hiddenApps = hiddenApps, onClick = onManageApps)
                     }
                 }
+}
                 if (ad != null) {
-                    item(key = "native_ad") { ad() }
+                    item(key = "native_ad") {
+Column(modifier = Modifier.fillMaxWidth()) { ad() }
+}
                 }
-                item {
+                item(span = StaggeredGridItemSpan.FullLine) {
+Column(modifier = Modifier.fillMaxWidth()) {
                     Text(
                         text = stringResource(R.string.nm_notifications),
                         style = MaterialTheme.typography.titleSmall,
@@ -159,8 +180,10 @@ fun NotificationHomeScreen(
                         modifier = Modifier.padding(start = 4.dp, top = 8.dp)
                     )
                 }
+}
                 if (summaries.isEmpty()) {
-                    item {
+                    item(span = StaggeredGridItemSpan.FullLine) {
+Column(modifier = Modifier.fillMaxWidth()) {
                         NmCard {
                             NmEmptyState(
                                 icon = Icons.Outlined.MarkChatUnread,
@@ -169,10 +192,13 @@ fun NotificationHomeScreen(
                             )
                         }
                     }
+}
                 } else {
                     items(summaries, key = { it.packageName }) { summary ->
+Column(modifier = Modifier.fillMaxWidth()) {
                         AppSummaryRow(summary = summary, time = formatTime(summary.lastTime), onClick = { onOpenApp(summary.packageName) })
                     }
+}
                 }
             }
         }
@@ -430,6 +456,8 @@ private fun IntroSection() {
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(start = 4.dp, top = 8.dp)
         )
+        // Phones: the cards stack as before. Tablets: they share the width in columns.
+        AdaptiveCardGrid(phoneArrangement = Arrangement.spacedBy(12.dp)) {
         IntroCard(
             title = stringResource(R.string.nm_intro_1_title),
             text = stringResource(R.string.nm_intro_1_text)
@@ -442,6 +470,7 @@ private fun IntroSection() {
             title = stringResource(R.string.nm_intro_3_title),
             text = stringResource(R.string.nm_intro_3_text)
         ) { StatusBarIllustration() }
+        }
     }
 }
 
